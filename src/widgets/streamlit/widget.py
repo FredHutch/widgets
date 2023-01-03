@@ -1,6 +1,8 @@
-from typing import List
+from pathlib import Path
+from typing import List, Union
 from widgets.streamlit.resources.base import StreamlitResource
 from widgets.base.exceptions import WidgetConfigurationException
+from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import WidgetInitializationException
 
 class StreamlitWidget:
@@ -68,4 +70,36 @@ class StreamlitWidget:
 
     def extra_functions(self) -> None:
         """Add generalized functionality to the widget."""
+        pass
+
+    def to_html(self, fp:Union[Path, None]=None) -> Union[None, str]:
+        """
+        Create an HTML file which will load this widget using the stlite
+        library, based on pyodide.
+        If no path is provided, return a string representation.
+        """
+
+        # Create the HTML as a string
+        html = self._render_html()
+
+        # If a path was not provided
+        if fp is None:
+
+            # Return the string
+            return html
+
+        # Otherwise
+        else:
+
+            if not isinstance(fp, Path):
+                raise WidgetFunctionException("The argument of to_html() must be a Path or None")
+
+
+            # Write out to the file
+            with open(fp, "w") as handle:
+                handle.write(html)
+
+    def _render_html(self):
+        """Render the widget as HTML"""
+
         pass

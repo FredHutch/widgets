@@ -2,7 +2,7 @@ import pandas as pd
 import streamlit as st
 from widgets.streamlit.widget import StreamlitWidget
 from widgets.streamlit.resources.dataframe import DataFrame
-from widgets.streamlit.resources.value import String, Float, Integer
+from widgets.streamlit.resources.value import String
 import plotly.express as px
 
 

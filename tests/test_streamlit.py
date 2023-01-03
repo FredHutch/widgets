@@ -1,11 +1,11 @@
-import os
 import pandas as pd
 import unittest
 from widgets.streamlit.resources.dataframe import DataFrame
 from widgets.streamlit.resources.value import String, Integer, Float
+from widgets.streamlit.widget import StreamlitWidget
 
 
-class TestStreamlit(unittest.TestCase):
+class TestStreamlitResources(unittest.TestCase):
 
     def test_dataframe(self):
 
@@ -73,6 +73,34 @@ class TestStreamlit(unittest.TestCase):
 
         # Check the saved value
         self.assertEqual(s.default, 1.1, "Saved float does not match")
+
+
+class StreamlitWidget(StreamlitWidget):
+    """Simple widget used for testing purposes"""
+
+    resources = [
+        String(id="s", default="s", label="String"),
+        String(id="i", default=0, label="Integer"),
+        String(id="f", default=0.0, label="Float")
+    ]
+
+    def viz(self):
+
+        pass
+
+
+class TestStreamlitWidget(unittest.TestCase):
+
+    def test_html(self):
+
+        # Create a simple widget
+        w = StreamlitWidget()
+
+        # Render HTML as a string
+        html = w.to_html()
+
+        self.assertIsInstance(html, str)
+        self.assertGreater(len(html), 0)
 
 
 if __name__ == '__main__':
