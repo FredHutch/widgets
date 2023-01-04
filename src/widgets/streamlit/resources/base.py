@@ -34,11 +34,11 @@ class StreamlitResource:
         value of this object.
         """
 
-        # Set up the default value
-        self._setup_default(default)
-
         # Set up the id, label, and help attributes
         self._setup_attributes(id, label, help)
+
+        # Set up the default value
+        self._setup_default(default)
 
         # If any extra setup behavior is needed, invoke it here
         self._setup_extra()
@@ -51,7 +51,7 @@ class StreamlitResource:
 
             # Make sure that the default value conforms to the expected type
             if not isinstance(default, self.datatype):
-                msg = f"Default value for resource '{self.id}' does not match expected type {self.datatype}"
+                msg = f"Resource {self.id}: Default value {self.default} ({str(type(self.default))}) for  does not match expected type {self.datatype}"
                 raise ResourceConfigurationException(msg)
 
             # Attach the value to this object

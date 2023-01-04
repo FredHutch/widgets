@@ -80,8 +80,8 @@ class StreamlitWidget(StreamlitWidget):
 
     resources = [
         String(id="s", default="s", label="String"),
-        String(id="i", default=0, label="Integer"),
-        String(id="f", default=0.0, label="Float")
+        Integer(id="i", default=0, label="Integer"),
+        Float(id="f", default=0.0, label="Float")
     ]
 
     def viz(self):
