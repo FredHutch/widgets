@@ -134,7 +134,7 @@ class StreamlitWidget:
         )
 
         # Get the template being used for this HTML
-        template = env.get_template("streamlit_single.html")
+        template = env.get_template("streamlit_single.html.j2")
 
         # Render the template
         html = template.render(
