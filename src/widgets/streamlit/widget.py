@@ -1,9 +1,13 @@
+from inspect import getsource
+from jinja2 import Environment, PackageLoader
+import json
 from pathlib import Path
 from typing import List, Union
 from widgets.streamlit.resources.base import StreamlitResource
 from widgets.base.exceptions import WidgetConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import WidgetInitializationException
+
 
 class StreamlitWidget:
     """
@@ -12,6 +16,14 @@ class StreamlitWidget:
 
     resources:List[StreamlitResource] = list()
     data = dict()
+    requirements:List[str] = ["widgets"]
+    imports:List[str] = [
+        "import streamlit as st"
+        "from widgets.streamlit.resources.dataframe import DataFrame",
+        "from widgets.streamlit.resources.value import String, Integer, Float",
+        "from widgets.streamlit.widget import StreamlitWidget"
+    ]
+    extra_imports:List[str] = []
 
     def __init__(self, data=dict()) -> None:
         """
@@ -99,7 +111,41 @@ class StreamlitWidget:
             with open(fp, "w") as handle:
                 handle.write(html)
 
-    def _render_html(self):
+    def _render_html(
+        self,
+        title="Widget",
+        stlite_ver="0.22.1",
+        footer="Made with widgets-lib (github.com/FredHutch/widgets)"
+    ):
         """Render the widget as HTML"""
 
-        pass
+        # Get the source code for this widget
+        widget_source = getsource(self.__class__)
+
+        # Get the data for this widget, encoded as JSON
+        data = json.dumps({
+            resource.id: resource.to_json(self.data[resource.id])
+            for resource in self.resources
+        })
+
+        # Set up the jinja2 environment
+        env = Environment(
+            loader=PackageLoader("widgets")
+        )
+
+        # Get the template being used for this HTML
+        template = env.get_template("streamlit_single.html")
+
+        # Render the template
+        html = template.render(
+            title=title,
+            stlite_ver=stlite_ver,
+            footer=footer,
+            requirements=self.requirements,
+            imports="\n".join(self.imports + self.extra_imports),
+            widget_source=widget_source,
+            widget_name=self.__class__.__name__,
+            data=data
+        )
+        
+        return html

@@ -77,3 +77,7 @@ class DataFrame(StreamlitResource):
                         self.uploader,
                         sep=self.sep
                     )
+
+    def to_json(self, d:pd.DataFrame):
+        """Return a JSON-compaitible representation of the DataFrame."""
+        return d.to_json(index=None)

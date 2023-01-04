@@ -83,3 +83,12 @@ class StreamlitResource:
         Should be overridden by each specific resource.
         """
         pass
+
+    def to_json(self, d):
+        """
+        Return a JSON-compatible representation of a value of this resource.
+        While this base method is extremely simple, it can be overridden
+        by resource types with more complex serialization.
+        """
+
+        return d
