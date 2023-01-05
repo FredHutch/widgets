@@ -18,6 +18,15 @@ class SimpleWidget(StreamlitWidget):
         String(id="y_col", default="y", label="Y-axis Column"),
         String(id="label_col", default="label", label="Label Column")
     ]
+    requirements = [
+        "widgets",
+        "pandas",
+        "plotly"
+    ]
+    extra_imports = [
+        "import pandas as pd",
+        "import plotly.express as px"
+    ]
 
     def viz(self):
 
