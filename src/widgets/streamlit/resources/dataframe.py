@@ -1,9 +1,9 @@
 import streamlit as st
 import pandas as pd
-from widgets.streamlit.resources.base import StreamlitResource
+from widgets.base.resource import Resource
 
 
-class DataFrame(StreamlitResource):
+class StDataFrame(Resource):
     """DataFrame resource used in a Streamlit-based widget."""
 
     datatype = pd.DataFrame

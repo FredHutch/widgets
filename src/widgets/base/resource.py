@@ -1,14 +1,16 @@
 from widgets.base.exceptions import ResourceConfigurationException
 
 
-class StreamlitResource:
+class Resource:
     """
-    Base class for all resources used by Streamlit-based apps.
+    Base class for all resources used by widgets.
 
     Attributes:
             id (str): The unique key used to store the resource in the widget `data` object.
             default: The default value for the resource, used if no saved value is present.
             datatype: The variable type returned by the `load()` method (should match the type of the default value).
+            label (str): Label displayed to the user for the resource
+            help (str): Help text describing the resource to the user
     """
 
     id:str = None
@@ -16,7 +18,6 @@ class StreamlitResource:
     datatype:type = None
     label:str = None
     help:str = None
-    widget_data = dict()
 
     def setup(
         self,
@@ -26,12 +27,7 @@ class StreamlitResource:
         help=""
     ) -> None:
         """
-        Set up the attributes which are used by all StreamlitResource objects.
-        Also attach the widget_data dictionary to this object.
-        If widget_data already contains a value for this resource, use that to override
-        the default attribute.
-        If widget_data does not yet have a value for this resource, assign the default
-        value of this object.
+        Set up the attributes which are used by all Resource objects.
         """
 
         # Set up the id, label, and help attributes

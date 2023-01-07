@@ -1,7 +1,7 @@
 import pandas as pd
 import unittest
-from widgets.streamlit.resources.dataframe import DataFrame
-from widgets.streamlit.resources.value import String, Integer, Float
+from widgets.streamlit.resources.dataframe import StDataFrame
+from widgets.streamlit.resources.value import StString, StInteger, StFloat
 from widgets.streamlit.widget import StreamlitWidget
 
 
@@ -11,7 +11,7 @@ class TestStreamlitResources(unittest.TestCase):
 
         df_default = pd.DataFrame(dict(a=[1, 2, 3], b=['a', 'b', 'c']))
 
-        df = DataFrame(
+        df = StDataFrame(
             id="test_dataframe",
             default=df_default
         )
@@ -28,7 +28,7 @@ class TestStreamlitResources(unittest.TestCase):
 
     def test_string(self):
 
-        s = String(
+        s = StString(
             id="test_string",
             default="default"
         )
@@ -44,7 +44,7 @@ class TestStreamlitResources(unittest.TestCase):
 
     def test_integer(self):
 
-        s = Integer(
+        s = StInteger(
             id="test_integer",
             default=0
         )
@@ -60,7 +60,7 @@ class TestStreamlitResources(unittest.TestCase):
 
     def test_float(self):
 
-        s = Float(
+        s = StFloat(
             id="test_float",
             default=0.0
         )
@@ -79,9 +79,9 @@ class StreamlitWidget(StreamlitWidget):
     """Simple widget used for testing purposes"""
 
     resources = [
-        String(id="s", default="s", label="String"),
-        Integer(id="i", default=0, label="Integer"),
-        Float(id="f", default=0.0, label="Float")
+        StString(id="s", default="s", label="String"),
+        StInteger(id="i", default=0, label="Integer"),
+        StFloat(id="f", default=0.0, label="Float")
     ]
 
     def viz(self):

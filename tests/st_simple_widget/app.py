@@ -1,15 +1,16 @@
 import pandas as pd
 import streamlit as st
 from widgets.streamlit.widget import StreamlitWidget
-from widgets.streamlit.resources.dataframe import DataFrame
+from widgets.streamlit.resources.dataframe import StDataFrame
 from widgets.streamlit.resources.value import String
 import plotly.express as px
 
 
 class SimpleWidget(StreamlitWidget):
+    """Simple widget used for testing."""
 
     resources = [
-        DataFrame(
+        StDataFrame(
             id="df",
             default=pd.DataFrame(dict(x=[], y=[], label=[])),
             label="Test CSV",

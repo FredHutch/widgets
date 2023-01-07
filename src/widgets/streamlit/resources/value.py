@@ -1,9 +1,9 @@
 import streamlit as st
-from widgets.streamlit.resources.base import StreamlitResource
+from widgets.base.resource import Resource
 from widgets.base.exceptions import ResourceConfigurationException
 
 
-class String(StreamlitResource):
+class StString(Resource):
     """String value resource used for Streamlit-based widgets."""
 
     datatype = str
@@ -44,7 +44,7 @@ class String(StreamlitResource):
             placeholder (str): (optional) An optional string displayed when the text input is empty
         
         Returns:
-            StreamlitResource: The instantiated resource object.
+            Resource: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -84,7 +84,7 @@ class String(StreamlitResource):
                 )
 
 
-class Integer(StreamlitResource):
+class StInteger(Resource):
     """Integer value resource used for Streamlit-based widgets."""
 
     datatype = int
@@ -125,7 +125,7 @@ class Integer(StreamlitResource):
             format (str):     (optional) Formatting f-string used for the input element
         
         Returns:
-            StreamlitResource: The instantiated resource object.
+            Resource: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -166,7 +166,7 @@ class Integer(StreamlitResource):
                 )
 
 
-class Float(StreamlitResource):
+class StFloat(Resource):
     """Integer value resource used for Streamlit-based widgets."""
 
     datatype = float
@@ -207,7 +207,7 @@ class Float(StreamlitResource):
             format (str):     (optional) Formatting f-string used for the input element
         
         Returns:
-            StreamlitResource: The instantiated resource object.
+            Resource: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -248,7 +248,7 @@ class Float(StreamlitResource):
                 )
 
 
-class SelectString(StreamlitResource):
+class StSelectString(Resource):
     """Select-string-value-from-list resource used for Streamlit-based widgets."""
 
     datatype = str
@@ -287,7 +287,7 @@ class SelectString(StreamlitResource):
             The default value will override the index value if they happen to differ.
         
         Returns:
-            StreamlitResource: The instantiated resource object.
+            Resource: The instantiated resource object.
         """
 
         # Set up the resource attributes
