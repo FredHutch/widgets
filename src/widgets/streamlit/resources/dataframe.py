@@ -80,4 +80,7 @@ class StDataFrame(Resource):
 
     def to_json(self, d:pd.DataFrame):
         """Return a JSON-compaitible representation of the DataFrame."""
-        return d.to_dict(orient="list")
+        if isinstance(d, pd.DataFrame):
+            return d.to_dict(orient="list")
+        else:
+            return d
