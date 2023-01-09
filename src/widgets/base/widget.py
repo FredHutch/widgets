@@ -15,18 +15,15 @@ class Widget:
     resources:List[Resource] = list()
     data = dict()
 
-    def __init__(self, data=dict()) -> 'Widget':
+    def __init__(self):
         """
         Set up the Widget object.
-        Optionally provide input data which will override the default values for each
-        of the resources defined by this widget.
+        Any values provided in the self.data object will be used to override
+        the default value of any resource with the corresponding key.
         """
 
-        if not isinstance(data, dict):
-            raise WidgetInitializationException(f"data must be a dict, not a {type(data)}")
-
-        # Attach the data provided at initialization
-        self.data = data
+        if not isinstance(self.data, dict):
+            raise WidgetInitializationException(f"self.data must be a dict, not a {type(self.data)}")
 
         # Iterate over each resource defined in the widget
         for resource in self.resources:
@@ -35,9 +32,9 @@ class Widget:
             if not isinstance(resource, Resource):
                 raise WidgetConfigurationException("All resources must be a derivative of Resource")
 
-            # If any data was provided at the time of initialization, use that to
+            # If any key exists in self.data, use that to
             # override the default value defined for the resource
-            resource._setup_default(data.get(resource.id))
+            resource._setup_default(self.data.get(resource.id))
 
             # Populate the initial state of the `data` object
             self.data[resource.id] = resource.default

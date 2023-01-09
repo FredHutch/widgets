@@ -98,10 +98,11 @@ class TestStreamlitWidget(unittest.TestCase):
         w_def = ExampleStreamlitWidget()
         self.assertEqual(w_def.data["s"], "s")
 
-        # Create a widget which overrides the default values
-        w_over = ExampleStreamlitWidget(dict(s="new_value"))
+        # Modify the widget class to override the default values
+        ExampleStreamlitWidget.data = dict(s="new_value")
+        w_over = ExampleStreamlitWidget()
         self.assertEqual(w_over.data["s"], "new_value")
-        
+
     def test_html(self):
         # Test if the to_html method returns a non-zero length string
 
