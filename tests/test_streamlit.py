@@ -75,7 +75,7 @@ class TestStreamlitResources(unittest.TestCase):
         self.assertEqual(s.default, 1.1, "Saved float does not match")
 
 
-class StreamlitWidget(StreamlitWidget):
+class ExampleStreamlitWidget(StreamlitWidget):
     """Simple widget used for testing purposes"""
 
     resources = [
@@ -91,10 +91,22 @@ class StreamlitWidget(StreamlitWidget):
 
 class TestStreamlitWidget(unittest.TestCase):
 
+    def test_import(self):
+        """Test whether the default resource values are overriden at widget initialization."""
+
+        # Create a widget with default values
+        w_def = ExampleStreamlitWidget()
+        self.assertEqual(w_def.data["s"], "s")
+
+        # Create a widget which overrides the default values
+        w_over = ExampleStreamlitWidget(dict(s="new_value"))
+        self.assertEqual(w_over.data["s"], "new_value")
+        
     def test_html(self):
+        # Test if the to_html method returns a non-zero length string
 
         # Create a simple widget
-        w = StreamlitWidget()
+        w = ExampleStreamlitWidget()
 
         # Render HTML as a string
         html = w.to_html()
