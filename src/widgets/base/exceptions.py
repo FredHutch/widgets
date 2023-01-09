@@ -16,3 +16,13 @@ class WidgetFunctionException(Exception):
 class ResourceConfigurationException(Exception):
     """Exception raised when a resource is not configured properly."""
     pass
+
+
+class CLIInvocationException(Exception):
+    """Exception raised when the CLI is not invoked properly."""
+    pass
+
+
+class CLIExecutionException(Exception):
+    """Exception raised when the CLI is not executed properly."""
+    pass

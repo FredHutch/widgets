@@ -1,9 +1,9 @@
+from inspect import getsource
+import json
 from pathlib import Path
 from typing import List, Union
-from widgets.streamlit.resources.base import StreamlitResource
-
-from widgets.base.exceptions import WidgetConfigurationException
-from widgets.base.exceptions import WidgetFunctionException
+from widgets.base.resource import Resource
+from widgets.base.exceptions import CLIExecutionException, WidgetConfigurationException
 from widgets.base.exceptions import WidgetInitializationException
 
 
@@ -15,7 +15,7 @@ class Widget:
     resources:List[Resource] = list()
     data = dict()
 
-    def __init__(self, data=dict()) -> None:
+    def __init__(self, data=dict()) -> 'Widget':
         """
         Set up the Widget object.
         Optionally provide input data which will override the default values for each
@@ -55,6 +55,13 @@ class Widget:
         self.viz()
         self.extra_functions()
 
+    def run_cli(self) -> None:
+        """
+        Entrypoint used to run the widget from the command line.
+        Should be overridden by each specific widget type.
+        """
+        self.run()
+
     def inputs(self) -> None:
         """Read in data from all of the resources defined in the widget."""
         
@@ -81,3 +88,27 @@ class Widget:
         """
 
         pass
+
+    def _data_to_json(self) -> str:
+        """Return the data saved in this widget as JSON."""
+
+        return json.dumps({
+            resource.id: resource.to_json(self.data[resource.id])
+            for resource in self.resources
+        })
+
+    def _source(self) -> str:
+        """Return the source code for this widget as a string."""
+
+        source = getsource(self.__class__)
+
+        # Backticks in the source code will cause errors in HTML
+        if "`" in source:
+            raise CLIExecutionException("Script may not contain backticks (`)")
+
+        return source
+
+    def _name(self) -> str:
+        """Return the name of this widget."""
+
+        return self.__class__.__name__

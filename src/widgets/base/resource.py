@@ -47,8 +47,13 @@ class Resource:
 
             # Make sure that the default value conforms to the expected type
             if not isinstance(default, self.datatype):
-                msg = f"Resource {self.id}: Default value {self.default} ({str(type(self.default))}) for  does not match expected type {self.datatype}"
-                raise ResourceConfigurationException(msg)
+
+                # Try to convert it to the expected type
+                try:
+                    default = self.datatype(default)
+                except:
+                    msg = f"Resource {self.id}: Default value {self.default} ({str(type(self.default))}) cannot be converted to expected type {self.datatype}"
+                    raise ResourceConfigurationException(msg)
 
             # Attach the value to this object
             self.default = default

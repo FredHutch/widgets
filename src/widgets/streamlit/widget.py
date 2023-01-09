@@ -1,31 +1,30 @@
-from inspect import getsource
+from tempfile import _TemporaryFileWrapper, NamedTemporaryFile, TemporaryFile
 from jinja2 import Environment, PackageLoader
-import json
 from pathlib import Path
-from typing import List, Union
-from widgets.streamlit.resources.base import StreamlitResource
+from streamlit.web.cli import _main_run
+from typing import IO, Any, Dict, List, Union
+from widgets.base.widget import Widget
+from widgets.base.resource import Resource
 from widgets.base.exceptions import WidgetConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import WidgetInitializationException
 
 
-class StreamlitWidget:
+class StreamlitWidget(Widget):
     """
     Base class used for building interactive widgets using Streamlit.
     """
 
-    resources:List[StreamlitResource] = list()
-    data = dict()
     requirements:List[str] = ["widgets"]
     imports:List[str] = [
-        "import streamlit as st"
-        "from widgets.streamlit.resources.dataframe import DataFrame",
-        "from widgets.streamlit.resources.value import String, Integer, Float",
+        "import streamlit as st",
+        "from widgets.streamlit.resources.dataframe import StDataFrame",
+        "from widgets.streamlit.resources.value import StString, StInteger, StFloat",
         "from widgets.streamlit.widget import StreamlitWidget"
     ]
     extra_imports:List[str] = []
 
-    def __init__(self, data=dict()) -> None:
+    def __init__(self, data=dict()) -> Widget:
         """
         Set up the StreamlitWidget object.
         Optionally provide input data which will override the default values for each
@@ -42,7 +41,7 @@ class StreamlitWidget:
         for resource in self.resources:
 
             # Make sure that the resource is a recognized type
-            if not isinstance(resource, StreamlitResource):
+            if not isinstance(resource, Resource):
                 raise WidgetConfigurationException("All resources must be a derivative of StreamlitResource")
 
             # If any data was provided at the time of initialization, use that to
@@ -64,6 +63,42 @@ class StreamlitWidget:
         self.inputs()
         self.viz()
         self.extra_functions()
+
+    def run_cli(self, args:List[str]=[], flag_options:Dict[str,Any]={}, title="Widget") -> None:
+        """
+        Run the widget from the command line.
+        """
+
+        # Make a copy of this widget in a tempfile
+        with self._render_script(title=title) as script:
+
+            # Launch the script with Streamlit
+            _main_run(script.name, args, flag_options=flag_options)
+
+    def _render_script(self, title="Widget") -> _TemporaryFileWrapper:
+        """Return a temporary file object which contains a script for this widget."""
+
+        # Render the template for this script
+        script = self._render_template(
+            "streamlit_single.py.j2",
+            title=title,
+            imports=self._imports(),
+            widget_source=self._source(),
+            widget_name=self._name(),
+            data=self._data_to_json()
+        )
+
+        # Make a temporary file
+        fp = NamedTemporaryFile(mode="w+t", prefix="script", suffix=".py")
+
+        # Write out the script
+        fp.write(script)
+
+        # Move the pointer back to the top
+        fp.seek(0)
+
+        # Return the file object
+        return fp
 
     def inputs(self) -> None:
         """Read in data from all of the resources defined in the widget."""
@@ -111,6 +146,11 @@ class StreamlitWidget:
             with open(fp, "w") as handle:
                 handle.write(html)
 
+    def _imports(self) -> str:
+        """Return the imports needed by this widget."""
+
+        return "\n".join(["\n".join(self.imports), "\n".join(self.extra_imports)])
+
     def _render_html(
         self,
         title="Widget",
@@ -119,33 +159,31 @@ class StreamlitWidget:
     ):
         """Render the widget as HTML"""
 
-        # Get the source code for this widget
-        widget_source = getsource(self.__class__)
+        # Render the template for this HTML
+        html = self._render_template(
+            "streamlit_single.html.j2",
+            title=title,
+            stlite_ver=stlite_ver,
+            footer=footer,
+            requirements=self.requirements,
+            imports=self._imports(),
+            widget_source=self._source(),
+            widget_name=self._name(),
+            data=self._data_to_json()
+        )
+        
+        return html
 
-        # Get the data for this widget, encoded as JSON
-        data = json.dumps({
-            resource.id: resource.to_json(self.data[resource.id])
-            for resource in self.resources
-        })
+    def _render_template(self, template_name:str, **kwargs):
+        """Return a jinja2 template defined in this library."""
 
         # Set up the jinja2 environment
         env = Environment(
             loader=PackageLoader("widgets")
         )
 
-        # Get the template being used for this HTML
-        template = env.get_template("streamlit_single.html.j2")
+        # Get the template being used
+        template = env.get_template(template_name)
 
         # Render the template
-        html = template.render(
-            title=title,
-            stlite_ver=stlite_ver,
-            footer=footer,
-            requirements=self.requirements,
-            imports="\n".join(self.imports + self.extra_imports),
-            widget_source=widget_source,
-            widget_name=self.__class__.__name__,
-            data=data
-        )
-        
-        return html
+        return template.render(**kwargs)
