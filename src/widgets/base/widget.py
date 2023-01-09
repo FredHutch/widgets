@@ -89,6 +89,14 @@ class Widget:
 
         pass
 
+    def download_html_button(self):
+        """Render a button which allows the user to download the widget as HTML."""
+        pass
+
+    def download_script_button(self):
+        """Render a button which allows the user to download the widget as a script."""
+        pass
+
     def _data_to_json(self) -> str:
         """Return the data saved in this widget as JSON."""
 
