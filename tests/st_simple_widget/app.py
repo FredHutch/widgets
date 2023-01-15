@@ -57,7 +57,7 @@ class SimpleWidget(StreamlitWidget):
     # scatterplot.
     def viz(self):
 
-        if st.session_state.df is not None and self.data["df"].shape[0] > 0:
+        if st.session_state.df is not None or self.data["df"].shape[0] > 0:
 
             fig = px.scatter(
                 data_frame=self.data["df"],
@@ -71,3 +71,6 @@ class SimpleWidget(StreamlitWidget):
         else:
 
             st.write("Please provide data to plot")
+
+        self.download_html_button()
+        self.download_script_button()

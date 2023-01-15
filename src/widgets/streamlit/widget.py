@@ -1,13 +1,10 @@
-from tempfile import _TemporaryFileWrapper, NamedTemporaryFile, TemporaryFile
-from jinja2 import Environment, PackageLoader
+from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
+import streamlit as st
 from streamlit.web.cli import _main_run
-from typing import IO, Any, Dict, List, Union
+from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
-from widgets.base.resource import Resource
-from widgets.base.exceptions import WidgetConfigurationException
-from widgets.base.exceptions import WidgetFunctionException
-from widgets.base.exceptions import WidgetInitializationException
+from widgets.base.helpers import render_template
 
 
 class StreamlitWidget(Widget):
@@ -30,29 +27,59 @@ class StreamlitWidget(Widget):
         """
 
         # Make a copy of this widget in a tempfile
-        with self._render_script(title=title) as script:
+        with self._script_tempfile(title=title) as script:
 
             # Launch the script with Streamlit
             _main_run(script.name, args, flag_options=flag_options)
 
-    def _render_script(self, title="Widget") -> _TemporaryFileWrapper:
-        """Return a temporary file object which contains a script for this widget."""
+    def download_html_button(self):
+        """Render a button which allows the user to download the widget as HTML."""
+        
+        with st.sidebar:
+            st.download_button(
+                "Download HTML",
+                self._render_html(),
+                file_name=f"{self._name()}.html",
+                mime="text/html",
+                help="Download this widget as a webpage (HTML)"
+            )
+
+    def download_script_button(self):
+        """Render a button which allows the user to download the widget as a script."""
+        
+        with st.sidebar:
+            st.download_button(
+                "Download Script",
+                self._render_script(),
+                file_name=f"{self._name()}.py",
+                mime="text/x-python",
+                help="Download this widget as a script (Python)"
+            )
+
+    def _render_script(self, title="Widget") -> str:
+        """
+        Return the script for this widget as a string.
+        """
 
         # Render the template for this script
-        script = self._render_template(
+        script = render_template(
             "streamlit_single.py.j2",
             title=title,
             imports=self._imports(),
             widget_source=self._source(),
-            widget_name=self._name(),
-            data=self._data_to_json()
+            widget_name=self._name()
         )
+
+        return script
+
+    def _script_tempfile(self, title="Widget") -> _TemporaryFileWrapper:
+        """Return a temporary file object which contains a script for this widget."""
 
         # Make a temporary file
         fp = NamedTemporaryFile(mode="w+t", prefix="script", suffix=".py")
 
         # Write out the script
-        fp.write(script)
+        fp.write(self._render_script(title=title))
 
         # Move the pointer back to the top
         fp.seek(0)
@@ -78,22 +105,21 @@ class StreamlitWidget(Widget):
         # Create the HTML as a string
         html = self._render_html()
 
-        # If a path was not provided
-        if fp is None:
+        # Write it out to a file (if provided), or return the string
+        return self._to_file(html, fp)
 
-            # Return the string
-            return html
+    def to_script(self, fp:Union[Path, None]=None) -> Union[None, str]:
+        """
+        Create a python script which will be load this widget.
+        If fp is None, return a string.
+        Should be overridden by each child class.
+        """
 
-        # Otherwise
-        else:
+        # Create the Python script as a string
+        script = self._render_script()
 
-            if not isinstance(fp, Path):
-                raise WidgetFunctionException("The argument of to_html() must be a Path or None")
-
-
-            # Write out to the file
-            with open(fp, "w") as handle:
-                handle.write(html)
+        # Write it out to a file (if provided), or return the string
+        return self._to_file(script, fp)
 
     def _imports(self) -> str:
         """Return the imports needed by this widget."""
@@ -109,7 +135,7 @@ class StreamlitWidget(Widget):
         """Render the widget as HTML"""
 
         # Render the template for this HTML
-        html = self._render_template(
+        html = render_template(
             "streamlit_single.html.j2",
             title=title,
             stlite_ver=stlite_ver,
@@ -117,22 +143,7 @@ class StreamlitWidget(Widget):
             requirements=self.requirements,
             imports=self._imports(),
             widget_source=self._source(),
-            widget_name=self._name(),
-            data=self._data_to_json()
+            widget_name=self._name()
         )
         
         return html
-
-    def _render_template(self, template_name:str, **kwargs):
-        """Return a jinja2 template defined in this library."""
-
-        # Set up the jinja2 environment
-        env = Environment(
-            loader=PackageLoader("widgets")
-        )
-
-        # Get the template being used
-        template = env.get_template(template_name)
-
-        # Render the template
-        return template.render(**kwargs)

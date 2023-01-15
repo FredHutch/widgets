@@ -1,4 +1,6 @@
+from inspect import signature
 from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.helpers import source_val
 
 
 class Resource:
@@ -40,7 +42,10 @@ class Resource:
         self._setup_extra()
 
     def _setup_default(self, default):
-        """If a non-null value is provided, assign it to the default attribute for this object."""
+        """
+        If a non-null value is provided, assign it to the default attribute for this object.
+        Otherwise, use an empty initialization of the default datatype
+        """
 
         # If a non-null default value is provided
         if default is not None:
@@ -57,6 +62,12 @@ class Resource:
 
             # Attach the value to this object
             self.default = default
+
+        # If no value is provided
+        else:
+
+            # Set up an empty instance of the datatype
+            self.default = self.datatype()
 
     def _setup_attributes(self, id, label, help):
         
@@ -85,11 +96,37 @@ class Resource:
         """
         pass
 
-    def to_json(self, d):
+    def native(self, d):
         """
-        Return a JSON-compatible representation of a value of this resource.
+        Return a native python representation of a value of this resource.
         While this base method is extremely simple, it can be overridden
         by resource types with more complex serialization.
         """
 
         return d
+
+    def source(self, default, indent=4):
+        """Return the code used to recreate this resource."""
+        spacer = "".join([" " for _ in range(indent)])
+
+        # Get the signature of the initialization function
+        sig = signature(self.__class__.__init__)
+
+        # Build up the parameters to use to invoke the object
+        params = {}
+
+        for kw in sig.parameters.keys():
+            if kw == "self":
+                continue
+            if kw == "default":
+                params[kw] = self.native(default)
+            else:
+                params[kw] = self.__dict__[kw]
+
+        # Format the params as a string
+        params_str = f',\n{spacer}{spacer}{spacer}'.join([
+            f"{kw}={source_val(val)}"
+            for kw, val in params.items()
+        ])
+
+        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})"

@@ -1,7 +1,7 @@
 from pathlib import Path
 import click
 import logging
-from widgets.cli.io import load_widget
+from widgets.base.io import load_widget
 
 
 @click.group()

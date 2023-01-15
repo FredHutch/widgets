@@ -1,10 +1,10 @@
-from inspect import getsource
-import json
+from inspect import getmro, getsource, isfunction
 from pathlib import Path
 from typing import List, Union
 from widgets.base.resource import Resource
-from widgets.base.exceptions import CLIExecutionException, WidgetConfigurationException
+from widgets.base.exceptions import CLIExecutionException, WidgetConfigurationException, WidgetFunctionException
 from widgets.base.exceptions import WidgetInitializationException
+from widgets.base.helpers import render_template, source_val
 
 
 class Widget:
@@ -18,8 +18,8 @@ class Widget:
     def __init__(self):
         """
         Set up the Widget object.
-        Any values provided in the self.data object will be used to override
-        the default value of any resource with the corresponding key.
+        The default values for each of the resources will be used
+        to populate the corresponding key in the data object.
         """
 
         if not isinstance(self.data, dict):
@@ -31,10 +31,6 @@ class Widget:
             # Make sure that the resource is a recognized type
             if not isinstance(resource, Resource):
                 raise WidgetConfigurationException("All resources must be a derivative of Resource")
-
-            # If any key exists in self.data, use that to
-            # override the default value defined for the resource
-            resource._setup_default(self.data.get(resource.id))
 
             # Populate the initial state of the `data` object
             self.data[resource.id] = resource.default
@@ -86,6 +82,37 @@ class Widget:
 
         pass
 
+    def to_script(self, fp:Union[Path, None]=None) -> Union[None, str]:
+        """
+        Create a python script which will be load this widget.
+        If fp is None, return a string.
+        Should be overridden by each child class.
+        """
+
+        pass
+
+    def _to_file(self, text:str, fp:Union[Path, None]=None) -> Union[None, str]:
+        """
+        If fp is not None, write the contents of text to the file object fp.
+        If fp is None, return text.
+        """
+
+        # If a path was not provided
+        if fp is None:
+
+            # Return the string
+            return text
+
+        # Otherwise
+        else:
+
+            if not isinstance(fp, Path):
+                raise WidgetFunctionException("The argument of _to_file() must be a Path or None")
+
+            # Write out to the file
+            with open(fp, "w") as handle:
+                handle.write(text)
+
     def download_html_button(self):
         """Render a button which allows the user to download the widget as HTML."""
         pass
@@ -94,18 +121,22 @@ class Widget:
         """Render a button which allows the user to download the widget as a script."""
         pass
 
-    def _data_to_json(self) -> str:
-        """Return the data saved in this widget as JSON."""
+    def _source(self, use_data=True) -> str:
+        """
+        Return the source code for this live widget as a string.
+        If use_data is True, the values in the data object will
+        be used to override the default values of the corresponding
+        resource.
+        """
 
-        return json.dumps({
-            resource.id: resource.to_json(self.data[resource.id])
-            for resource in self.resources
-        })
-
-    def _source(self) -> str:
-        """Return the source code for this widget as a string."""
-
-        source = getsource(self.__class__)
+        source = render_template(
+            "source.py.j2",
+            name=self._name(),
+            parent_name=self._parent_name(),
+            resources=self._source_resources(use_data=use_data),
+            attributes=self._source_attributes(),
+            functions=self._source_functions()
+        )
 
         # Backticks in the source code will cause errors in HTML
         if "`" in source:
@@ -117,3 +148,88 @@ class Widget:
         """Return the name of this widget."""
 
         return self.__class__.__name__
+
+    def _parent_name(self) -> str:
+        """Return the name of the parent class for this object."""
+
+        return self._parent_class().__name__
+
+    def _parent_class(self):
+        """Return the parent class for this object."""
+
+        for cls in getmro(self.__class__):
+            if cls != self.__class__:
+                return cls
+
+    def _class_items(self, filter_functions=False):
+        """
+        Yield the items associated with the class of this widget.
+        If filter_functions is True, yield only functions, otherwise
+        do not yield any functions.
+        """
+        for kw, val in self.__class__.__dict__.items():
+            if kw.startswith("__"):
+                continue
+            if filter_functions == isfunction(val):
+                yield kw, val
+
+    def _source_resources(self, use_data=True, indent=4) -> str:
+        """
+        Return a string which captures the source code needed to initialize
+        the resources attached to this object.
+        If use_data is True, the values in the data object will
+        be used to override the default values of the corresponding
+        resource.
+        """
+        spacer = "".join([" " for _ in range(indent)])
+
+        # Format the source code for each of the resources in this widget
+        resources_str = []
+        for r in self.resources:
+
+            # If the use_data flag is set, use the value in the self.data
+            # object as the default value for the resource.
+            # Otherwise, just use the default value set for the resource.
+            if use_data:
+                r_default = self.data.get(r.id)
+            else:
+                r_default = r.default
+
+            # Format the source code and append it to the lsit
+            resources_str.append(r.source(default=r_default))
+
+        # Join all of those resource strings into a list
+        line_spacer = f",\n{spacer}{spacer}"
+        resources_str = f"    resources = [\n{spacer}{spacer}{line_spacer.join(resources_str)}\n{spacer}]"
+
+        return resources_str
+
+    def _source_attributes(self, omit=["data", "resources"]) -> str:
+        """
+        Return a text block which captures the attributes of this class.
+        Any attributes in the omit list will be omitted.
+        """
+
+        attributes = []
+
+        # Iterate over the attributes of this class
+        for kw, attrib in self._class_items(filter_functions=False):
+
+            # If the attribute is not in the omit list
+            if kw not in omit:
+
+                # Add it to the list
+                attributes.append(f"    {kw} = {source_val(attrib)}")
+
+        return "\n\n".join(attributes)
+
+    def _source_functions(self) -> str:
+        """
+        Return a text block with source code for all functions of this widget
+        which do not match the parent class.
+        """
+
+        return "\n\n".join([
+            getsource(func)
+            for _, func in self._class_items(filter_functions=True)
+        ])

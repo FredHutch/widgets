@@ -1,7 +1,6 @@
 from importlib.util import spec_from_file_location
 from importlib.util import module_from_spec
 import sys
-from widgets.streamlit.widget import StreamlitWidget
 from widgets.base.widget import Widget
 from widgets.base.exceptions import CLIExecutionException
 
@@ -30,7 +29,7 @@ def _load_module(url):
         raise CLIExecutionException(msg)
 
 
-def load_widget(url, widget_name) -> Widget:
+def load_widget(url:str, widget_name:str) -> Widget:
     """
     Import a Widget defined in a script.
     

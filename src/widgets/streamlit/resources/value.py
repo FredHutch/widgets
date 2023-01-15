@@ -350,6 +350,12 @@ class StSelectString(Resource):
         Read in the integer value from the user.
         """
 
+        # Start with the default value
+        widget_data[self.id] = self.default
+        
+        # Reset the index value
+        self._setup_extra()
+
         if not self.disabled:
             with st.sidebar:
                 widget_data[self.id] = st.selectbox(

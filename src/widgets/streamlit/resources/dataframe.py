@@ -78,8 +78,8 @@ class StDataFrame(Resource):
                         sep=self.sep
                     )
 
-    def to_json(self, d:pd.DataFrame):
-        """Return a JSON-compaitible representation of the DataFrame."""
+    def native(self, d:pd.DataFrame):
+        """Return a native Python representation of the DataFrame."""
         if isinstance(d, pd.DataFrame):
             return d.to_dict(orient="list")
         else:
