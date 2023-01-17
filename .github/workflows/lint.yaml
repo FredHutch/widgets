@@ -35,4 +35,4 @@ jobs:
       - name: Run Tests
         working-directory: tests
         run: |
-          pytest --cov --cov-report=xml --cov-branch -o junit_family=xunit2 --junitxml=junit/test-results.xml
+          pytest --cov-report term-missing --cov=widgets
