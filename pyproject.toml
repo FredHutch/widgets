@@ -26,3 +26,6 @@ classifiers = [
 
 [project.scripts]
 widgets = "widgets:cli.main.main"
+
+[tool.distutils.bdist_wheel]
+universal = true

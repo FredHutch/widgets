@@ -28,16 +28,16 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install wheel
+          pip install build
 
       - name: Test install
         run: |
-          python setup.py install
+          python -m build
           widgets
 
       - name: Build python package
         run: |
-          python setup.py bdist_wheel
+          python -m build
 
       - name: Publish package
         if: github.event_name == 'release'
