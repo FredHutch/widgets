@@ -26,3 +26,7 @@ class CLIInvocationException(Exception):
 class CLIExecutionException(Exception):
     """Exception raised when the CLI is not executed properly."""
     pass
+
+class IOException(Exception):
+    """Exception raised upon IO error."""
+    pass

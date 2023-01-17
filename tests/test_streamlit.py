@@ -2,6 +2,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 import pandas as pd
 import unittest
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.io import load_widget
 from widgets.streamlit.resources.dataframe import StDataFrame
 from widgets.streamlit.resources.value import StString, StInteger, StFloat
@@ -29,6 +30,21 @@ class TestStreamlitResources(unittest.TestCase):
         # Check the saved value
         self.assertTrue(df_saved.equals(df.default), "Saved DataFrame does not match")
 
+        # Use a dict to assign the default instead
+        dict_saved = dict(a=[1, 2, 3], b=['x', 'y', 'z'])
+        df._setup_default(dict_saved)
+        self.assertTrue(df_saved.equals(df.default), "Saved DataFrame does not match")
+
+        # Make sure that an error is raised for an inappropriate type
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: df._setup_default("foo")
+        )
+
+        # Try an empty value
+        df._setup_default(None)
+        self.assertTrue(pd.DataFrame().equals(df.default), "Empty value not created correctly")
+
     def test_string(self):
 
         s = StString(
@@ -44,6 +60,10 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Check the saved value
         self.assertEqual(s.default, "saved", "Saved string does not match")
+
+        # Try an empty value
+        s._setup_default(None)
+        self.assertEqual("", s.default, "Empty value not created correctly")
 
     def test_integer(self):
 
@@ -61,6 +81,10 @@ class TestStreamlitResources(unittest.TestCase):
         # Check the saved value
         self.assertEqual(s.default, 1, "Saved integer does not match")
 
+        # Try an empty value
+        s._setup_default(None)
+        self.assertEqual(int(), s.default, "Empty value not created correctly")
+
     def test_float(self):
 
         s = StFloat(
@@ -76,6 +100,10 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Check the saved value
         self.assertEqual(s.default, 1.1, "Saved float does not match")
+
+        # Try an empty value
+        s._setup_default(None)
+        self.assertEqual(float(), s.default, "Empty value not created correctly")
 
 
 class ExampleStreamlitWidget(StreamlitWidget):

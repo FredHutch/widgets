@@ -2,7 +2,7 @@ from importlib.util import spec_from_file_location
 from importlib.util import module_from_spec
 import sys
 from widgets.base.widget import Widget
-from widgets.base.exceptions import CLIExecutionException
+from widgets.base.exceptions import IOException, WidgetInitializationException
 
 
 def _load_module(url):
@@ -12,13 +12,13 @@ def _load_module(url):
         spec = spec_from_file_location("imported_widget", url)
     except Exception as e:
         msg = f"Error accessing URL: {url}\n{str(e)}"
-        raise CLIExecutionException(msg)
+        raise IOException(msg)
 
     try:
         module = module_from_spec(spec)
     except Exception as e:
         msg = f"Error loading module: {url}\n{str(e)}"
-        raise CLIExecutionException(msg)
+        raise IOException(msg)
 
     sys.modules["imported_widget"] = module
 
@@ -26,7 +26,7 @@ def _load_module(url):
         spec.loader.exec_module(module)
     except Exception as e:
         msg = f"Error executing code: {url}\n{str(e)}"
-        raise CLIExecutionException(msg)
+        raise IOException(msg)
 
 
 def load_widget(url:str, widget_name:str) -> Widget:
@@ -46,10 +46,10 @@ def load_widget(url:str, widget_name:str) -> Widget:
 
     # If that widget was not defined
     if widget is None:
-        raise CLIExecutionException(f"Widget {widget_name} not defined in {url}")
+        raise IOException(f"Widget {widget_name} not defined in {url}")
 
     # If the code does not define a valid Widget object
     if not isinstance(widget(), Widget):
-        raise CLIExecutionException(f"Code for {widget_name} must be a Widget-based object, not {str(type(widget))}")
+        raise WidgetInitializationException(f"Code for {widget_name} must be a Widget-based object, not {str(type(widget))}")
 
     return widget
