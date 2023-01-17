@@ -30,7 +30,7 @@ jobs:
 
       - name: Run lint
         run: |
-          flake8 widgets
+          flake8 src
 
       - name: Run Tests
         working-directory: tests
