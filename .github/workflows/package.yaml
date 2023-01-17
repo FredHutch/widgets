@@ -32,7 +32,7 @@ jobs:
 
       - name: Test install
         run: |
-          python -m build
+          pip install .
           widgets
 
       - name: Build python package
