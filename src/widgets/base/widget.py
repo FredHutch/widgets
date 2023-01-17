@@ -47,7 +47,7 @@ class Widget:
         2. Invoke the viz() function;
         3. Add buttons extending functionality of the widget;
         """
-        
+
         self.inputs()
         self.viz()
         self.extra_functions()
@@ -61,7 +61,7 @@ class Widget:
 
     def inputs(self) -> None:
         """Read in data from all of the resources defined in the widget."""
-        
+
         # Iterate over each of the resources defined for this widget
         for resource in self.resources:
 

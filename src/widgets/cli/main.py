@@ -32,7 +32,7 @@ def run(path_or_url, widget_name, title="Widget"):
     logging.debug("Subcommand: run")
     logging.debug(f"path_or_url: {path_or_url}")
     logging.debug(f"widget_name: {widget_name}")
-    
+
     # Get the widget defined in the file
     widget = load_widget(path_or_url, widget_name)
 
@@ -66,7 +66,7 @@ def tohtml(path_or_url, widget_name, filename):
     logging.debug(f"path_or_url: {path_or_url}")
     logging.debug(f"widget_name: {widget_name}")
     logging.debug(f"filename: {filename}")
-    
+
     # Get the widget defined in the file
     widget = load_widget(path_or_url, widget_name)
 

@@ -27,7 +27,7 @@ class TestStreamlitResources(unittest.TestCase):
         # Use a different value to override the default
         df_saved = pd.DataFrame(dict(a=[1, 2, 3], b=['x', 'y', 'z']))
         df._setup_default(df_saved)
-        
+
         # Check the saved value
         msg = "Saved DataFrame does not match"
         self.assertTrue(df_saved.equals(df.default), msg)
@@ -143,7 +143,7 @@ class TestStreamlitWidget(unittest.TestCase):
 
         # Create a widget with default values
         w = ExampleStreamlitWidget()
-        
+
         # Change the data value
         w.data["s"] = "t"
         w.data["i"] = 1

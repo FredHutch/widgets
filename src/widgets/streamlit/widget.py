@@ -43,7 +43,7 @@ class StreamlitWidget(Widget):
         """
         Render a button which allows the user to download the widget as HTML.
         """
-        
+
         with st.sidebar:
             st.download_button(
                 "Download HTML",
@@ -57,7 +57,7 @@ class StreamlitWidget(Widget):
         """
         Render a button which allows the user to download the widget as code.
         """
-        
+
         with st.sidebar:
             st.download_button(
                 "Download Script",
@@ -160,5 +160,5 @@ class StreamlitWidget(Widget):
             widget_source=self._source(),
             widget_name=self._name()
         )
-        
+
         return html

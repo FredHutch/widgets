@@ -74,7 +74,7 @@ class Resource:
             self.default = self.datatype()
 
     def _setup_attributes(self, id, label, help):
-        
+
         # Save the id and default value for this particular resource
         self.id = id
 

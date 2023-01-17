@@ -32,7 +32,7 @@ def _load_module(url):
 def load_widget(url: str, widget_name: str) -> Widget:
     """
     Import a Widget defined in a script.
-    
+
     Arguments:
         url (str):          URL to local or HTTP(S) file containing code
                             defining a Widget

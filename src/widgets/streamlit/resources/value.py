@@ -55,7 +55,7 @@ class StString(Resource):
                                 property.
             placeholder (str):  (optional) An optional string displayed when
                                 the text input is empty
-        
+
         Returns:
             Resource: The instantiated resource object.
         """
@@ -146,7 +146,7 @@ class StInteger(Resource):
             step (int):         (optional) Step size for input element
             format (str):       (optional) Formatting f-string used for the
                                 input element
-        
+
         Returns:
             Resource: The instantiated resource object.
         """
@@ -228,7 +228,7 @@ class StFloat(Resource):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=""). 
+                                (equivalent to label="").
                                 If "collapsed", both the label and the space
                                 are removed. Default is "visible".
             min_value (int):    (optional) The minimum value used for the
@@ -238,7 +238,7 @@ class StFloat(Resource):
             step (int):         (optional) Step size for input element
             format (str):       (optional) Formatting f-string used for the
                                 input element
-        
+
         Returns:
             Resource: The instantiated resource object.
         """
@@ -325,12 +325,12 @@ class StSelectString(Resource):
             index (int):        The index of the preselected option on first
                                 render.
 
-            Note: 
+            Note:
             The default value may be defined either using the index position
             or the default value.
             The default value will override the index value if they happen
             to differ.
-        
+
         Returns:
             Resource: The instantiated resource object.
         """
@@ -401,7 +401,7 @@ class StSelectString(Resource):
 
         # Start with the default value
         widget_data[self.id] = self.default
-        
+
         # Reset the index value
         self._setup_extra()
 

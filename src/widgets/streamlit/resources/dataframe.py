@@ -40,7 +40,7 @@ class StDataFrame(Resource):
                             (equivalent to label=""). If "collapsed", both
                             the label and the space are removed.
                             Default is "visible".
-        
+
         Returns:
             StreamlitResource: The instantiated resource object.
         """
@@ -76,7 +76,7 @@ class StDataFrame(Resource):
                     # Assign the default, or the value provided at the
                     # time of initialization
                     widget_data[self.id] = self.default
-                    
+
                 # If a file was provided
                 else:
 

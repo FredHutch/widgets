@@ -11,7 +11,7 @@ class TestCLI(unittest.TestCase):
         runner = CliRunner()
         result = runner.invoke(main, [])
         self.assertEqual(result.exit_code, 0)
-        
+
     def test_tohtml(self):
 
         runner = CliRunner()
