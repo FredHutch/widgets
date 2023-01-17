@@ -12,16 +12,23 @@ class StreamlitWidget(Widget):
     Base class used for building interactive widgets using Streamlit.
     """
 
-    requirements:List[str] = ["widgets"]
-    imports:List[str] = [
+    requirements: List[str] = ["widgets"]
+    imports: List[str] = [
         "import streamlit as st",
         "from widgets.streamlit.resources.dataframe import StDataFrame",
-        "from widgets.streamlit.resources.value import StString, StInteger, StFloat",
+        "from widgets.streamlit.resources.value import StString",
+        "from widgets.streamlit.resources.value import StInteger",
+        "from widgets.streamlit.resources.value import StFloat",
         "from widgets.streamlit.widget import StreamlitWidget"
     ]
-    extra_imports:List[str] = []
+    extra_imports: List[str] = []
 
-    def run_cli(self, args:List[str]=[], flag_options:Dict[str,Any]={}, title="Widget") -> None:
+    def run_cli(
+        self,
+        args: List[str] = [],
+        flag_options: Dict[str, Any] = {},
+        title="Widget"
+    ) -> None:
         """
         Run the widget from the command line.
         """
@@ -33,7 +40,9 @@ class StreamlitWidget(Widget):
             _main_run(script.name, args, flag_options=flag_options)
 
     def download_html_button(self):
-        """Render a button which allows the user to download the widget as HTML."""
+        """
+        Render a button which allows the user to download the widget as HTML.
+        """
         
         with st.sidebar:
             st.download_button(
@@ -45,7 +54,9 @@ class StreamlitWidget(Widget):
             )
 
     def download_script_button(self):
-        """Render a button which allows the user to download the widget as a script."""
+        """
+        Render a button which allows the user to download the widget as code.
+        """
         
         with st.sidebar:
             st.download_button(
@@ -73,7 +84,9 @@ class StreamlitWidget(Widget):
         return script
 
     def _script_tempfile(self, title="Widget") -> _TemporaryFileWrapper:
-        """Return a temporary file object which contains a script for this widget."""
+        """
+        Return a temporary file object which contains a script for this widget.
+        """
 
         # Make a temporary file
         fp = NamedTemporaryFile(mode="w+t", prefix="script", suffix=".py")
@@ -88,14 +101,16 @@ class StreamlitWidget(Widget):
         return fp
 
     def viz(self) -> None:
-        """The viz() method should be overridden by any widget based on this class."""
+        """
+        The viz() method should be overridden by any widget based on this.
+        """
         pass
 
     def extra_functions(self) -> None:
         """Add generalized functionality to the widget."""
         pass
 
-    def to_html(self, fp:Union[Path, None]=None) -> Union[None, str]:
+    def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
         library, based on pyodide.
@@ -108,7 +123,7 @@ class StreamlitWidget(Widget):
         # Write it out to a file (if provided), or return the string
         return self._to_file(html, fp)
 
-    def to_script(self, fp:Union[Path, None]=None) -> Union[None, str]:
+    def to_script(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create a python script which will be load this widget.
         If fp is None, return a string.
@@ -124,7 +139,7 @@ class StreamlitWidget(Widget):
     def _imports(self) -> str:
         """Return the imports needed by this widget."""
 
-        return "\n".join(["\n".join(self.imports), "\n".join(self.extra_imports)])
+        return "\n".join(["\n".join(self.imports), "\n".join(self.extra_imports)]) # noqa
 
     def _render_html(
         self,

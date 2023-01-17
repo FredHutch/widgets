@@ -46,7 +46,11 @@ def run(path_or_url, widget_name, title="Widget"):
 @main.command()
 @click.argument("path_or_url")
 @click.argument("widget_name")
-@click.option("--filename", default="widget.html", help="Name of HTML file (default: widget.html)")
+@click.option(
+    "--filename",
+    default="widget.html",
+    help="Name of HTML file (default: widget.html)"
+)
 def tohtml(path_or_url, widget_name, filename):
     """
     Convert a widget script to an HTML file

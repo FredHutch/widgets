@@ -6,9 +6,11 @@ class SimpleWidget(Widget):
 
     pass
 
+
 class SimpleStWidget(StreamlitWidget):
 
     pass
+
 
 class SimpleWidgetNoBase:
     """

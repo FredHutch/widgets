@@ -8,18 +8,21 @@ class Resource:
     Base class for all resources used by widgets.
 
     Attributes:
-            id (str): The unique key used to store the resource in the widget `data` object.
-            default: The default value for the resource, used if no saved value is present.
-            datatype: The variable type returned by the `load()` method (should match the type of the default value).
+            id (str):   The unique key used to store the resource
+                        in the widget `data` object.
+            default:    The default value for the resource, used
+                        if no saved value is present.
+            datatype:   The variable type returned by the `load()` method
+                        (should match the type of the default value).
             label (str): Label displayed to the user for the resource
             help (str): Help text describing the resource to the user
     """
 
-    id:str = None
+    id: str = None
     default = None
-    datatype:type = None
-    label:str = None
-    help:str = None
+    datatype: type = None
+    label: str = None
+    help: str = None
 
     def setup(
         self,
@@ -43,7 +46,8 @@ class Resource:
 
     def _setup_default(self, default):
         """
-        If a non-null value is provided, assign it to the default attribute for this object.
+        If a non-null value is provided, assign it to the default attribute
+        for this object.
         Otherwise, use an empty initialization of the default datatype
         """
 
@@ -56,8 +60,8 @@ class Resource:
                 # Try to convert it to the expected type
                 try:
                     default = self.datatype(default)
-                except:
-                    msg = f"Resource {self.id}: Default value {self.default} ({str(type(self.default))}) cannot be converted to expected type {self.datatype}"
+                except Exception as e:
+                    msg = f"Resource {self.id}: Default value {self.default} ({str(type(self.default))}) cannot be converted to expected type {self.datatype}\n{str(e)}" # noqa
                     raise ResourceConfigurationException(msg)
 
             # Attach the value to this object
@@ -129,4 +133,4 @@ class Resource:
             for kw, val in params.items()
         ])
 
-        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})"
+        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa

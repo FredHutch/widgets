@@ -7,8 +7,8 @@ class StDataFrame(Resource):
     """DataFrame resource used in a Streamlit-based widget."""
 
     datatype = pd.DataFrame
-    disabled:bool=False
-    label_visibility:str="visible"
+    disabled: bool = False
+    label_visibility: str = "visible"
     sep = ","
 
     def __init__(
@@ -17,22 +17,29 @@ class StDataFrame(Resource):
         default=None,
         label="",
         help="",
-        disabled:bool=False,
-        label_visibility:str="visible",
+        disabled: bool = False,
+        label_visibility: str = "visible",
         sep=","
     ):
         """
         Args:
-            id (str):     The unique key used to store the resource in the widget `data` object.
-            label (str):  Optional label used for user input display elements
-            help (str):   Optional help text used for user input display elements
-            default:      (optional) The default Pandas DataFrame, used if no saved value is present.
-            sep (str):    Separator value used when reading from a file
-            disabled (bool):  (optional) If True, the input element is disabled (default: False)
+            id (str):       The unique key used to store the resource in
+                            the widget `data` object.
+            label (str):    (optional) Label used for user input display
+                            elements
+            help (str):     (optional) Help text used for user input display
+                            elements
+            default:        (optional) The default Pandas DataFrame, used if
+                            no saved value is present.
+            sep (str):      Separator value used when reading from a file
+            disabled (bool):  (optional) If True, the input element is
+                            disabled (default: False)
             label_visibility: (optional) The visibility of the label.
-                              If "hidden", the label doesn't show but there is still empty space for
-                              it above the widget (equivalent to label=""). If "collapsed", both the
-                              label and the space are removed. Default is "visible".
+                            If "hidden", the label doesn't show but there is
+                            still empty space for it above the widget
+                            (equivalent to label=""). If "collapsed", both
+                            the label and the space are removed.
+                            Default is "visible".
         
         Returns:
             StreamlitResource: The instantiated resource object.
@@ -51,7 +58,7 @@ class StDataFrame(Resource):
         self.label_visibility = label_visibility
         self.sep = sep
 
-    def user_input(self, widget_data:dict):
+    def user_input(self, widget_data: dict):
         """Allow the user to provide their own DataFrame from a file."""
 
         if not self.disabled:
@@ -66,7 +73,8 @@ class StDataFrame(Resource):
                 # If no file was uploaded
                 if self.uploader is None:
 
-                    # Assign the default, or the value provided at the time of initialization
+                    # Assign the default, or the value provided at the
+                    # time of initialization
                     widget_data[self.id] = self.default
                     
                 # If a file was provided
@@ -78,7 +86,7 @@ class StDataFrame(Resource):
                         sep=self.sep
                     )
 
-    def native(self, d:pd.DataFrame):
+    def native(self, d: pd.DataFrame):
         """Return a native Python representation of the DataFrame."""
         if isinstance(d, pd.DataFrame):
             return d.to_dict(orient="list")

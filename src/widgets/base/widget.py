@@ -2,7 +2,9 @@ from inspect import getmro, getsource, isfunction
 from pathlib import Path
 from typing import List, Union
 from widgets.base.resource import Resource
-from widgets.base.exceptions import CLIExecutionException, WidgetConfigurationException, WidgetFunctionException
+from widgets.base.exceptions import CLIExecutionException
+from widgets.base.exceptions import WidgetConfigurationException
+from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import WidgetInitializationException
 from widgets.base.helpers import render_template, source_val
 
@@ -12,7 +14,7 @@ class Widget:
     Base class used for building interactive widgets.
     """
 
-    resources:List[Resource] = list()
+    resources: List[Resource] = list()
     data = dict()
 
     def __init__(self):
@@ -23,14 +25,16 @@ class Widget:
         """
 
         if not isinstance(self.data, dict):
-            raise WidgetInitializationException(f"self.data must be a dict, not a {type(self.data)}")
+            msg = f"self.data must be a dict, not a {type(self.data)}"
+            raise WidgetInitializationException(msg)
 
         # Iterate over each resource defined in the widget
         for resource in self.resources:
 
             # Make sure that the resource is a recognized type
             if not isinstance(resource, Resource):
-                raise WidgetConfigurationException("All resources must be a derivative of Resource")
+                msg = "All resources must be a derivative of Resource"
+                raise WidgetConfigurationException(msg)
 
             # Populate the initial state of the `data` object
             self.data[resource.id] = resource.default
@@ -67,14 +71,16 @@ class Widget:
             resource.user_input(self.data)
 
     def viz(self) -> None:
-        """The viz() method should be overridden by any widget based on this class."""
+        """
+        The viz() method should be overridden by any widget based on this.
+        """
         pass
 
     def extra_functions(self) -> None:
         """Add generalized functionality to the widget."""
         pass
 
-    def to_html(self, fp:Union[Path, None]=None) -> Union[None, str]:
+    def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget.
         Should be overriden by each child class
@@ -82,7 +88,7 @@ class Widget:
 
         pass
 
-    def to_script(self, fp:Union[Path, None]=None) -> Union[None, str]:
+    def to_script(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create a python script which will be load this widget.
         If fp is None, return a string.
@@ -91,7 +97,11 @@ class Widget:
 
         pass
 
-    def _to_file(self, text:str, fp:Union[Path, None]=None) -> Union[None, str]:
+    def _to_file(
+        self,
+        text: str,
+        fp: Union[Path, None] = None
+    ) -> Union[None, str]:
         """
         If fp is not None, write the contents of text to the file object fp.
         If fp is None, return text.
@@ -107,18 +117,23 @@ class Widget:
         else:
 
             if not isinstance(fp, Path):
-                raise WidgetFunctionException("The argument of _to_file() must be a Path or None")
+                msg = "The argument of _to_file() must be a Path or None"
+                raise WidgetFunctionException(msg)
 
             # Write out to the file
             with open(fp, "w") as handle:
                 handle.write(text)
 
     def download_html_button(self):
-        """Render a button which allows the user to download the widget as HTML."""
+        """
+        Render a button which allows the user to download the widget as HTML.
+        """
         pass
 
     def download_script_button(self):
-        """Render a button which allows the user to download the widget as a script."""
+        """
+        Render a button which allows the user to download the widget as code.
+        """
         pass
 
     def _source(self, use_data=True) -> str:
@@ -200,7 +215,7 @@ class Widget:
 
         # Join all of those resource strings into a list
         line_spacer = f",\n{spacer}{spacer}"
-        resources_str = f"    resources = [\n{spacer}{spacer}{line_spacer.join(resources_str)}\n{spacer}]"
+        resources_str = f"    resources = [\n{spacer}{spacer}{line_spacer.join(resources_str)}\n{spacer}]" # noqa
 
         return resources_str
 

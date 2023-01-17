@@ -21,19 +21,22 @@ class TestStreamlitResources(unittest.TestCase):
         )
 
         # Check the default value
-        self.assertTrue(df_default.equals(df.default), "Default DataFrame does not match")
+        msg = "Default DataFrame does not match"
+        self.assertTrue(df_default.equals(df.default), msg)
 
         # Use a different value to override the default
         df_saved = pd.DataFrame(dict(a=[1, 2, 3], b=['x', 'y', 'z']))
         df._setup_default(df_saved)
         
         # Check the saved value
-        self.assertTrue(df_saved.equals(df.default), "Saved DataFrame does not match")
+        msg = "Saved DataFrame does not match"
+        self.assertTrue(df_saved.equals(df.default), msg)
 
         # Use a dict to assign the default instead
         dict_saved = dict(a=[1, 2, 3], b=['x', 'y', 'z'])
         df._setup_default(dict_saved)
-        self.assertTrue(df_saved.equals(df.default), "Saved DataFrame does not match")
+        msg = "Saved DataFrame does not match"
+        self.assertTrue(df_saved.equals(df.default), msg)
 
         # Make sure that an error is raised for an inappropriate type
         self.assertRaises(
@@ -43,7 +46,8 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Try an empty value
         df._setup_default(None)
-        self.assertTrue(pd.DataFrame().equals(df.default), "Empty value not created correctly")
+        msg = "Empty value not created correctly"
+        self.assertTrue(pd.DataFrame().equals(df.default), msg)
 
     def test_string(self):
 
@@ -93,17 +97,20 @@ class TestStreamlitResources(unittest.TestCase):
         )
 
         # Check the default value
-        self.assertEqual(s.default, 0.0, "Default float does not match")
+        msg = "Default float does not match"
+        self.assertEqual(s.default, 0.0, msg)
 
         # Use a different value to override the default
         s._setup_default(1.1)
 
         # Check the saved value
-        self.assertEqual(s.default, 1.1, "Saved float does not match")
+        msg = "Saved float does not match"
+        self.assertEqual(s.default, 1.1, msg)
 
         # Try an empty value
         s._setup_default(None)
-        self.assertEqual(float(), s.default, "Empty value not created correctly")
+        msg = "Empty value not created correctly"
+        self.assertEqual(float(), s.default, msg)
 
 
 class ExampleStreamlitWidget(StreamlitWidget):
@@ -149,7 +156,10 @@ class TestStreamlitWidget(unittest.TestCase):
             w.to_script(Path(tmp.name))
 
             # Load the script
-            saved_widget = load_widget(Path(tmp.name), "ExampleStreamlitWidget")
+            saved_widget = load_widget(
+                Path(tmp.name),
+                "ExampleStreamlitWidget"
+            )
 
             # Instantiate the widget
             s = saved_widget()

@@ -7,7 +7,7 @@ class StString(Resource):
     """String value resource used for Streamlit-based widgets."""
 
     datatype = str
-    max_chars:int = None
+    max_chars: int = None
     type = "default"
     autocomplete = None
     placeholder = None
@@ -18,30 +18,43 @@ class StString(Resource):
         default=None,
         label="",
         help="",
-        disabled:bool=False,
-        label_visibility:str="visible",
-        max_chars:int=None,
-        type:str="default",
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        max_chars: int = None,
+        type: str = "default",
         autocomplete=None,
-        placeholder:str=None,
-   ):
+        placeholder: str = None
+    ):
         """
         Args:
-            id (str):         The unique key used to store the resource in the widget `data` object.
-            label (str):      (optional) Label used for user input display elements
-            help (str):       (optional) Help text used for user input display elements
-            default (int):    (optional) The default float, used if no saved value is present.
-            disabled (bool):  (optional) If True, the input element is disabled (default: False)
-            label_visibility: (optional) The visibility of the label.
-                              If "hidden", the label doesn't show but there is still empty space for
-                              it above the widget (equivalent to label=""). If "collapsed", both the
-                              label and the space are removed. Default is "visible".
-            max_chars (int):  (optional) Max number of characters allowed in text input
-            type (str):       (optional) The type of the text input. This can be either "default"
-                              (for a regular text input), or "password" (for a text input that masks the
-                              user's typed value). Defaults to "default".
-            autocomplete:     (optional) An optional value that will be passed to the <input> element's autocomplete property
-            placeholder (str): (optional) An optional string displayed when the text input is empty
+            id (str):           The unique key used to store the resource in
+                                the widget `data` object.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            default (int):      (optional) The default float, used if no saved
+                                value is present.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for
+                                it above the widget (equivalent to label="").
+                                If "collapsed", both the label and the space
+                                are removed. Default is "visible".
+            max_chars (int):    (optional) Max number of characters allowed in
+                                text input
+            type (str):         (optional) The type of the text input.
+                                This can be either "default"
+                                (for a regular text input), or "password"
+                                (for a text input that masks the user's
+                                typed value). Defaults to "default".
+            autocomplete:       (optional) An optional value that will be
+                                passed to the <input> element's autocomplete
+                                property.
+            placeholder (str):  (optional) An optional string displayed when
+                                the text input is empty
         
         Returns:
             Resource: The instantiated resource object.
@@ -63,7 +76,7 @@ class StString(Resource):
         self.autocomplete = autocomplete
         self.placeholder = placeholder
 
-    def user_input(self, widget_data:dict={}):
+    def user_input(self, widget_data: dict = {}):
         """
         Read in the string value from the user.
         """
@@ -88,12 +101,12 @@ class StInteger(Resource):
     """Integer value resource used for Streamlit-based widgets."""
 
     datatype = int
-    disabled:bool=False
-    label_visibility:str="visible"
-    min_value:int = None
-    max_value:int = None
-    step:int = 1
-    format:str = "%d"
+    disabled: bool = False
+    label_visibility: str = "visible"
+    min_value: int = None
+    max_value: int = None
+    step: int = 1
+    format: str = "%d"
 
     def __init__(
         self,
@@ -101,28 +114,38 @@ class StInteger(Resource):
         default=None,
         label="",
         help="",
-        disabled:bool=False,
-        label_visibility:str="visible",
-        min_value:int=None,
-        max_value:int=None,
-        step:int=1,
-        format:str="%d",
-   ):
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        min_value: int = None,
+        max_value: int = None,
+        step: int = 1,
+        format: str = "%d",
+    ):
         """
         Args:
-            id (str):         The unique key used to store the resource in the widget `data` object.
-            label (str):      (optional) Label used for user input display elements
-            help (str):       (optional) Help text used for user input display elements
-            default (int):    (optional) The default integer, used if no saved value is present.
-            disabled (bool):  (optional) If True, the input element is disabled (default: False)
-            label_visibility: (optional) The visibility of the label.
-                              If "hidden", the label doesn't show but there is still empty space for
-                              it above the widget (equivalent to label=""). If "collapsed", both the
-                              label and the space are removed. Default is "visible".
-            min_value (int):  (optional) The minimum value used for the input element
-            max_value (int):  (optional) The maximum value used for the input element
-            step (int):       (optional) Step size for input element
-            format (str):     (optional) Formatting f-string used for the input element
+            id (str):           The unique key used to store the resource in
+                                the widget `data` object.
+            label (str):        (optional) Label used for user input display
+                                elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            default (int):      (optional) The default integer, used if no
+                                saved value is present.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label=""). If "collapsed", both
+                                the label and the space are removed.
+                                Default is "visible".
+            min_value (int):    (optional) The minimum value used for the
+                                input element
+            max_value (int):    (optional) The maximum value used for the
+                                input element
+            step (int):         (optional) Step size for input element
+            format (str):       (optional) Formatting f-string used for the
+                                input element
         
         Returns:
             Resource: The instantiated resource object.
@@ -144,7 +167,7 @@ class StInteger(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self, widget_data:dict):
+    def user_input(self, widget_data: dict):
         """
         Read in the integer value from the user.
         """
@@ -170,12 +193,12 @@ class StFloat(Resource):
     """Integer value resource used for Streamlit-based widgets."""
 
     datatype = float
-    disabled:bool=False
-    label_visibility:str="visible"
-    min_value:int = None
-    max_value:int = None
-    step:int = None
-    format:str = "%f"
+    disabled: bool = False
+    label_visibility: str = "visible"
+    min_value: int = None
+    max_value: int = None
+    step: int = None
+    format: str = "%f"
 
     def __init__(
         self,
@@ -183,28 +206,38 @@ class StFloat(Resource):
         default=None,
         label="",
         help="",
-        disabled:bool=False,
-        label_visibility:str="visible",
-        min_value:int=None,
-        max_value:int=None,
-        step:int=None,
-        format:str="%f",
-   ):
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        min_value: int = None,
+        max_value: int = None,
+        step: int = None,
+        format: str = "%f",
+    ):
         """
         Args:
-            id (str):         The unique key used to store the resource in the widget `data` object.
-            label (str):      (optional) Label used for user input display elements
-            help (str):       (optional) Help text used for user input display elements
-            default (int):    (optional) The default float, used if no saved value is present.
-            disabled (bool):  (optional) If True, the input element is disabled (default: False)
-            label_visibility: (optional) The visibility of the label.
-                              If "hidden", the label doesn't show but there is still empty space for
-                              it above the widget (equivalent to label=""). If "collapsed", both the
-                              label and the space are removed. Default is "visible".
-            min_value (int):  (optional) The minimum value used for the input element
-            max_value (int):  (optional) The maximum value used for the input element
-            step (int):       (optional) Step size for input element
-            format (str):     (optional) Formatting f-string used for the input element
+            id (str):           The unique key used to store the resource in
+                                the widget `data` object.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            default (int):      (optional) The default float, used if no saved
+                                value is present.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label=""). 
+                                If "collapsed", both the label and the space
+                                are removed. Default is "visible".
+            min_value (int):    (optional) The minimum value used for the
+                                input element
+            max_value (int):    (optional) The maximum value used for the
+                                input element
+            step (int):         (optional) Step size for input element
+            format (str):       (optional) Formatting f-string used for the
+                                input element
         
         Returns:
             Resource: The instantiated resource object.
@@ -226,7 +259,7 @@ class StFloat(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self, widget_data:dict={}):
+    def user_input(self, widget_data: dict = {}):
         """
         Read in the integer value from the user.
         """
@@ -249,13 +282,15 @@ class StFloat(Resource):
 
 
 class StSelectString(Resource):
-    """Select-string-value-from-list resource used for Streamlit-based widgets."""
+    """
+    Select-string-value-from-list resource used for Streamlit-based widgets.
+    """
 
     datatype = str
-    disabled:bool=False
-    label_visibility:str="visible"
-    options:list = []
-    index:int = 0
+    disabled: bool = False
+    label_visibility: str = "visible"
+    options: list = []
+    index: int = 0
 
     def __init__(
         self,
@@ -263,28 +298,38 @@ class StSelectString(Resource):
         default=None,
         label="",
         help="",
-        disabled:bool=False,
-        label_visibility:str="visible",
-        options:list=[],
-        index:int=0
-   ):
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        options: list = [],
+        index: int = 0
+    ):
         """
         Args:
-            id (str):         The unique key used to store the resource in the widget `data` object.
-            label (str):      (optional) Label used for user input display elements
-            help (str):       (optional) Help text used for user input display elements
-            default (int):    (optional) The default float, used if no saved value is present.
-            disabled (bool):  (optional) If True, the input element is disabled (default: False)
-            label_visibility: (optional) The visibility of the label.
-                              If "hidden", the label doesn't show but there is still empty space for
-                              it above the widget (equivalent to label=""). If "collapsed", both the
-                              label and the space are removed. Default is "visible".
-            options (list):   List of options to select from.
-            index (int):      The index of the preselected option on first render.
+            id (str):           The unique key used to store the resource in
+                                the widget `data` object.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            default (int):      (optional) The default float, used if no saved
+                                 value is present.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label=""). If "collapsed", both
+                                the label and the space are removed.
+                                Default is "visible".
+            options (list):     List of options to select from.
+            index (int):        The index of the preselected option on first
+                                render.
 
             Note: 
-            The default value may be defined either using the index position or the default value.
-            The default value will override the index value if they happen to differ.
+            The default value may be defined either using the index position
+            or the default value.
+            The default value will override the index value if they happen
+            to differ.
         
         Returns:
             Resource: The instantiated resource object.
@@ -306,46 +351,50 @@ class StSelectString(Resource):
 
     def _setup_extra(self):
         """
-        The default values for this resource need to be set up in a different way
-        than the other resources.
-        The streamlit selectbox input element sets up the default value by indicating
-        which index position in the list of options to use.
-        To set up the default, we need to (1) make sure that the default value is
-        in the list of options, and (2) set the index variable to the position of
-        that element.
+        The default values for this resource need to be set up in a different
+        way than the other resources.
+        The streamlit selectbox input element sets up the default value by
+        indicating which index position in the list of options to use.
+        To set up the default, we need to (1) make sure that the default value
+        is in the list of options, and (2) set the index variable to the
+        position of that element.
         """
 
         # There must be a list of options provided
         if self.options is None or not isinstance(self.options, list):
-            raise ResourceConfigurationException(f"Resource {self.id} must have a list of options defined")
+            msg = f"Resource {self.id} must have a list of options defined"
+            raise ResourceConfigurationException(msg)
 
         # That list must contain elements
         if len(self.options) == 0:
-            raise ResourceConfigurationException(f"Resource {self.id} options may not be empty")
+            msg = f"Resource {self.id} options may not be empty"
+            raise ResourceConfigurationException(msg)
 
         # If there is no default option set
         if self.default is None:
 
             # There must be an index defined
             if self.index is None or not isinstance(self.index, int):
-                raise ResourceConfigurationException(f"Resource {self.id} must have an index defined")
+                msg = f"Resource {self.id} must have an index defined"
+                raise ResourceConfigurationException(msg)
 
             # The index must be a valid indeger
             if self.index < 0 or self.index >= len(self.options):
-                raise ResourceConfigurationException(f"Resource {self.id} must have an index defined in the valid range")
+                msg = f"Resource {self.id} must have an index defined in the valid range" # noqa
+                raise ResourceConfigurationException(msg)
 
             # Set the default using the index position from the list
             self.default = self.options[self.index]
 
         # The default element must be present in the list of options
-        if not self.default in self.options:
-            msg = f"Default value {self.default} not found in list of options: {', '.join(self.options)}"
+        if self.default not in self.options:
+            msg = f"Default {self.default} not found in list of options: {', '.join(self.options)}" # noqa
             raise ResourceConfigurationException(msg)
 
         # Set the index position of the default element
         self.index = self.options.index(self.default)
 
-    def user_input(self, widget_data:dict={}):
+    def user_input(self, widget_data: dict = {}):
         """
         Read in the integer value from the user.
         """

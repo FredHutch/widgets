@@ -29,12 +29,13 @@ def _load_module(url):
         raise IOException(msg)
 
 
-def load_widget(url:str, widget_name:str) -> Widget:
+def load_widget(url: str, widget_name: str) -> Widget:
     """
     Import a Widget defined in a script.
     
     Arguments:
-        url (str):          URL to local or HTTP(S) file containing code defining a Widget
+        url (str):          URL to local or HTTP(S) file containing code
+                            defining a Widget
         widget_name (str):  Name of the Widget defined in the file to import
     """
 
@@ -50,6 +51,8 @@ def load_widget(url:str, widget_name:str) -> Widget:
 
     # If the code does not define a valid Widget object
     if not isinstance(widget(), Widget):
-        raise WidgetInitializationException(f"Code for {widget_name} must be a Widget-based object, not {str(type(widget))}")
+        t = str(type(widget))
+        msg = f"Code for {widget_name} must be a Widget-based object, not {t}"
+        raise WidgetInitializationException(msg)
 
     return widget
