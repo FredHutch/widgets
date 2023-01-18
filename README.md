@@ -3,9 +3,7 @@ Merging code and data in webpages
 
 [![Build Python package](https://github.com/FredHutch/widgets/actions/workflows/package.yaml/badge.svg)](https://github.com/FredHutch/widgets/actions/workflows/package.yaml)
 
-[![Lint and run tests](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml/badge.svg)](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml)
-
-[![Coverage](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml/coverage.svg)](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml)
+[![Test Coverage](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml/badge.svg)](https://github.com/FredHutch/widgets/actions/workflows/lint.yaml)
 
 ## Purpose
 
