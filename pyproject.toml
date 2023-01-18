@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project]
+name = "widgets-lib"
+version = "0.0.1"
+authors = [
+  { name="Samuel Minot", email="sminot@fredhutch.org" },
+]
+description = "Merging code and data in webpages"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/FredHutch/widgets"
+"Bug Tracker" = "https://github.com/FredHutch/widgets/issues"
+
+[project.scripts]
+widgets = "widgets:cli.main.main"
+
+[tool.distutils.bdist_wheel]
+universal = true

@@ -1,0 +1,11 @@
+{{ imports }}
+
+st.set_page_config(
+   page_title='{{ title }}'
+)
+
+{{ widget_source }}
+
+if __name__ == "__main__":
+    widget = {{ widget_name }}({{ data }})
+    widget.run()

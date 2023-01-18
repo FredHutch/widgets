@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>{{ title }}</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/@stlite/mountable@{{ stlite_ver }}/build/stlite.css"
+    />
+    <style>
+      footer {        
+        visibility: hidden;
+      }
+      footer:after {
+        content:'{{ footer }}'; 
+        visibility: visible;
+        display: block;
+        position: relative;
+        padding: 5px;
+        top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="https://cdn.jsdelivr.net/npm/@stlite/mountable@{{ stlite_ver }}/build/stlite.js"></script>
+    <script>
+        stlite.mount(
+            {
+                requirements: {{ requirements }},
+                entrypoint: "app.py",
+                files: {
+                    "app.py": `
+{{ imports }}
+
+
+{{ widget_source }}
+
+
+widget = {{ widget_name }}()
+widget.run()
+`
+                }
+            },
+            document.getElementById("root")
+        );
+    </script>
+  </body>
+</html>
