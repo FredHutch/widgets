@@ -38,6 +38,7 @@ jobs:
       - name: Build python package
         run: |
           python -m build
+          python -m build --wheel
 
       - name: Publish package
         if: github.event_name == 'release'
