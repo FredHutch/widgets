@@ -85,7 +85,7 @@ class SimpleWidget(StreamlitWidget):
     # Specify any packages which should be installed prior to loading
 
     requirements = [
-        "widgets",
+        "widgets-lib",
         "pandas",
         "plotly"
     ]

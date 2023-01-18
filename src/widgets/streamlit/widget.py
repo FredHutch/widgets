@@ -12,7 +12,7 @@ class StreamlitWidget(Widget):
     Base class used for building interactive widgets using Streamlit.
     """
 
-    requirements: List[str] = ["widgets"]
+    requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
         "from widgets.streamlit.resources.dataframe import StDataFrame",
