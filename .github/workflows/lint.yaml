@@ -25,7 +25,7 @@ jobs:
       - name: Install deps
         run: |
           python -m pip install --upgrade pip
-          pip install flake8 pytest pytest-cov plotly
+          pip install flake8 pytest pytest-cov plotly coverage-badge
           pip install .
           python -c "import widgets"
 
@@ -36,3 +36,4 @@ jobs:
       - name: Run Tests
         run: |
           pytest --cov-report term-missing --cov=widgets
+          coverage-badge -o coverage.svg
