@@ -14,14 +14,3 @@ def render_template(template_name: str, **kwargs):
 
     # Render the template
     return template.render(**kwargs)
-
-
-def source_val(val):
-    """
-    Return a string representation of the value which can be used in source.
-    """
-
-    if isinstance(val, str):
-        return f'"{val}"'
-    else:
-        return val

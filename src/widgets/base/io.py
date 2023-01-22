@@ -1,5 +1,6 @@
 from importlib.util import spec_from_file_location
 from importlib.util import module_from_spec
+from inspect import getsource
 import sys
 from widgets.base.widget import Widget
 from widgets.base.exceptions import IOException, WidgetInitializationException
@@ -49,8 +50,16 @@ def load_widget(url: str, widget_name: str) -> Widget:
     if widget is None:
         raise IOException(f"Widget {widget_name} not defined in {url}")
 
+    # Try to instantiate the widget
+    try:
+        w = widget()
+    except Exception as e:
+        source = getsource(widget)
+        msg = f"Error loading module:\n{source}\n{str(e)}"
+        raise WidgetInitializationException(msg)
+
     # If the code does not define a valid Widget object
-    if not isinstance(widget(), Widget):
+    if not isinstance(w, Widget):
         t = str(type(widget))
         msg = f"Code for {widget_name} must be a Widget-based object, not {t}"
         raise WidgetInitializationException(msg)

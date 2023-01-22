@@ -1,12 +1,14 @@
+from typing import Union
 import streamlit as st
 import pandas as pd
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.resource import Resource
 
 
 class StDataFrame(Resource):
     """DataFrame resource used in a Streamlit-based widget."""
 
-    datatype = pd.DataFrame
+    value = pd.DataFrame()
     disabled: bool = False
     label_visibility: str = "visible"
     sep = ","
@@ -14,23 +16,21 @@ class StDataFrame(Resource):
     def __init__(
         self,
         id="",
-        default=None,
+        value=None,
         label="",
-        help="",
+        help: Union[str, None] = None,
         disabled: bool = False,
         label_visibility: str = "visible",
         sep=","
     ):
         """
         Args:
-            id (str):       The unique key used to store the resource in
-                            the widget `data` object.
+            id (str):       The unique key for the resource.
             label (str):    (optional) Label used for user input display
-                            elements
+                            elements.
             help (str):     (optional) Help text used for user input display
-                            elements
-            default:        (optional) The default Pandas DataFrame, used if
-                            no saved value is present.
+                            elements.
+            value:          (optional) The starting Pandas DataFrame.
             sep (str):      Separator value used when reading from a file
             disabled (bool):  (optional) If True, the input element is
                             disabled (default: False)
@@ -45,12 +45,29 @@ class StDataFrame(Resource):
             StreamlitResource: The instantiated resource object.
         """
 
+        # If the value is a dict, convert it
+        if isinstance(value, dict):
+            try:
+                value = pd.DataFrame(value)
+            except Exception as e:
+                msg = f"value could not be converted to DataFrame ({str(e)})"
+                raise ResourceConfigurationException(msg)
+        # If the value is a DataFrame, keep it
+        elif isinstance(value, pd.DataFrame):
+            pass
+        # If the value is None, make an empty DataFrame
+        elif value is None:
+            value = pd.DataFrame()
+        else:
+            msg = f"value must be None, dict, or DataFrame, not {type(value)}"
+            raise ResourceConfigurationException(msg)
+
         # Set up the resource attributes
-        self.setup(
+        super().__init__(
             id=id,
             label=label,
             help=help,
-            default=default
+            value=value
         )
 
         # Set up the specific attributes for this type of resource
@@ -70,25 +87,26 @@ class StDataFrame(Resource):
                     help=self.help
                 )
 
-                # If no file was uploaded
-                if self.uploader is None:
-
-                    # Assign the default, or the value provided at the
-                    # time of initialization
-                    widget_data[self.id] = self.default
-
                 # If a file was provided
-                else:
+                if self.uploader is not None:
 
                     # Read the file as a DataFrame
-                    widget_data[self.id] = pd.read_csv(
+                    self.value = pd.read_csv(
                         self.uploader,
                         sep=self.sep
                     )
 
-    def native(self, d: pd.DataFrame):
-        """Return a native Python representation of the DataFrame."""
-        if isinstance(d, pd.DataFrame):
-            return d.to_dict(orient="list")
+    def source_val(self, val):
+        """
+        Return a string representation of an attribute value
+        which can be used in source code initializing this resource.
+        The value attribute is a DataFrame which can be serialized
+        as a dict of lists.
+        """
+
+        if isinstance(val, str):
+            return f'"{val}"'
+        elif isinstance(val, pd.DataFrame):
+            return val.to_dict(orient="list")
         else:
-            return d
+            return val

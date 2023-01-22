@@ -9,11 +9,13 @@ class TestIO(unittest.TestCase):
 
     def test_load_widget(self):
 
-        # Load the test widgets
+        # Load the test widget
         w = load_widget("tests/assets/app.py", "SimpleWidget")
         self.assertIsInstance(w(), Widget)
 
-        # Load the test widgets
+    def test_load_streamlit_widget(self):
+
+        # Load the test streamlit widget
         w = load_widget("tests/assets/app.py", "SimpleStWidget")
         self.assertIsInstance(w(), StreamlitWidget)
 

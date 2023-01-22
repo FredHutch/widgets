@@ -1,32 +1,30 @@
 from inspect import getmro, getsource, isfunction
 from pathlib import Path
-from typing import List, Union
+from typing import Any, Dict, List, Union
 from widgets.base.resource import Resource
 from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
-from widgets.base.exceptions import WidgetInitializationException
-from widgets.base.helpers import render_template, source_val
+from widgets.base.helpers import render_template
 
 
 class Widget:
     """
     Base class used for building interactive widgets.
+    The list of resources will be mapped by .id to the
+    resource_dict at initialization.
     """
 
     resources: List[Resource] = list()
-    data = dict()
+    resource_dict: Dict[str, Resource] = dict()
 
     def __init__(self):
         """
-        Set up the Widget object.
-        The default values for each of the resources will be used
-        to populate the corresponding key in the data object.
+        Set up the Widget object
         """
 
-        if not isinstance(self.data, dict):
-            msg = f"self.data must be a dict, not a {type(self.data)}"
-            raise WidgetInitializationException(msg)
+        # The resource_dict must be empty at initialization
+        self.resource_dict = dict()
 
         # Iterate over each resource defined in the widget
         for resource in self.resources:
@@ -36,8 +34,11 @@ class Widget:
                 msg = "All resources must be a derivative of Resource"
                 raise WidgetConfigurationException(msg)
 
-            # Populate the initial state of the `data` object
-            self.data[resource.id] = resource.default
+            # Make sure that the id attribute is not repeated
+            if resource.id in self.resource_dict:
+                msg = f"Resource ids must be unique (repeated: {resource.id})"
+                raise WidgetConfigurationException(msg)
+            self.resource_dict[resource.id] = resource
 
     def run(self) -> None:
         """
@@ -66,9 +67,40 @@ class Widget:
         for resource in self.resources:
 
             # Add the interactive input element, if any has been defined
-            # We pass in the data object for the widget so that the value
-            # can be updated when the user input changes
-            resource.user_input(self.data)
+            resource.user_input()
+
+    def get(self, resource_id: str, attr: str) -> Any:
+        """Get the value of an attribute of a resource."""
+
+        # Return the value provided by the get method of the resource
+        return self._get_resource(resource_id).get(attr)
+
+    def get_value(self, resource_id: str) -> Any:
+        """Get the 'value' attribute of a resource."""
+
+        return self.get(resource_id, "value")
+
+    def set(self, resource_id, attr, val):
+        """Set the value of an attribute of a resource."""
+
+        # Call the set function of the resource
+        self._get_resource(resource_id).set(attr, val)
+
+    def set_value(self, resource_id, val):
+        """Set the 'value' attribute of a resource."""
+
+        # Call the set function of the resource
+        self.set(resource_id, "value", val)
+
+    def _get_resource(self, resource_id) -> Resource:
+        """Return the resource with a corresponding id."""
+
+        # Get the resource
+        r = self.resource_dict.get(resource_id)
+
+        if r is None:
+            raise WidgetFunctionException(f"No resource exists: {resource_id}")
+        return r
 
     def viz(self) -> None:
         """
@@ -136,19 +168,16 @@ class Widget:
         """
         pass
 
-    def _source(self, use_data=True) -> str:
+    def _source(self) -> str:
         """
         Return the source code for this live widget as a string.
-        If use_data is True, the values in the data object will
-        be used to override the default values of the corresponding
-        resource.
         """
 
         source = render_template(
             "source.py.j2",
             name=self._name(),
             parent_name=self._parent_name(),
-            resources=self._source_resources(use_data=use_data),
+            resources=self._source_resources(),
             attributes=self._source_attributes(),
             functions=self._source_functions()
         )
@@ -188,13 +217,10 @@ class Widget:
             if filter_functions == isfunction(val):
                 yield kw, val
 
-    def _source_resources(self, use_data=True, indent=4) -> str:
+    def _source_resources(self, indent=4) -> str:
         """
         Return a string which captures the source code needed to initialize
         the resources attached to this object.
-        If use_data is True, the values in the data object will
-        be used to override the default values of the corresponding
-        resource.
         """
         spacer = "".join([" " for _ in range(indent)])
 
@@ -202,16 +228,8 @@ class Widget:
         resources_str = []
         for r in self.resources:
 
-            # If the use_data flag is set, use the value in the self.data
-            # object as the default value for the resource.
-            # Otherwise, just use the default value set for the resource.
-            if use_data:
-                r_default = self.data.get(r.id)
-            else:
-                r_default = r.default
-
             # Format the source code and append it to the lsit
-            resources_str.append(r.source(default=r_default))
+            resources_str.append(r.source())
 
         # Join all of those resource strings into a list
         line_spacer = f",\n{spacer}{spacer}"
@@ -219,7 +237,7 @@ class Widget:
 
         return resources_str
 
-    def _source_attributes(self, omit=["data", "resources"]) -> str:
+    def _source_attributes(self, omit=["resources", "resource_dict"]) -> str:
         """
         Return a text block which captures the attributes of this class.
         Any attributes in the omit list will be omitted.
@@ -234,7 +252,7 @@ class Widget:
             if kw not in omit:
 
                 # Add it to the list
-                attributes.append(f"    {kw} = {source_val(attrib)}")
+                attributes.append(f"    {kw} = {self.source_val(attrib)}")
 
         return "\n\n".join(attributes)
 
@@ -248,3 +266,14 @@ class Widget:
             getsource(func)
             for _, func in self._class_items(filter_functions=True)
         ])
+
+    def source_val(self, val):
+        """
+        Return a string representation of an attribute value
+        which can be used in source code initializing this widget.
+        """
+
+        if isinstance(val, str):
+            return f'"{val}"'
+        else:
+            return val

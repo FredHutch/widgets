@@ -6,7 +6,7 @@ from widgets.base.exceptions import ResourceConfigurationException
 class StString(Resource):
     """String value resource used for Streamlit-based widgets."""
 
-    datatype = str
+    value = ""
     max_chars: int = None
     type = "default"
     autocomplete = None
@@ -15,7 +15,7 @@ class StString(Resource):
     def __init__(
         self,
         id="",
-        default=None,
+        value="",
         label="",
         help="",
         disabled: bool = False,
@@ -27,14 +27,12 @@ class StString(Resource):
     ):
         """
         Args:
-            id (str):           The unique key used to store the resource in
-                                the widget `data` object.
+            id (str):           The unique key for the resource.
             label (str):        (optional) Label used for user input
                                 display elements
             help (str):         (optional) Help text used for user input
                                 display elements
-            default (int):      (optional) The default float, used if no saved
-                                value is present.
+            value (int):        (optional) The starting value.
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
             label_visibility:   (optional) The visibility of the label.
@@ -60,12 +58,15 @@ class StString(Resource):
             Resource: The instantiated resource object.
         """
 
+        if not isinstance(value, str):
+            raise ResourceConfigurationException("value must be a string")
+
         # Set up the resource attributes
-        self.setup(
+        super().__init__(
             id=id,
             label=label,
             help=help,
-            default=default
+            value=value
         )
 
         # Set up the specific attributes for this type of resource
@@ -76,16 +77,16 @@ class StString(Resource):
         self.autocomplete = autocomplete
         self.placeholder = placeholder
 
-    def user_input(self, widget_data: dict = {}):
+    def user_input(self):
         """
         Read in the string value from the user.
         """
 
         if not self.disabled:
             with st.sidebar:
-                widget_data[self.id] = st.text_input(
+                self.ui = st.text_input(
                     self.label,
-                    value=widget_data.get(self.id),
+                    value=self.value,
                     key=self.id,
                     help=self.help,
                     max_chars=self.max_chars,
@@ -100,7 +101,7 @@ class StString(Resource):
 class StInteger(Resource):
     """Integer value resource used for Streamlit-based widgets."""
 
-    datatype = int
+    value = 0
     disabled: bool = False
     label_visibility: str = "visible"
     min_value: int = None
@@ -111,7 +112,7 @@ class StInteger(Resource):
     def __init__(
         self,
         id="",
-        default=None,
+        value=0,
         label="",
         help="",
         disabled: bool = False,
@@ -123,14 +124,12 @@ class StInteger(Resource):
     ):
         """
         Args:
-            id (str):           The unique key used to store the resource in
-                                the widget `data` object.
+            id (str):           The unique key for the resource.
             label (str):        (optional) Label used for user input display
                                 elements
             help (str):         (optional) Help text used for user input
                                 display elements
-            default (int):      (optional) The default integer, used if no
-                                saved value is present.
+            value (int):        (optional) The starting value.
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
             label_visibility:   (optional) The visibility of the label.
@@ -152,11 +151,11 @@ class StInteger(Resource):
         """
 
         # Set up the resource attributes
-        self.setup(
+        super().__init__(
             id=id,
             label=label,
             help=help,
-            default=default
+            value=value
         )
 
         # Set up the specific attributes for this type of resource
@@ -167,17 +166,17 @@ class StInteger(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self, widget_data: dict):
+    def user_input(self):
         """
         Read in the integer value from the user.
         """
 
         if not self.disabled:
             with st.sidebar:
-                widget_data[self.id] = self.datatype(
+                self.ui = self.datatype(
                     st.number_input(
                         self.label,
-                        value=widget_data.get(self.id),
+                        value=self.value,
                         key=self.id,
                         help=self.help,
                         min_value=self.min_value,
@@ -190,9 +189,9 @@ class StInteger(Resource):
 
 
 class StFloat(Resource):
-    """Integer value resource used for Streamlit-based widgets."""
+    """Float value resource used for Streamlit-based widgets."""
 
-    datatype = float
+    value = 0.0
     disabled: bool = False
     label_visibility: str = "visible"
     min_value: int = None
@@ -203,7 +202,7 @@ class StFloat(Resource):
     def __init__(
         self,
         id="",
-        default=None,
+        value=0.0,
         label="",
         help="",
         disabled: bool = False,
@@ -215,14 +214,12 @@ class StFloat(Resource):
     ):
         """
         Args:
-            id (str):           The unique key used to store the resource in
-                                the widget `data` object.
+            id (str):           The unique key for the resource.
             label (str):        (optional) Label used for user input
                                 display elements
             help (str):         (optional) Help text used for user input
                                 display elements
-            default (int):      (optional) The default float, used if no saved
-                                value is present.
+            value (float):      (optional) The starting value.
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
             label_visibility:   (optional) The visibility of the label.
@@ -243,12 +240,15 @@ class StFloat(Resource):
             Resource: The instantiated resource object.
         """
 
+        if not isinstance(value, float):
+            raise ResourceConfigurationException("value must be a float")
+
         # Set up the resource attributes
-        self.setup(
+        super().__init__(
             id=id,
             label=label,
             help=help,
-            default=default
+            value=value
         )
 
         # Set up the specific attributes for this type of resource
@@ -266,18 +266,16 @@ class StFloat(Resource):
 
         if not self.disabled:
             with st.sidebar:
-                widget_data[self.id] = self.datatype(
-                    st.number_input(
-                        self.label,
-                        value=widget_data.get(self.id),
-                        key=self.id,
-                        help=self.help,
-                        min_value=self.min_value,
-                        max_value=self.max_value,
-                        step=self.step,
-                        format=self.format,
-                        label_visibility=self.label_visibility,
-                    )
+                self.ui = st.number_input(
+                    self.label,
+                    value=self.value,
+                    key=self.id,
+                    help=self.help,
+                    min_value=self.min_value,
+                    max_value=self.max_value,
+                    step=self.step,
+                    format=self.format,
+                    label_visibility=self.label_visibility,
                 )
 
 
@@ -286,7 +284,7 @@ class StSelectString(Resource):
     Select-string-value-from-list resource used for Streamlit-based widgets.
     """
 
-    datatype = str
+    value = ""
     disabled: bool = False
     label_visibility: str = "visible"
     options: list = []
@@ -295,7 +293,7 @@ class StSelectString(Resource):
     def __init__(
         self,
         id="",
-        default=None,
+        value="",
         label="",
         help="",
         disabled: bool = False,
@@ -305,14 +303,12 @@ class StSelectString(Resource):
     ):
         """
         Args:
-            id (str):           The unique key used to store the resource in
-                                the widget `data` object.
+            id (str):           The unique key for the resource.
             label (str):        (optional) Label used for user input
                                 display elements
             help (str):         (optional) Help text used for user input
                                 display elements
-            default (int):      (optional) The default float, used if no saved
-                                 value is present.
+            value (str):        (optional) The starting value
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
             label_visibility:   (optional) The visibility of the label.
@@ -326,9 +322,9 @@ class StSelectString(Resource):
                                 render.
 
             Note:
-            The default value may be defined either using the index position
-            or the default value.
-            The default value will override the index value if they happen
+            The value may be defined either using the index position
+            or the value attribute.
+            The value attribute will override the index value if they happen
             to differ.
 
         Returns:
@@ -336,11 +332,11 @@ class StSelectString(Resource):
         """
 
         # Set up the resource attributes
-        self.setup(
+        super().__init__(
             id=id,
             label=label,
             help=help,
-            default=default
+            value=value
         )
 
         # Set up the specific attributes for this type of resource
@@ -349,16 +345,11 @@ class StSelectString(Resource):
         self.options = options
         self.index = index
 
-    def _setup_extra(self):
-        """
-        The default values for this resource need to be set up in a different
-        way than the other resources.
-        The streamlit selectbox input element sets up the default value by
-        indicating which index position in the list of options to use.
-        To set up the default, we need to (1) make sure that the default value
-        is in the list of options, and (2) set the index variable to the
-        position of that element.
-        """
+        # Resolve any inconsistencies between value and index
+        self._resolve_index()
+
+    def _resolve_index(self):
+        """Resolve any inconsistencies between the value and index."""
 
         # There must be a list of options provided
         if self.options is None or not isinstance(self.options, list):
@@ -370,8 +361,8 @@ class StSelectString(Resource):
             msg = f"Resource {self.id} options may not be empty"
             raise ResourceConfigurationException(msg)
 
-        # If there is no default option set
-        if self.default is None:
+        # If there is no value attribute provided
+        if self.value is None:
 
             # There must be an index defined
             if self.index is None or not isinstance(self.index, int):
@@ -383,34 +374,40 @@ class StSelectString(Resource):
                 msg = f"Resource {self.id} must have an index defined in the valid range" # noqa
                 raise ResourceConfigurationException(msg)
 
-            # Set the default using the index position from the list
-            self.default = self.options[self.index]
+            # Set the value using the index position from the list
+            self.value = self.options[self.index]
 
-        # The default element must be present in the list of options
-        if self.default not in self.options:
-            msg = f"Default {self.default} not found in list of options: {', '.join(self.options)}" # noqa
-            raise ResourceConfigurationException(msg)
+        # If the value attribute was provided
+        else:
 
-        # Set the index position of the default element
-        self.index = self.options.index(self.default)
+            # The value must be present in the list of options
+            if self.value not in self.options:
+                msg = f"Default {self.value} not found in list of options: {', '.join(self.options)}" # noqa
+                raise ResourceConfigurationException(msg)
+
+            # Set the index position of the default element
+            self.index = self.options.index(self.default)
 
     def user_input(self, widget_data: dict = {}):
         """
         Read in the integer value from the user.
         """
 
-        # Start with the default value
-        widget_data[self.id] = self.default
-
-        # Reset the index value
-        self._setup_extra()
-
         if not self.disabled:
             with st.sidebar:
-                widget_data[self.id] = st.selectbox(
+                self.ui = st.selectbox(
                     self.label,
                     options=self.options,
+                    index=self.index,
                     key=self.id,
                     help=self.help,
                     label_visibility=self.label_visibility,
+                    on_change=self.on_change
                 )
+
+    def on_change(self):
+        """Function called when the selectbox is changed."""
+
+        # Set the value attribute according to the updated
+        # index position from the option list which was selected
+        self.value = self.get("options")[self.get("index")]
