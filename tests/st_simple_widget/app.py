@@ -18,19 +18,23 @@ class SimpleWidget(StreamlitWidget):
     # This app will prompt the user to provide four inputs,
     # one DataFrame (which can be provided as CSV), and
     # three string values.
-    # The data provided for each of these elements will be
-    # available in the viz() scope using the self.data object
 
     resources = [
         StDataFrame(
             id="df",
-            default=pd.DataFrame(dict(x=[], y=[], label=[])),
+            value=pd.DataFrame(dict(x=[], y=[], label=[])),
             label="Test CSV",
         ),
-        StString(id="x_col", default="x", label="X-axis Column"),
-        StString(id="y_col", default="y", label="Y-axis Column"),
-        StString(id="label_col", default="label", label="Label Column")
+        StString(id="x_col", value="x", label="X-axis Column"),
+        StString(id="y_col", value="y", label="Y-axis Column"),
+        StString(id="label_col", value="label", label="Label Column")
     ]
+    # The updated values for each of these resources can be accessed
+    # and modified using the .get_value() and .set_value() functions
+    # For example:
+    #   self.get_value("x_col") -> "x"
+    #   or
+    #   self.set_value("x_col", "new_value")
 
     # Specify any packages which should be installed prior to loading
 
@@ -57,13 +61,13 @@ class SimpleWidget(StreamlitWidget):
     # scatterplot.
     def viz(self):
 
-        if st.session_state.df is not None or self.data["df"].shape[0] > 0:
+        if st.session_state.df is not None or self.get_value("df").shape[0] > 0: # noqa
 
             fig = px.scatter(
-                data_frame=self.data["df"],
-                x=self.data["x_col"],
-                y=self.data["y_col"],
-                hover_name=self.data["label_col"]
+                data_frame=self.get_value("df"),
+                x=self.get_value("x_col"),
+                y=self.get_value("y_col"),
+                hover_name=self.get_value("label_col")
             )
 
             st.plotly_chart(fig)

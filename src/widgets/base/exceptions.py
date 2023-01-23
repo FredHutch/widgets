@@ -18,6 +18,11 @@ class ResourceConfigurationException(Exception):
     pass
 
 
+class ResourceExecutionException(Exception):
+    """Exception raised when a resource is not executed properly."""
+    pass
+
+
 class CLIInvocationException(Exception):
     """Exception raised when the CLI is not invoked properly."""
     pass
