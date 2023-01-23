@@ -75,7 +75,7 @@ class StDataFrame(Resource):
         self.label_visibility = label_visibility
         self.sep = sep
 
-    def user_input(self, widget_data: dict):
+    def user_input(self):
         """Allow the user to provide their own DataFrame from a file."""
 
         if not self.disabled:

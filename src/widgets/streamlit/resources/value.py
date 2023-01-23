@@ -259,7 +259,7 @@ class StFloat(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self, widget_data: dict = {}):
+    def user_input(self):
         """
         Read in the integer value from the user.
         """
@@ -388,7 +388,7 @@ class StSelectString(Resource):
             # Set the index position of the default element
             self.index = self.options.index(self.default)
 
-    def user_input(self, widget_data: dict = {}):
+    def user_input(self):
         """
         Read in the integer value from the user.
         """
