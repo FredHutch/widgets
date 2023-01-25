@@ -5,6 +5,7 @@ from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
+from widgets.streamlit.resources.base import StResource
 
 
 class StreamlitWidget(Widget):
@@ -12,6 +13,8 @@ class StreamlitWidget(Widget):
     Base class used for building interactive widgets using Streamlit.
     """
 
+    resources: List[StResource] = list()
+    resource_dict: Dict[str, StResource] = dict()
     requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
@@ -19,6 +22,7 @@ class StreamlitWidget(Widget):
         "from widgets.streamlit.resources.value import StString",
         "from widgets.streamlit.resources.value import StInteger",
         "from widgets.streamlit.resources.value import StFloat",
+        "from widgets.streamlit.resources.value import StSelectString",
         "from widgets.streamlit.widget import StreamlitWidget"
     ]
     extra_imports: List[str] = []
@@ -162,3 +166,8 @@ class StreamlitWidget(Widget):
         )
 
         return html
+
+    def resource_key(self, resource_id):
+        """Return the UI identifier for a resource."""
+
+        return self._get_resource(resource_id).key()

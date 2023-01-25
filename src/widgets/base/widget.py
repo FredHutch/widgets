@@ -44,7 +44,7 @@ class Widget:
         """
         Primary entrypoint used to launch the widget.
 
-        1. Run the user_input() method for all resources defined in the widget;
+        1. Run the setup_ui() method for all resources defined in the widget;
         2. Invoke the viz() function;
         3. Add buttons extending functionality of the widget;
         """
@@ -67,7 +67,7 @@ class Widget:
         for resource in self.resources:
 
             # Add the interactive input element, if any has been defined
-            resource.user_input()
+            resource.setup_ui()
 
     def get(self, resource_id: str, attr: str) -> Any:
         """Get the value of an attribute of a resource."""
@@ -78,7 +78,7 @@ class Widget:
     def get_value(self, resource_id: str) -> Any:
         """Get the 'value' attribute of a resource."""
 
-        return self.get(resource_id, "value")
+        return self._get_resource(resource_id).get_value()
 
     def set(self, resource_id, attr, val):
         """Set the value of an attribute of a resource."""

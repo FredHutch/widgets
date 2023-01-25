@@ -2,10 +2,10 @@ from typing import Union
 import streamlit as st
 import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.base.resource import Resource
+from widgets.streamlit.resources.base import StResource
 
 
-class StDataFrame(Resource):
+class StDataFrame(StResource):
     """DataFrame resource used in a Streamlit-based widget."""
 
     value = pd.DataFrame()
@@ -75,26 +75,29 @@ class StDataFrame(Resource):
         self.label_visibility = label_visibility
         self.sep = sep
 
-    def user_input(self):
+    def update_ui(self):
         """Allow the user to provide their own DataFrame from a file."""
 
-        if not self.disabled:
-            with st.sidebar:
-                self.uploader = st.file_uploader(
-                    self.label,
-                    accept_multiple_files=False,
-                    key=self.id,
-                    help=self.help
-                )
+        # Increment the UI revision
+        self.ui_revision += 1
 
-                # If a file was provided
-                if self.uploader is not None:
+        # Update the input element
+        self.ui.file_uploader(
+            self.label,
+            accept_multiple_files=False,
+            help=self.help,
+            key=self.key(),
+            disabled=self.disabled
+        )
 
-                    # Read the file as a DataFrame
-                    self.value = pd.read_csv(
-                        self.uploader,
-                        sep=self.sep
-                    )
+        # If a file was provided
+        if st.session_state[self.key()] is not None:
+
+            # Read the file as a DataFrame
+            self.value = pd.read_csv(
+                st.session_state[self.key()],
+                sep=self.sep
+            )
 
     def source_val(self, val):
         """
@@ -110,3 +113,8 @@ class StDataFrame(Resource):
             return val.to_dict(orient="list")
         else:
             return val
+
+    def get_value(self):
+        """Return the updated DataFrame."""
+
+        return self.value

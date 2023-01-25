@@ -1,12 +1,12 @@
 import streamlit as st
-from widgets.base.resource import Resource
 from widgets.base.exceptions import ResourceConfigurationException
+from widgets.streamlit.resources.base import StResource
 
 
-class StString(Resource):
+class StString(StResource):
     """String value resource used for Streamlit-based widgets."""
 
-    value = ""
+    value: str = None
     max_chars: int = None
     type = "default"
     autocomplete = None
@@ -15,7 +15,7 @@ class StString(Resource):
     def __init__(
         self,
         id="",
-        value="",
+        value=None,
         label="",
         help="",
         disabled: bool = False,
@@ -58,9 +58,6 @@ class StString(Resource):
             Resource: The instantiated resource object.
         """
 
-        if not isinstance(value, str):
-            raise ResourceConfigurationException("value must be a string")
-
         # Set up the resource attributes
         super().__init__(
             id=id,
@@ -77,28 +74,31 @@ class StString(Resource):
         self.autocomplete = autocomplete
         self.placeholder = placeholder
 
-    def user_input(self):
+    def update_ui(self):
         """
         Read in the string value from the user.
         """
 
-        if not self.disabled:
-            with st.sidebar:
-                self.ui = st.text_input(
-                    self.label,
-                    value=self.value,
-                    key=self.id,
-                    help=self.help,
-                    max_chars=self.max_chars,
-                    type=self.type,
-                    autocomplete=self.autocomplete,
-                    placeholder=self.placeholder,
-                    disabled=self.disabled,
-                    label_visibility=self.label_visibility,
-                )
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.text_input(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            max_chars=self.max_chars,
+            type=self.type,
+            autocomplete=self.autocomplete,
+            placeholder=self.placeholder,
+            disabled=self.disabled,
+            label_visibility=self.label_visibility
+        )
 
 
-class StInteger(Resource):
+class StInteger(StResource):
     """Integer value resource used for Streamlit-based widgets."""
 
     value = 0
@@ -166,29 +166,31 @@ class StInteger(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self):
+    def update_ui(self):
         """
         Read in the integer value from the user.
         """
 
-        if not self.disabled:
-            with st.sidebar:
-                self.ui = self.datatype(
-                    st.number_input(
-                        self.label,
-                        value=self.value,
-                        key=self.id,
-                        help=self.help,
-                        min_value=self.min_value,
-                        max_value=self.max_value,
-                        step=self.step,
-                        format=self.format,
-                        label_visibility=self.label_visibility,
-                    )
-                )
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.number_input(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            min_value=self.min_value,
+            max_value=self.max_value,
+            step=self.step,
+            format=self.format,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
 
 
-class StFloat(Resource):
+class StFloat(StResource):
     """Float value resource used for Streamlit-based widgets."""
 
     value = 0.0
@@ -259,32 +261,35 @@ class StFloat(Resource):
         self.step = step
         self.format = format
 
-    def user_input(self):
+    def update_ui(self):
         """
         Read in the integer value from the user.
         """
+        # Increment the UI revision
+        self.ui_revision += 1
 
-        if not self.disabled:
-            with st.sidebar:
-                self.ui = st.number_input(
-                    self.label,
-                    value=self.value,
-                    key=self.id,
-                    help=self.help,
-                    min_value=self.min_value,
-                    max_value=self.max_value,
-                    step=self.step,
-                    format=self.format,
-                    label_visibility=self.label_visibility,
-                )
+        # Update the input element
+        self.ui.number_input(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            min_value=self.min_value,
+            max_value=self.max_value,
+            step=self.step,
+            format=self.format,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
 
 
-class StSelectString(Resource):
+class StSelectString(StResource):
     """
     Select-string-value-from-list resource used for Streamlit-based widgets.
     """
 
-    value = ""
+    value: str = None
     disabled: bool = False
     label_visibility: str = "visible"
     options: list = []
@@ -293,7 +298,7 @@ class StSelectString(Resource):
     def __init__(
         self,
         id="",
-        value="",
+        value=None,
         label="",
         help="",
         disabled: bool = False,
@@ -356,11 +361,6 @@ class StSelectString(Resource):
             msg = f"Resource {self.id} must have a list of options defined"
             raise ResourceConfigurationException(msg)
 
-        # That list must contain elements
-        if len(self.options) == 0:
-            msg = f"Resource {self.id} options may not be empty"
-            raise ResourceConfigurationException(msg)
-
         # If there is no value attribute provided
         if self.value is None:
 
@@ -370,44 +370,50 @@ class StSelectString(Resource):
                 raise ResourceConfigurationException(msg)
 
             # The index must be a valid indeger
-            if self.index < 0 or self.index >= len(self.options):
+            if self.index < 0 or (len(self.options) > 0 and self.index >= len(self.options)): # noqa
                 msg = f"Resource {self.id} must have an index defined in the valid range" # noqa
                 raise ResourceConfigurationException(msg)
 
             # Set the value using the index position from the list
-            self.value = self.options[self.index]
+            if self.index < len(self.options):
+                self.value = self.options[self.index]
 
         # If the value attribute was provided
-        else:
+        elif self.value is not None:
 
             # The value must be present in the list of options
             if self.value not in self.options:
-                msg = f"Default {self.value} not found in list of options: {', '.join(self.options)}" # noqa
+                msg = f"Default ({self.value} [{type(self.value)}]) not found in list of options: {', '.join(self.options)}" # noqa
                 raise ResourceConfigurationException(msg)
 
             # Set the index position of the default element
-            self.index = self.options.index(self.default)
+            self.index = self.options.index(self.value)
 
-    def user_input(self):
+    def update_ui(self):
         """
-        Read in the integer value from the user.
+        Read in the selected string value from the user.
         """
 
-        if not self.disabled:
-            with st.sidebar:
-                self.ui = st.selectbox(
-                    self.label,
-                    options=self.options,
-                    index=self.index,
-                    key=self.id,
-                    help=self.help,
-                    label_visibility=self.label_visibility,
-                    on_change=self.on_change
-                )
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.selectbox(
+            self.label,
+            on_change=self.on_change,
+            key=self.key(),
+            options=self.options,
+            index=self.index,
+            help=self.help,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
 
     def on_change(self):
         """Function called when the selectbox is changed."""
 
-        # Set the value attribute according to the updated
-        # index position from the option list which was selected
-        self.value = self.get("options")[self.get("index")]
+        # Set the value attribute on the resource
+        self.value = st.session_state[self.key()]
+
+        # Update the starting index position (used in update_ui())
+        self.index = self.options.index(self.value)
