@@ -49,7 +49,7 @@ class TestStreamlitResources(unittest.TestCase):
         # Try an empty value
         s = StString(id="test_string")
         msg = "Empty value not created correctly"
-        self.assertEqual("", s.get("value"), msg)
+        self.assertIsNone(s.get("value"), msg)
 
     def test_integer(self):
 

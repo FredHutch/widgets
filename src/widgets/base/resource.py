@@ -38,7 +38,7 @@ class Resource:
         self.label = id if label == "" else label
         self.help = help
 
-    def user_input(self) -> None:
+    def setup_ui(self) -> None:
         """
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.
@@ -55,12 +55,19 @@ class Resource:
     def get(self, attr) -> Any:
         """Return the value of the attribute for this resource."""
 
-        val = self.__dict__.get(attr)
-        if val is None:
+        if attr not in self.__dict__:
             msg = f"Attribute does not exist {attr} for {self.id}"
             raise ResourceExecutionException(msg)
 
-        return val
+        return self.__dict__.get(attr)
+
+    def get_value(self) -> Any:
+        """
+        Return the selected value of this resource (the 'value' attribute).
+        Provided in the base class to be overridden by specialized resources.
+        """
+
+        return self.get("value")
 
     def set(self, attr, val) -> None:
         """Set the value of an attribute for this resource."""
@@ -69,6 +76,7 @@ class Resource:
 
     def source(self, indent=4) -> str:
         """Return the code used to recreate this resource."""
+
         spacer = "".join([" " for _ in range(indent)])
 
         # Get the signature of the initialization function
