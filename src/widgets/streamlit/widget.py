@@ -5,16 +5,14 @@ from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
-from widgets.streamlit.resources.base import StResource
+from widgets.streamlit.resource_list import StResourceList
 
 
-class StreamlitWidget(Widget):
+class StreamlitWidget(StResourceList, Widget):
     """
     Base class used for building interactive widgets using Streamlit.
     """
 
-    resources: List[StResource] = list()
-    resource_dict: Dict[str, StResource] = dict()
     requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
@@ -166,20 +164,3 @@ class StreamlitWidget(Widget):
         )
 
         return html
-
-    def resource_key(self, resource_id):
-        """Return the UI identifier for a resource."""
-
-        return self._get_resource(resource_id).key()
-
-    def set(self, resource_id, attr, val, update=True):
-        """Set the value of an attribute of a resource."""
-
-        # Call the set function of the resource
-        self._get_resource(resource_id).set(attr, val, update=update)
-
-    def set_value(self, resource_id, val, update=True):
-        """Set the 'value' attribute of a resource."""
-
-        # Call the set function of the resource
-        self.set(resource_id, "value", val, update=update)
