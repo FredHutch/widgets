@@ -1,7 +1,6 @@
 from inspect import getmro, getsource, isfunction
 from pathlib import Path
-from typing import Dict, List, Union
-from widgets.base.resource import Resource
+from typing import Union
 from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.helpers import render_template
