@@ -1,5 +1,6 @@
 from inspect import signature
 from typing import Any, Union
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 
 
@@ -21,7 +22,7 @@ class Resource:
 
     def __init__(
         self,
-        id="",
+        id: str = None,
         value=None,
         label="",
         help: Union[str, None] = None
@@ -29,6 +30,11 @@ class Resource:
         """
         Set up the attributes which are used by all Resource objects.
         """
+
+        # The 'id' cannot be empty
+        if id is None:
+            msg = "Must provide id for Resource"
+            raise ResourceConfigurationException(msg)
 
         # Save the id and starting value for this particular resource
         self.id = id
