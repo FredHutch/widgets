@@ -15,9 +15,6 @@ class Widget(ResourceList):
     resource_dict at initialization.
     """
 
-    resources: List[Resource] = list()
-    resource_dict: Dict[str, Resource] = dict()
-
     def run(self) -> None:
         """
         Primary entrypoint used to launch the widget.
