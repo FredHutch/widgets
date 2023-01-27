@@ -417,3 +417,74 @@ class StSelectString(StResource):
 
         # Update the starting index position (used in update_ui())
         self.index = self.options.index(self.value)
+
+
+class StCheckbox(StResource):
+    """Checkbox resource used for Streamlit-based widgets."""
+
+    value = False
+    disabled: bool = False
+    label_visibility: str = "visible"
+
+    def __init__(
+        self,
+        id="",
+        value=False,
+        label="",
+        help="",
+        disabled: bool = False,
+        label_visibility: str = "visible"
+    ):
+        """
+        Args:
+            id (str):           The unique key for the resource.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            value (bool):       (optional) The starting value.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label="").
+                                If "collapsed", both the label and the space
+                                are removed. Default is "visible".
+
+        Returns:
+            Resource: The instantiated resource object.
+        """
+
+        if not isinstance(value, bool):
+            raise ResourceConfigurationException("value must be a bool")
+
+        # Set up the resource attributes
+        super().__init__(
+            id=id,
+            label=label,
+            help=help,
+            value=value
+        )
+
+        # Set up the specific attributes for this type of resource
+        self.disabled = disabled
+        self.label_visibility = label_visibility
+
+    def update_ui(self):
+        """
+        Read in the bool value from the user.
+        """
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.checkbox(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
