@@ -46,14 +46,13 @@ class StResource(Resource):
         """Set up the UI element (overridden by child classes)."""
         pass
 
-    def setup_ui(self):
+    def setup_ui(self, container: DeltaGenerator):
         """
         Read in the integer value from the user.
         """
 
         # Set up the placeholder container
-        with st.sidebar:
-            self.ui = st.empty()
+        self.ui = container.empty()
 
         # Update the element being displayed in the UI
         self.update_ui()

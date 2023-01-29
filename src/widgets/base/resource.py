@@ -44,7 +44,7 @@ class Resource:
         self.label = id if label == "" else label
         self.help = help
 
-    def setup_ui(self) -> None:
+    def setup_ui(self, container) -> None:
         """
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.

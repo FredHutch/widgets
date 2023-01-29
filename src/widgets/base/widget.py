@@ -14,6 +14,8 @@ class Widget(ResourceList):
     resource_dict at initialization.
     """
 
+    resource_container = None
+
     def run(self) -> None:
         """
         Primary entrypoint used to launch the widget.
@@ -41,7 +43,7 @@ class Widget(ResourceList):
         for resource in self.resources:
 
             # Add the interactive input element, if any has been defined
-            resource.setup_ui()
+            resource.setup_ui(self.resource_container)
 
     def viz(self) -> None:
         """

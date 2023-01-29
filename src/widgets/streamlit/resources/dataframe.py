@@ -99,7 +99,7 @@ class StDataFrame(StResource):
                 sep=self.sep
             )
 
-    def source_val(self, val):
+    def _source_val(self, val):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
