@@ -51,13 +51,6 @@ class Resource:
         """
         pass
 
-    def cli(self) -> None:
-        """
-        Method used to provide the option for user input from the command line.
-        Should be overridden by each specific resource.
-        """
-        pass
-
     def get(self, attr) -> Any:
         """Return the value of the attribute for this resource."""
 
