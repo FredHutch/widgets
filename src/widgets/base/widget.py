@@ -193,7 +193,7 @@ class Widget(ResourceList):
             if kw not in omit:
 
                 # Add it to the list
-                attributes.append(f"    {kw} = {self.source_val(attrib)}")
+                attributes.append(f"    {kw} = {self._source_val(attrib)}")
 
         return "\n\n".join(attributes)
 
@@ -208,7 +208,7 @@ class Widget(ResourceList):
             for _, func in self._class_items(filter_functions=True)
         ])
 
-    def source_val(self, val):
+    def _source_val(self, val):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this widget.

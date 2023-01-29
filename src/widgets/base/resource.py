@@ -99,13 +99,13 @@ class Resource:
 
         # Format the params as a string
         params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self.source_val(val)}"
+            f"{kw}={self._source_val(val)}"
             for kw, val in params.items()
         ])
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def source_val(self, val):
+    def _source_val(self, val):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
