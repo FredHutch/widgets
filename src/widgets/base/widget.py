@@ -11,7 +11,7 @@ class Widget(ResourceList):
     """
     Base class used for building interactive widgets.
     The list of resources will be mapped by .id to the
-    resource_dict at initialization.
+    _resource_dict at initialization.
     """
 
     resource_container = None
@@ -180,7 +180,7 @@ class Widget(ResourceList):
 
         return resources_str
 
-    def _source_attributes(self, omit=["resources", "resource_dict"]) -> str:
+    def _source_attributes(self, omit=["resources", "_resource_dict"]) -> str:
         """
         Return a text block which captures the attributes of this class.
         Any attributes in the omit list will be omitted.

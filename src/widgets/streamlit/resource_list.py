@@ -9,7 +9,7 @@ class StResourceList(ResourceList):
     """
 
     resources: List[StResource] = list()
-    resource_dict: Dict[str, StResource] = dict()
+    _resource_dict: Dict[str, StResource] = dict()
 
     def resource_key(self, resource_id):
         """Return the UI identifier for a resource."""

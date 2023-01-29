@@ -10,15 +10,15 @@ class ResourceList:
     """
 
     resources: List[Resource] = list()
-    resource_dict: Dict[str, Resource] = dict()
 
     def __init__(self):
+    _resource_dict: Dict[str, Resource] = dict()
         """
         Set up the ResourceList object
         """
 
-        # The resource_dict must be empty at initialization
-        self.resource_dict = dict()
+        # The _resource_dict must be empty at initialization
+        self._resource_dict = dict()
 
         # Iterate over each resource defined in the widget
         for resource in self.resources:
@@ -29,10 +29,10 @@ class ResourceList:
                 raise WidgetConfigurationException(msg)
 
             # Make sure that the id attribute is not repeated
-            if resource.id in self.resource_dict:
+            if resource.id in self._resource_dict:
                 msg = f"Resource ids must be unique (repeated: {resource.id})"
                 raise WidgetConfigurationException(msg)
-            self.resource_dict[resource.id] = resource
+            self._resource_dict[resource.id] = resource
 
     def get(self, resource_id: str, attr: str) -> Any:
         """Get the value of an attribute of a resource."""
@@ -61,7 +61,7 @@ class ResourceList:
         """Return the resource with a corresponding id."""
 
         # Get the resource
-        r = self.resource_dict.get(resource_id)
+        r = self._resource_dict.get(resource_id)
 
         if r is None:
             raise WidgetFunctionException(f"No resource exists: {resource_id}")
