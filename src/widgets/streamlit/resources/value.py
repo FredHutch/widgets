@@ -1,3 +1,4 @@
+import logging
 import streamlit as st
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.streamlit.resources.base import StResource
@@ -79,9 +80,7 @@ class StString(StResource):
         Read in the string value from the user.
         """
 
-        # Increment the UI revision
-        self.ui_revision += 1
-
+        logging.info(f"{self.__class__.__name__} - {self.id} - update_ui")
         # Update the input element
         self.ui.text_input(
             self.label,
@@ -171,9 +170,7 @@ class StInteger(StResource):
         Read in the integer value from the user.
         """
 
-        # Increment the UI revision
-        self.ui_revision += 1
-
+        logging.info(f"{self.__class__.__name__} - {self.id} - update_ui")
         # Update the input element
         self.ui.number_input(
             self.label,
@@ -265,9 +262,7 @@ class StFloat(StResource):
         """
         Read in the integer value from the user.
         """
-        # Increment the UI revision
-        self.ui_revision += 1
-
+        logging.info(f"{self.__class__.__name__} - {self.id} - update_ui")
         # Update the input element
         self.ui.number_input(
             self.label,
@@ -394,9 +389,7 @@ class StSelectString(StResource):
         Read in the selected string value from the user.
         """
 
-        # Increment the UI revision
-        self.ui_revision += 1
-
+        logging.info(f"{self.__class__.__name__} - {self.id} - update_ui")
         # Update the input element
         self.ui.selectbox(
             self.label,
@@ -475,9 +468,7 @@ class StCheckbox(StResource):
         """
         Read in the bool value from the user.
         """
-        # Increment the UI revision
-        self.ui_revision += 1
-
+        logging.info(f"{self.__class__.__name__} - {self.id} - update_ui")
         # Update the input element
         self.ui.checkbox(
             self.label,

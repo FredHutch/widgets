@@ -1,6 +1,8 @@
 from inspect import getmro, getsource, isfunction
+import logging
 from pathlib import Path
 from typing import Union
+from uuid import uuid4
 from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.helpers import render_template
@@ -22,12 +24,12 @@ class Widget(ResourceList):
 
         1. Run the setup_ui() method for all resources defined in the widget;
         2. Invoke the viz() function;
-        3. Add buttons extending functionality of the widget;
         """
+        self.rand = uuid4()
+        logging.info(f"Widget - run ({self.rand})")
 
         self.inputs()
         self.viz()
-        self.extra_functions()
 
     def run_cli(self) -> None:
         """
@@ -39,20 +41,14 @@ class Widget(ResourceList):
     def inputs(self) -> None:
         """Read in data from all of the resources defined in the widget."""
 
-        # Iterate over each of the resources defined for this widget
-        for resource in self.resources:
-
-            # Add the interactive input element, if any has been defined
-            resource.setup_ui(self.resource_container)
+        # This method will recursively run setup_ui for each Resource
+        logging.info(f"Widget - inputs ({self.rand})")
+        self.setup_ui(self.resource_container)
 
     def viz(self) -> None:
         """
         The viz() method should be overridden by any widget based on this.
         """
-        pass
-
-    def extra_functions(self) -> None:
-        """Add generalized functionality to the widget."""
         pass
 
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
@@ -120,7 +116,6 @@ class Widget(ResourceList):
             "source.py.j2",
             name=self._name(),
             parent_name=self._parent_name(),
-            resources=self._source_resources(),
             attributes=self._source_attributes(),
             functions=self._source_functions()
         )
@@ -160,30 +155,9 @@ class Widget(ResourceList):
             if filter_functions == isfunction(val):
                 yield kw, val
 
-    def _source_resources(self, indent=4) -> str:
-        """
-        Return a string which captures the source code needed to initialize
-        the resources attached to this object.
-        """
-        spacer = "".join([" " for _ in range(indent)])
-
-        # Format the source code for each of the resources in this widget
-        resources_str = []
-        for r in self.resources:
-
-            # Format the source code and append it to the lsit
-            resources_str.append(r.source())
-
-        # Join all of those resource strings into a list
-        line_spacer = f",\n{spacer}{spacer}"
-        resources_str = f"    resources = [\n{spacer}{spacer}{line_spacer.join(resources_str)}\n{spacer}]" # noqa
-
-        return resources_str
-
-    def _source_attributes(self, omit=["resources", "_resource_dict"]) -> str:
+    def _source_attributes(self) -> str:
         """
         Return a text block which captures the attributes of this class.
-        Any attributes in the omit list will be omitted.
         """
 
         attributes = []
@@ -191,11 +165,8 @@ class Widget(ResourceList):
         # Iterate over the attributes of this class
         for kw, attrib in self._class_items(filter_functions=False):
 
-            # If the attribute is not in the omit list
-            if kw not in omit:
-
-                # Add it to the list
-                attributes.append(f"    {kw} = {self._source_val(attrib)}")
+            # Add it to the list
+            attributes.append(f"    {kw} = {self._source_val(attrib)}")
 
         return "\n\n".join(attributes)
 
@@ -209,14 +180,3 @@ class Widget(ResourceList):
             getsource(func)
             for _, func in self._class_items(filter_functions=True)
         ])
-
-    def _source_val(self, val):
-        """
-        Return a string representation of an attribute value
-        which can be used in source code initializing this widget.
-        """
-
-        if isinstance(val, str):
-            return f'"{val}"'
-        else:
-            return val

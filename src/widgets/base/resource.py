@@ -1,5 +1,6 @@
 from inspect import signature
-from typing import Any, Union
+import logging
+from typing import Any
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 
@@ -25,7 +26,7 @@ class Resource:
         id: str = None,
         value=None,
         label="",
-        help: Union[str, None] = None
+        help=""
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
@@ -49,6 +50,8 @@ class Resource:
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.
         """
+        logging.info(f"Resource {self.id} - setup_ui")
+
         pass
 
     def get(self, attr) -> Any:
@@ -73,8 +76,13 @@ class Resource:
 
         self.__dict__[attr] = val
 
+    def set_value(self, val, **kwargs) -> None:
+        """Set the value of the 'value' attribute for this resource."""
+
+        self.set("value", val, **kwargs)
+
     def source(self, indent=4) -> str:
-        """Return the code used to recreate this resource."""
+        """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
 
@@ -92,13 +100,13 @@ class Resource:
 
         # Format the params as a string
         params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self._source_val(val)}"
+            f"{kw}={self._source_val(val, indent=indent+4)}"
             for kw, val in params.items()
         ])
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def _source_val(self, val):
+    def _source_val(self, val, indent=4):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
@@ -106,5 +114,12 @@ class Resource:
 
         if isinstance(val, str):
             return f'"{val}"'
+        elif isinstance(val, list):
+            return f"""[{', '.join([
+                self._source_val(i, indent=indent)
+                for i in val
+            ])}]"""
+        elif isinstance(val, Resource):
+            return val.source(indent=indent)
         else:
             return val

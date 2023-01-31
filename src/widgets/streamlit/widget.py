@@ -108,10 +108,6 @@ class StreamlitWidget(StResourceList, Widget):
         """
         pass
 
-    def extra_functions(self) -> None:
-        """Add generalized functionality to the widget."""
-        pass
-
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
@@ -127,9 +123,8 @@ class StreamlitWidget(StResourceList, Widget):
 
     def to_script(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
-        Create a python script which will be load this widget.
+        Create a python script which will be used to load this widget.
         If fp is None, return a string.
-        Should be overridden by each child class.
         """
 
         # Create the Python script as a string

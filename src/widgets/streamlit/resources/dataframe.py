@@ -78,8 +78,7 @@ class StDataFrame(StResource):
     def update_ui(self):
         """Allow the user to provide their own DataFrame from a file."""
 
-        # Increment the UI revision
-        self.ui_revision += 1
+        st.write(f"HERE ({self.key()})")
 
         # Update the input element
         self.ui.file_uploader(
@@ -99,7 +98,7 @@ class StDataFrame(StResource):
                 sep=self.sep
             )
 
-    def _source_val(self, val):
+    def _source_val(self, val, **kwargs):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
@@ -113,8 +112,3 @@ class StDataFrame(StResource):
             return val.to_dict(orient="list")
         else:
             return val
-
-    def get_value(self):
-        """Return the updated DataFrame."""
-
-        return self.value

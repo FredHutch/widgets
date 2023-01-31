@@ -21,16 +21,16 @@ class SimpleWidget(StreamlitWidget):
     # three string values.
 
     resources = [
-        StDataFrame(
-            id="df",
-            value=pd.DataFrame(dict(x=[], y=[], label=[])),
-            label="Test CSV",
-        ),
-        StSelectString(id="x_col", label="X-axis Column"),
-        StString(id="x_label", label="X-axis Label", value="x-axis"),
-        StSelectString(id="y_col", label="Y-axis Column"),
+        # StDataFrame(
+        #     id="df",
+        #     value=pd.DataFrame(dict(x=[], y=[], label=[])),
+        #     label="Test CSV",
+        # ),
+        # StSelectString(id="x_col", label="X-axis Column"),
+        # StString(id="x_label", label="X-axis Label", value="x-axis"),
+        # StSelectString(id="y_col", label="Y-axis Column"),
         StString(id="y_label", label="Y-axis Label", value="y-axis"),
-        StSelectString(id="label_col", label="Label Column")
+        # StSelectString(id="label_col", label="Label Column")
     ]
     # The updated values for each of these resources can be accessed
     # and modified using the .get_value() and .set_value() functions
@@ -69,38 +69,40 @@ class SimpleWidget(StreamlitWidget):
     # scatterplot.
     def viz(self):
 
-        # Get the updated values from the UI
-        df = self.get_value("df")
+        # # Get the updated values from the UI
+        # df = self.get_value("df")
 
-        # If a table has been uploaded
-        if df is not None and df.shape[0] > 0:
+        # # If a table has been uploaded
+        # if df is not None and df.shape[0] > 0:
 
-            # Update the options for the x_col, y_col, and label_col variables
-            self.update_options(df.columns.values)
+        #     # Update the options for the x_col, y_col, and label_col variables
+        #     self.update_options(df.columns.values)
 
-            # Make a plot
-            fig = px.scatter(
-                data_frame=df,
-                x=self.get_value("x_col"),
-                y=self.get_value("y_col"),
-                hover_name=self.get_value("label_col"),
-                labels={
-                    self.get_value("x_col"): self.get_value("x_label"),
-                    self.get_value("y_col"): self.get_value("y_label")
-                }
-            )
+        #     # Make a plot
+        #     fig = px.scatter(
+        #         data_frame=df,
+        #         x=self.get_value("x_col"),
+        #         y=self.get_value("y_col"),
+        #         hover_name=self.get_value("label_col"),
+        #         labels={
+        #             self.get_value("x_col"): self.get_value("x_label"),
+        #             self.get_value("y_col"): self.get_value("y_label")
+        #         }
+        #     )
 
-            # Display the plot
-            st.plotly_chart(fig)
+        #     # Display the plot
+        #     st.plotly_chart(fig)
 
-        # If no table has been uploaded
-        else:
+        # # If no table has been uploaded
+        # else:
 
-            # Print a simple message to the user
-            st.write("Please provide data to plot")
+        #     # Print a simple message to the user
+        #     st.write("Please provide data to plot")
 
-        self.download_html_button()
-        self.download_script_button()
+        # self.download_html_button()
+        # self.download_script_button()
+
+        pass
 
     # Custom methods can be defined for the widget
     def update_options(self, options):
