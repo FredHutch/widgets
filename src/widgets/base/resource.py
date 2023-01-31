@@ -1,5 +1,7 @@
 from inspect import signature
-from typing import Any, Union
+import logging
+from typing import Any
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 
 
@@ -21,14 +23,19 @@ class Resource:
 
     def __init__(
         self,
-        id="",
+        id: str = None,
         value=None,
         label="",
-        help: Union[str, None] = None
+        help=""
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
         """
+
+        # The 'id' cannot be empty
+        if id is None:
+            msg = "Must provide id for Resource"
+            raise ResourceConfigurationException(msg)
 
         # Save the id and starting value for this particular resource
         self.id = id
@@ -38,18 +45,13 @@ class Resource:
         self.label = id if label == "" else label
         self.help = help
 
-    def setup_ui(self) -> None:
+    def setup_ui(self, container) -> None:
         """
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.
         """
-        pass
+        logging.info(f"Resource {self.id} - setup_ui")
 
-    def cli(self) -> None:
-        """
-        Method used to provide the option for user input from the command line.
-        Should be overridden by each specific resource.
-        """
         pass
 
     def get(self, attr) -> Any:
@@ -74,8 +76,13 @@ class Resource:
 
         self.__dict__[attr] = val
 
+    def set_value(self, val, **kwargs) -> None:
+        """Set the value of the 'value' attribute for this resource."""
+
+        self.set("value", val, **kwargs)
+
     def source(self, indent=4) -> str:
-        """Return the code used to recreate this resource."""
+        """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
 
@@ -93,13 +100,13 @@ class Resource:
 
         # Format the params as a string
         params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self.source_val(val)}"
+            f"{kw}={self._source_val(val, indent=indent+4)}"
             for kw, val in params.items()
         ])
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def source_val(self, val):
+    def _source_val(self, val, indent=4):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
@@ -107,5 +114,12 @@ class Resource:
 
         if isinstance(val, str):
             return f'"{val}"'
+        elif isinstance(val, list):
+            return f"""[{', '.join([
+                self._source_val(i, indent=indent)
+                for i in val
+            ])}]"""
+        elif isinstance(val, Resource):
+            return val.source(indent=indent)
         else:
             return val
