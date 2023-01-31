@@ -1,7 +1,7 @@
-from typing import Any
+import logging
+from uuid import uuid4
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
-from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.resource import Resource
 
 
@@ -15,22 +15,12 @@ class StResource(Resource):
     # Every streamlit-based resource will set up a UI object
     ui: DeltaGenerator = None
 
-    # Keep track of the number of times that the UI element has been updated
-    ui_revision = 0
+    # Keep track of uuid assigned to this resource in the browser
+    uuid: str = None
 
     def key(self):
-        """Format a unique UI key based on the id and ui_revision."""
-        return f"{self.id}_{self.ui_revision}"
-
-    def get(self, attr) -> Any:
-        """Return the value of the attribute for this resource."""
-
-        # If there is no value, raise an error
-        if attr not in self.__dict__:
-            msg = f"Attribute does not exist {attr} for {self.id}"
-            raise ResourceExecutionException(msg)
-
-        return self.__dict__.get(attr)
+        """Format a unique UI key based on the id and uuid."""
+        return f"{self.id}_{self.uuid}"
 
     def set(self, attr, val, update=True) -> None:
         """Set the value of an attribute for this resource."""
@@ -39,21 +29,34 @@ class StResource(Resource):
         self.__dict__[attr] = val
 
         if update and self.ui is not None:
+
+            # Make a new uuid for the input element
+            self.uuid = uuid4()
+
             # Call the method to setup the input element
             self.update_ui()
+
+    def set_value(self, val, update=True, **kwargs) -> None:
+        """Set the value of the 'value' attribute for this resource."""
+
+        self.set("value", val, update=update, **kwargs)
 
     def update_ui(self) -> None:
         """Set up the UI element (overridden by child classes)."""
         pass
 
-    def setup_ui(self):
+    def setup_ui(self, container: DeltaGenerator):
         """
-        Read in the integer value from the user.
+        Read in the value from the user.
         """
 
+        logging.info(f"StResource {self.id} - setup_ui")
+
         # Set up the placeholder container
-        with st.sidebar:
-            self.ui = st.empty()
+        self.ui = container.empty()
+
+        # Populate the .uuid to start
+        self.uuid = uuid4()
 
         # Update the element being displayed in the UI
         self.update_ui()
@@ -63,19 +66,3 @@ class StResource(Resource):
 
         # Set the value attribute on the resource
         self.value = st.session_state[self.key()]
-
-    def get_value(self):
-        """Return the updated value for the widget in the session state."""
-
-        # If the ui has been set up
-        if self.ui is not None:
-
-            # Get the value from the ui
-            self.value = st.session_state[self.key()]
-            return st.session_state[self.key()]
-
-        # If the ui has not been set up
-        else:
-
-            # Use the object attribute
-            return self.value
