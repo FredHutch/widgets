@@ -1,5 +1,6 @@
 from inspect import signature
-from typing import Any, Union
+from typing import Any
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 
 
@@ -8,46 +9,51 @@ class Resource:
     Base class for all resources used by widgets.
 
     Attributes:
-            id (str):   The unique key used to identify the resource.
-            value:      The starting value for the resource.
-            label (str): Label displayed to the user for the resource
-            help (str): Help text describing the resource to the user
+            id (str):          The unique key used to identify the resource.
+            value:             The starting value for the resource.
+            label (str):       Label displayed to the user for the resource.
+            help (str):        Help text describing the resource to the user.
     """
 
-    id: str = None
+    id = ""
     value = None
-    label: str = None
-    help: str = None
+    label = ""
+    help = ""
 
     def __init__(
         self,
         id="",
         value=None,
         label="",
-        help: Union[str, None] = None
+        help="",
+        **kwargs
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
         """
+
+        # The 'id' cannot be empty
+        if len(id) == 0:
+            msg = "Must provide id for Resource"
+            raise ResourceConfigurationException(msg)
 
         # Save the id and starting value for this particular resource
         self.id = id
         self.value = value
 
         # If no label is provided, default to the id
-        self.label = id if label == "" else label
+        self.label = id.title() if label == "" else label
         self.help = help
 
-    def setup_ui(self) -> None:
+        # Any additional keyword arguments
+        for attr, val in kwargs.items():
+
+            # Will be attached to this object
+            self.__dict__[attr] = val
+
+    def setup_ui(self, container) -> None:
         """
         Method used to provide the option for user input from the GUI.
-        Should be overridden by each specific resource.
-        """
-        pass
-
-    def cli(self) -> None:
-        """
-        Method used to provide the option for user input from the command line.
         Should be overridden by each specific resource.
         """
         pass
@@ -74,8 +80,13 @@ class Resource:
 
         self.__dict__[attr] = val
 
-    def source(self, indent=4) -> str:
-        """Return the code used to recreate this resource."""
+    def set_value(self, val, **kwargs) -> None:
+        """Set the value of the 'value' attribute for this resource."""
+
+        self.set("value", val, **kwargs)
+
+    def source(self, indent=4, skip=["self", "kwargs"]) -> str:
+        """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
 
@@ -86,20 +97,20 @@ class Resource:
         params = {}
 
         for kw in sig.parameters.keys():
-            if kw == "self":
+            if kw in skip:
                 continue
             else:
                 params[kw] = self.__dict__[kw]
 
         # Format the params as a string
         params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self.source_val(val)}"
+            f"{kw}={self._source_val(val, indent=indent+4)}"
             for kw, val in params.items()
         ])
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def source_val(self, val):
+    def _source_val(self, val, indent=4) -> Any:
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
@@ -107,5 +118,12 @@ class Resource:
 
         if isinstance(val, str):
             return f'"{val}"'
+        elif isinstance(val, list):
+            return f"""[{', '.join([
+                self._source_val(i, indent=indent)
+                for i in val
+            ])}]"""
+        elif isinstance(val, Resource):
+            return val.source(indent=indent)
         else:
             return val

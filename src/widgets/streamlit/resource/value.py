@@ -1,6 +1,6 @@
 import streamlit as st
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.streamlit.resources.base import StResource
+from widgets.streamlit.resource import StResource
 
 
 class StString(StResource):
@@ -23,7 +23,8 @@ class StString(StResource):
         max_chars: int = None,
         type: str = "default",
         autocomplete=None,
-        placeholder: str = None
+        placeholder: str = None,
+        **kwargs
     ):
         """
         Args:
@@ -63,7 +64,8 @@ class StString(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -97,6 +99,8 @@ class StString(StResource):
             label_visibility=self.label_visibility
         )
 
+        self.on_change()
+
 
 class StInteger(StResource):
     """Integer value resource used for Streamlit-based widgets."""
@@ -121,6 +125,7 @@ class StInteger(StResource):
         max_value: int = None,
         step: int = 1,
         format: str = "%d",
+        **kwargs
     ):
         """
         Args:
@@ -155,7 +160,8 @@ class StInteger(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -189,6 +195,8 @@ class StInteger(StResource):
             disabled=self.disabled
         )
 
+        self.on_change()
+
 
 class StFloat(StResource):
     """Float value resource used for Streamlit-based widgets."""
@@ -213,6 +221,7 @@ class StFloat(StResource):
         max_value: int = None,
         step: int = None,
         format: str = "%f",
+        **kwargs
     ):
         """
         Args:
@@ -250,7 +259,8 @@ class StFloat(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -265,6 +275,7 @@ class StFloat(StResource):
         """
         Read in the integer value from the user.
         """
+
         # Increment the UI revision
         self.ui_revision += 1
 
@@ -282,6 +293,8 @@ class StFloat(StResource):
             label_visibility=self.label_visibility,
             disabled=self.disabled
         )
+
+        self.on_change()
 
 
 class StSelectString(StResource):
@@ -304,7 +317,8 @@ class StSelectString(StResource):
         disabled: bool = False,
         label_visibility: str = "visible",
         options: list = [],
-        index: int = 0
+        index: int = 0,
+        **kwargs
     ):
         """
         Args:
@@ -341,7 +355,8 @@ class StSelectString(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -409,11 +424,90 @@ class StSelectString(StResource):
             disabled=self.disabled
         )
 
+        self.on_change()
+
     def on_change(self):
         """Function called when the selectbox is changed."""
 
         # Set the value attribute on the resource
         self.value = st.session_state[self.key()]
 
-        # Update the starting index position (used in update_ui())
-        self.index = self.options.index(self.value)
+        if self.value is not None:
+            # Update the starting index position (used in update_ui())
+            self.index = self.options.index(self.value)
+
+
+class StCheckbox(StResource):
+    """Checkbox resource used for Streamlit-based widgets."""
+
+    value = False
+    disabled: bool = False
+    label_visibility: str = "visible"
+
+    def __init__(
+        self,
+        id="",
+        value=False,
+        label="",
+        help="",
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        **kwargs
+    ):
+        """
+        Args:
+            id (str):           The unique key for the resource.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            value (bool):       (optional) The starting value.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label="").
+                                If "collapsed", both the label and the space
+                                are removed. Default is "visible".
+
+        Returns:
+            Resource: The instantiated resource object.
+        """
+
+        if not isinstance(value, bool):
+            raise ResourceConfigurationException("value must be a bool")
+
+        # Set up the resource attributes
+        super().__init__(
+            id=id,
+            label=label,
+            help=help,
+            value=value,
+            **kwargs
+        )
+
+        # Set up the specific attributes for this type of resource
+        self.disabled = disabled
+        self.label_visibility = label_visibility
+
+    def update_ui(self):
+        """
+        Read in the bool value from the user.
+        """
+
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.checkbox(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
+
+        self.on_change()

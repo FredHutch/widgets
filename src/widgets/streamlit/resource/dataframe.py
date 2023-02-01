@@ -2,7 +2,7 @@ from typing import Union
 import streamlit as st
 import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.streamlit.resources.base import StResource
+from widgets.streamlit.resource import StResource
 
 
 class StDataFrame(StResource):
@@ -21,7 +21,8 @@ class StDataFrame(StResource):
         help: Union[str, None] = None,
         disabled: bool = False,
         label_visibility: str = "visible",
-        sep=","
+        sep=",",
+        **kwargs
     ):
         """
         Args:
@@ -67,7 +68,8 @@ class StDataFrame(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -99,7 +101,7 @@ class StDataFrame(StResource):
                 sep=self.sep
             )
 
-    def source_val(self, val):
+    def _source_val(self, val, **kwargs):
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.
@@ -113,8 +115,3 @@ class StDataFrame(StResource):
             return val.to_dict(orient="list")
         else:
             return val
-
-    def get_value(self):
-        """Return the updated DataFrame."""
-
-        return self.value

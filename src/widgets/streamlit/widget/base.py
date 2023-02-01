@@ -5,24 +5,24 @@ from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
-from widgets.streamlit.resources.base import StResource
+from widgets.streamlit.resource_list import StResourceList
 
 
-class StreamlitWidget(Widget):
+class StreamlitWidget(StResourceList, Widget):
     """
     Base class used for building interactive widgets using Streamlit.
     """
 
-    resources: List[StResource] = list()
-    resource_dict: Dict[str, StResource] = dict()
     requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
-        "from widgets.streamlit.resources.dataframe import StDataFrame",
-        "from widgets.streamlit.resources.value import StString",
-        "from widgets.streamlit.resources.value import StInteger",
-        "from widgets.streamlit.resources.value import StFloat",
-        "from widgets.streamlit.resources.value import StSelectString",
+        "from widgets.streamlit.resource import StDataFrame",
+        "from widgets.streamlit.resource import StString",
+        "from widgets.streamlit.resource import StInteger",
+        "from widgets.streamlit.resource import StFloat",
+        "from widgets.streamlit.resource import StSelectString",
+        "from widgets.streamlit.resource import StCheckbox",
+        "from widgets.streamlit.resource_list import StResourceList",
         "from widgets.streamlit.widget import StreamlitWidget"
     ]
     extra_imports: List[str] = []
@@ -110,10 +110,6 @@ class StreamlitWidget(Widget):
         """
         pass
 
-    def extra_functions(self) -> None:
-        """Add generalized functionality to the widget."""
-        pass
-
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
@@ -129,9 +125,8 @@ class StreamlitWidget(Widget):
 
     def to_script(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
-        Create a python script which will be load this widget.
+        Create a python script which will be used to load this widget.
         If fp is None, return a string.
-        Should be overridden by each child class.
         """
 
         # Create the Python script as a string
@@ -166,8 +161,3 @@ class StreamlitWidget(Widget):
         )
 
         return html
-
-    def resource_key(self, resource_id):
-        """Return the UI identifier for a resource."""
-
-        return self._get_resource(resource_id).key()
