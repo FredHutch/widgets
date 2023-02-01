@@ -4,8 +4,8 @@ import pandas as pd
 import unittest
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.io import load_widget
-from widgets.streamlit.resource.dataframe import StDataFrame
-from widgets.streamlit.resource.value import StString, StInteger, StFloat
+from widgets.streamlit.resource import StDataFrame
+from widgets.streamlit.resource import StString, StInteger, StFloat
 from widgets.streamlit.widget import StreamlitWidget
 
 

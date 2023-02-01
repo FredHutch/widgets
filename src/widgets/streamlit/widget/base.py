@@ -5,7 +5,7 @@ from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
-from widgets.streamlit.resource_list.base import StResourceList
+from widgets.streamlit.resource_list import StResourceList
 
 
 class StreamlitWidget(StResourceList, Widget):
@@ -16,11 +16,13 @@ class StreamlitWidget(StResourceList, Widget):
     requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
-        "from widgets.streamlit.resource.dataframe import StDataFrame",
-        "from widgets.streamlit.resource.value import StString",
-        "from widgets.streamlit.resource.value import StInteger",
-        "from widgets.streamlit.resource.value import StFloat",
-        "from widgets.streamlit.resource.value import StSelectString",
+        "from widgets.streamlit.resource import StDataFrame",
+        "from widgets.streamlit.resource import StString",
+        "from widgets.streamlit.resource import StInteger",
+        "from widgets.streamlit.resource import StFloat",
+        "from widgets.streamlit.resource import StSelectString",
+        "from widgets.streamlit.resource import StCheckbox",
+        "from widgets.streamlit.resource_list import StResourceList",
         "from widgets.streamlit.widget import StreamlitWidget"
     ]
     extra_imports: List[str] = []

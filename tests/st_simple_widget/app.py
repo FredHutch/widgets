@@ -20,6 +20,8 @@ class SimpleWidget(StreamlitWidget):
     # This app will prompt the user to provide a set of inputs,
     # one DataFrame (which can be provided as CSV), and
     # strings indicating which columns to plot.
+    # The list of resources will be wrapped in an expand/collapse
+    # element, which starts off as being expanded by default.
 
     resources = [
         StExpander(
@@ -63,10 +65,15 @@ class SimpleWidget(StreamlitWidget):
 
     # Specify any inputs statements which are needed by the widget
     # beyond the following (which will be executed by default):
-    #   import streamlit as st
-    #   from widgets.streamlit.resource.dataframe import StDataFrame
-    #   from widgets.streamlit.resource.value import String, Integer, Float
-    #   from widgets.streamlit.widget import StreamlitWidget
+    # import streamlit as st
+    # from widgets.streamlit.resource import StDataFrame
+    # from widgets.streamlit.resource import StString
+    # from widgets.streamlit.resource import StInteger
+    # from widgets.streamlit.resource import StFloat
+    # from widgets.streamlit.resource import StSelectString
+    # from widgets.streamlit.resource import StCheckbox
+    # from widgets.streamlit.resource_list import StResourceList
+    # from widgets.streamlit.widget import StreamlitWidget
 
     extra_imports = [
         "import pandas as pd",
