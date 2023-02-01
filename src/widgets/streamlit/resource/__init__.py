@@ -1,0 +1,1 @@
+from widgets.streamlit.resource.base import StResource # noqa

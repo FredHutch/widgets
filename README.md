@@ -92,8 +92,8 @@ class SimpleWidget(StreamlitWidget):
     # Specify any inputs statements which are needed by the widget
     # beyond the following (which will be executed by default):
     #   import streamlit as st
-    #   from widgets.streamlit.resources.dataframe import StDataFrame
-    #   from widgets.streamlit.resources.value import String, Integer, Float
+    #   from widgets.streamlit.resource.dataframe import StDataFrame
+    #   from widgets.streamlit.resource.value import String, Integer, Float
     #   from widgets.streamlit.widget import StreamlitWidget
 
     extra_imports = [

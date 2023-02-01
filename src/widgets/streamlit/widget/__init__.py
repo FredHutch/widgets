@@ -1,0 +1,1 @@
+from widgets.streamlit.widget.base import StreamlitWidget # noqa
