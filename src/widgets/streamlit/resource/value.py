@@ -23,7 +23,8 @@ class StString(StResource):
         max_chars: int = None,
         type: str = "default",
         autocomplete=None,
-        placeholder: str = None
+        placeholder: str = None,
+        **kwargs
     ):
         """
         Args:
@@ -63,7 +64,8 @@ class StString(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -123,6 +125,7 @@ class StInteger(StResource):
         max_value: int = None,
         step: int = 1,
         format: str = "%d",
+        **kwargs
     ):
         """
         Args:
@@ -157,7 +160,8 @@ class StInteger(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -217,6 +221,7 @@ class StFloat(StResource):
         max_value: int = None,
         step: int = None,
         format: str = "%f",
+        **kwargs
     ):
         """
         Args:
@@ -254,7 +259,8 @@ class StFloat(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -311,7 +317,8 @@ class StSelectString(StResource):
         disabled: bool = False,
         label_visibility: str = "visible",
         options: list = [],
-        index: int = 0
+        index: int = 0,
+        **kwargs
     ):
         """
         Args:
@@ -348,7 +355,8 @@ class StSelectString(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource
@@ -443,7 +451,8 @@ class StCheckbox(StResource):
         label="",
         help="",
         disabled: bool = False,
-        label_visibility: str = "visible"
+        label_visibility: str = "visible",
+        **kwargs
     ):
         """
         Args:
@@ -474,7 +483,8 @@ class StCheckbox(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource

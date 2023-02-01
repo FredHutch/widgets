@@ -45,7 +45,15 @@ class StResourceList(ResourceList):
             # Make a new container within it
             list_container = container.container()
 
+        # Provide an opportunity for child classes to manipulate the container
+        # prior to setting up the UI for the child resources
+        list_container = self.customize_container(list_container)
+
         super().setup_ui(list_container)
+
+    def customize_container(self, container: DeltaGenerator) -> DeltaGenerator:
+        """Customize the container prior to setting up the child resources."""
+        return container
 
     def set(self, resource_id, attr, val, *subattrs, update=True, **kwargs):
         """

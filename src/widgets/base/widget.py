@@ -15,7 +15,6 @@ class Widget(ResourceList):
             id (str):          The unique key used to identify the resource.
             label (str):       Label displayed to the user for the resource.
             help (str):        Help text describing the resource to the user.
-            parent_ids (list): Optional list of all parent element ids.
             resources (list):  List of resources contained in this object.
             resource_container: Base container used for the widget.
     """

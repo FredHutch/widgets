@@ -13,7 +13,6 @@ class ResourceList(Resource):
             id (str):          The unique key used to identify the resource.
             label (str):       Label displayed to the user for the resource.
             help (str):        Help text describing the resource to the user.
-            parent_ids (list): Optional list of all parent element ids.
             resources (list):  List of resources contained in this object.
 
     """
@@ -27,14 +26,14 @@ class ResourceList(Resource):
         resources: List[Resource] = [],
         label="",
         help="",
-        parent_ids=[]
+        **kwargs
     ) -> None:
         """
         Set up the ResourceList object
         """
 
         # Set up the core attributes of the ResourceList
-        super().__init__(id=id, label=label, help=help, parent_ids=parent_ids)
+        super().__init__(id=id, label=label, help=help, **kwargs)
 
         # The _resource_dict must be empty at initialization
         self._resource_dict = dict()
@@ -107,7 +106,7 @@ class ResourceList(Resource):
         # Recursively run this get_value function on that object
         return r.get_value(*subattrs, **kwargs)
 
-    def all_values(self, **kwargs) -> dict:
+    def all_values(self, *subattrs, **kwargs) -> dict:
         """
         Return a dict with the values of every element in this list.
         The keys of the dict will be the .id element, while the
@@ -117,10 +116,30 @@ class ResourceList(Resource):
         Optional kwargs will be passed along to those methods.
         """
 
-        return {
-            resource_id: r.all_values(**kwargs) if isinstance(r, ResourceList) else r.get_value(**kwargs) # noqa
-            for resource_id, r in self._resource_dict.items()
-        }
+        # If a subattrs was specified
+        if len(subattrs) > 0:
+
+            subattrs = list(subattrs)
+
+            # The first element must be a resource
+            resource_id = subattrs.pop(0)
+
+            # Get the resource
+            r = self._get_resource(
+                resource_id,
+                # If subattribute(s) were specified, the first level is a list
+                is_list=len(subattrs) > 0
+            )
+
+            # Return the all_values() result for that resource
+            return r.all_values(*subattrs, **kwargs)
+
+        else:
+
+            return {
+                resource_id: r.all_values(**kwargs) if isinstance(r, ResourceList) else r.get_value(**kwargs) # noqa
+                for resource_id, r in self._resource_dict.items()
+            }
 
     def set(self, resource_id, attr, val, *subattrs, **kwargs) -> None:
         """

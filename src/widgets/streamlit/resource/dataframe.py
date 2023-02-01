@@ -21,7 +21,8 @@ class StDataFrame(StResource):
         help: Union[str, None] = None,
         disabled: bool = False,
         label_visibility: str = "visible",
-        sep=","
+        sep=",",
+        **kwargs
     ):
         """
         Args:
@@ -67,7 +68,8 @@ class StDataFrame(StResource):
             id=id,
             label=label,
             help=help,
-            value=value
+            value=value,
+            **kwargs
         )
 
         # Set up the specific attributes for this type of resource

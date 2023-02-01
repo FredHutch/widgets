@@ -13,14 +13,12 @@ class Resource:
             value:             The starting value for the resource.
             label (str):       Label displayed to the user for the resource.
             help (str):        Help text describing the resource to the user.
-            parent_ids (list): Optional list of all parent element ids.
     """
 
     id = ""
     value = None
     label = ""
     help = ""
-    parent_ids = []
 
     def __init__(
         self,
@@ -28,7 +26,7 @@ class Resource:
         value=None,
         label="",
         help="",
-        parent_ids=[]
+        **kwargs
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
@@ -42,11 +40,16 @@ class Resource:
         # Save the id and starting value for this particular resource
         self.id = id
         self.value = value
-        self.parent_ids = parent_ids
 
         # If no label is provided, default to the id
-        self.label = id if label == "" else label
+        self.label = id.title() if label == "" else label
         self.help = help
+
+        # Any additional keyword arguments
+        for attr, val in kwargs.items():
+
+            # Will be attached to this object
+            self.__dict__[attr] = val
 
     def setup_ui(self, container) -> None:
         """
@@ -82,7 +85,7 @@ class Resource:
 
         self.set("value", val, **kwargs)
 
-    def source(self, indent=4) -> str:
+    def source(self, indent=4, skip=["self", "kwargs"]) -> str:
         """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
@@ -94,7 +97,7 @@ class Resource:
         params = {}
 
         for kw in sig.parameters.keys():
-            if kw == "self":
+            if kw in skip:
                 continue
             else:
                 params[kw] = self.__dict__[kw]

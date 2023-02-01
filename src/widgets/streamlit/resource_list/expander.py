@@ -1,27 +1,14 @@
-from typing import List
-from widgets.streamlit.resource import StResource
+from streamlit.delta_generator import DeltaGenerator
+from widgets.streamlit.resource_list import StResourceList
 
 
-class StExpander(StResource):
-    """Resource which contains other resources within an expander element."""
+class StExpander(StResourceList):
+    """List of resources wrapped in an expand/collapse element."""
 
-    resouces: List[StResource] = []
+    expanded = False
 
-    def __init__(
-        self,
-        id="",
-        resources: List[StResource] = [],
-        label="",
-        help=""
-    ):
+    def customize_container(self, container: DeltaGenerator) -> DeltaGenerator:
         """
-        Args:
-            id (str):           The unique key for the resource.
-            resources (list):   List of Resources included in the expander.
-            label (str):        (optional) Label used for user input
-                                display elements
-            help (str):         (optional) Help text used for user input
-                                display elements
+        Instantiate a expand/collapse container
         """
-
-        pass
+        return container.expander(self.label, expanded=self.expanded)

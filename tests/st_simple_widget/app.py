@@ -10,6 +10,7 @@ from widgets.streamlit.widget import StreamlitWidget
 from widgets.streamlit.resource.dataframe import StDataFrame
 from widgets.streamlit.resource.value import StSelectString
 from widgets.streamlit.resource.value import StString
+from widgets.streamlit.resource_list.expander import StExpander
 import plotly.express as px
 
 
@@ -21,15 +22,22 @@ class SimpleWidget(StreamlitWidget):
     # strings indicating which columns to plot.
 
     resources = [
-        StDataFrame(
-            id="df",
-            value=pd.DataFrame(dict(x=[], y=[], label=[])),
-            label="Test CSV",
-        ),
-        StSelectString(id="x_col", label="X-axis Column"),
-        StString(id="x_label", label="X-axis Label", value="x-axis"),
-        StSelectString(id="y_col", label="Y-axis Column"),
-        StString(id="y_label", label="Y-axis Label", value="y-axis")
+        StExpander(
+            id='options_expander',
+            label='Options',
+            expanded=True,
+            resources=[
+                StDataFrame(
+                    id="df",
+                    value=pd.DataFrame(dict(x=[], y=[], label=[])),
+                    label="Test CSV",
+                ),
+                StSelectString(id="x_col", label="X-axis Column"),
+                StString(id="x_label", label="X-axis Label", value="x-axis"),
+                StSelectString(id="y_col", label="Y-axis Column"),
+                StString(id="y_label", label="Y-axis Label", value="y-axis")
+            ]
+        )
     ]
     # The updated values for each of these resources can be accessed
     # and modified using the .get_value() and .set_value() functions
@@ -71,7 +79,7 @@ class SimpleWidget(StreamlitWidget):
     def viz(self):
 
         # Get the updated DataFrame from the UI
-        df = self.get_value("df")
+        df = self.get_value("options_expander", "df")
 
         # If a table has been uploaded
         if df is not None and df.shape[0] > 0:
@@ -82,7 +90,7 @@ class SimpleWidget(StreamlitWidget):
             # After making that update, get the complete set of values
             # It is a nuance of streamlit that this object will not be
             # updated appropriately if called before .update_options()
-            vals = self.all_values()
+            vals = self.all_values("options_expander")
 
             # Make a plot
             fig = px.scatter(
@@ -116,7 +124,7 @@ class SimpleWidget(StreamlitWidget):
         for resource_id in ["x_col", "y_col"]:
 
             # Update the options attribute of the resource
-            self.set(resource_id, "options", list(options))
+            self.set("options_expander", resource_id, "options", list(options))
 
 
 if __name__ == "__main__":
