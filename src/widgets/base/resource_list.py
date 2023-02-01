@@ -1,4 +1,3 @@
-import logging
 from typing import Any, Dict, List, Union
 from widgets.base.resource import Resource
 from widgets.base.exceptions import ResourceExecutionException
@@ -9,27 +8,33 @@ from widgets.base.exceptions import WidgetFunctionException
 class ResourceList(Resource):
     """
     Base class used for interacting with a list of Resources
+
+    Attributes:
+            id (str):          The unique key used to identify the resource.
+            label (str):       Label displayed to the user for the resource.
+            help (str):        Help text describing the resource to the user.
+            parent_ids (list): Optional list of all parent element ids.
+            resources (list):  List of resources contained in this object.
+
     """
 
-    id: str = None
-    label: str = None
-    help: str = None
     resources: List[Resource] = list()
     _resource_dict: Dict[str, Resource] = dict()
 
     def __init__(
         self,
-        id="",
+        id="root",
         resources: List[Resource] = [],
         label="",
-        help=""
+        help="",
+        parent_ids=[]
     ) -> None:
         """
         Set up the ResourceList object
         """
 
         # Set up the core attributes of the ResourceList
-        super().__init__(id=id, label=label, help=help)
+        super().__init__(id=id, label=label, help=help, parent_ids=parent_ids)
 
         # The _resource_dict must be empty at initialization
         self._resource_dict = dict()
@@ -117,7 +122,7 @@ class ResourceList(Resource):
             for resource_id, r in self._resource_dict.items()
         }
 
-    def set(self, resource_id, attr, val, *subattrs, **kwargs):
+    def set(self, resource_id, attr, val, *subattrs, **kwargs) -> None:
         """
         Set the value of an attribute of a resource.
         Supports nested ResourceList objects.
@@ -141,7 +146,7 @@ class ResourceList(Resource):
         # Call the set function of the resource
         r.set(attr, val, *subattrs, **kwargs)
 
-    def set_value(self, resource_id, val, *subattrs, **kwargs):
+    def set_value(self, resource_id, val, *subattrs, **kwargs) -> None:
         """Set the 'value' attribute of a resource."""
 
         # Get the indicated resource
@@ -180,8 +185,6 @@ class ResourceList(Resource):
 
     def setup_ui(self, container) -> None:
         """Run the .setup_ui() method for each Resource in the list"""
-
-        logging.info(f"ResourceList {self.id} - setup_ui")
 
         for r in self.resources:
             r.setup_ui(container)

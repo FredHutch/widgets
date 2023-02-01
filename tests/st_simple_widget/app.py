@@ -16,9 +16,9 @@ import plotly.express as px
 # Give the widget a descriptive name
 class SimpleWidget(StreamlitWidget):
 
-    # This app will prompt the user to provide four inputs,
+    # This app will prompt the user to provide a set of inputs,
     # one DataFrame (which can be provided as CSV), and
-    # three string values.
+    # strings indicating which columns to plot.
 
     resources = [
         StDataFrame(
@@ -29,8 +29,7 @@ class SimpleWidget(StreamlitWidget):
         StSelectString(id="x_col", label="X-axis Column"),
         StString(id="x_label", label="X-axis Label", value="x-axis"),
         StSelectString(id="y_col", label="Y-axis Column"),
-        StString(id="y_label", label="Y-axis Label", value="y-axis"),
-        StSelectString(id="label_col", label="Label Column")
+        StString(id="y_label", label="Y-axis Label", value="y-axis")
     ]
     # The updated values for each of these resources can be accessed
     # and modified using the .get_value() and .set_value() functions
@@ -38,6 +37,8 @@ class SimpleWidget(StreamlitWidget):
     #   self.get_value("x_col") -> "x"
     #   or
     #   self.set_value("x_col", "new_value")
+    # Additionally, self.all_values() creates a dict with the values
+    # for all of the resources.
 
     # The attributes of the resources can also be modified, using the
     # .set() and .get() functions.
@@ -69,7 +70,7 @@ class SimpleWidget(StreamlitWidget):
     # scatterplot.
     def viz(self):
 
-        # Get the updated values from the UI
+        # Get the updated DataFrame from the UI
         df = self.get_value("df")
 
         # If a table has been uploaded
@@ -78,15 +79,20 @@ class SimpleWidget(StreamlitWidget):
             # Update the options for the x_col, y_col, and label_col variables
             self.update_options(df.columns.values)
 
+            # After making that update, get the complete set of values
+            # It is a nuance of streamlit that this object will not be
+            # updated appropriately if called before .update_options()
+            vals = self.all_values()
+
             # Make a plot
             fig = px.scatter(
                 data_frame=df,
-                x=self.get_value("x_col"),
-                y=self.get_value("y_col"),
-                hover_name=self.get_value("label_col"),
+                x=vals["x_col"],
+                y=vals["y_col"],
+                hover_data=df.columns.values,
                 labels={
-                    self.get_value("x_col"): self.get_value("x_label"),
-                    self.get_value("y_col"): self.get_value("y_label")
+                    vals["x_col"]: vals["x_label"],
+                    vals["y_col"]: vals["y_label"]
                 }
             )
 
@@ -107,7 +113,7 @@ class SimpleWidget(StreamlitWidget):
         """Update the options displayed for each of the column menus."""
 
         # For each of the resources
-        for resource_id in ["x_col", "y_col", "label_col"]:
+        for resource_id in ["x_col", "y_col"]:
 
             # Update the options attribute of the resource
             self.set(resource_id, "options", list(options))

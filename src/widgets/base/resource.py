@@ -1,5 +1,4 @@
 from inspect import signature
-import logging
 from typing import Any
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
@@ -10,36 +9,40 @@ class Resource:
     Base class for all resources used by widgets.
 
     Attributes:
-            id (str):   The unique key used to identify the resource.
-            value:      The starting value for the resource.
-            label (str): Label displayed to the user for the resource
-            help (str): Help text describing the resource to the user
+            id (str):          The unique key used to identify the resource.
+            value:             The starting value for the resource.
+            label (str):       Label displayed to the user for the resource.
+            help (str):        Help text describing the resource to the user.
+            parent_ids (list): Optional list of all parent element ids.
     """
 
-    id: str = None
+    id = ""
     value = None
-    label: str = None
-    help: str = None
+    label = ""
+    help = ""
+    parent_ids = []
 
     def __init__(
         self,
-        id: str = None,
+        id="",
         value=None,
         label="",
-        help=""
+        help="",
+        parent_ids=[]
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
         """
 
         # The 'id' cannot be empty
-        if id is None:
+        if len(id) == 0:
             msg = "Must provide id for Resource"
             raise ResourceConfigurationException(msg)
 
         # Save the id and starting value for this particular resource
         self.id = id
         self.value = value
+        self.parent_ids = parent_ids
 
         # If no label is provided, default to the id
         self.label = id if label == "" else label
@@ -50,8 +53,6 @@ class Resource:
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.
         """
-        logging.info(f"Resource {self.id} - setup_ui")
-
         pass
 
     def get(self, attr) -> Any:
@@ -106,7 +107,7 @@ class Resource:
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def _source_val(self, val, indent=4):
+    def _source_val(self, val, indent=4) -> Any:
         """
         Return a string representation of an attribute value
         which can be used in source code initializing this resource.

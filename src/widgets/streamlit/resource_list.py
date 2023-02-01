@@ -1,4 +1,3 @@
-import logging
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from typing import Dict, List, Union
@@ -25,8 +24,6 @@ class StResourceList(ResourceList):
         If a container is provided, add a new container to it.
         If no container is provided (is None), then set up a new container.
         """
-
-        logging.info(f"StResourceList {self.id} - setup_ui")
 
         # If no container is provided
         if container is None:

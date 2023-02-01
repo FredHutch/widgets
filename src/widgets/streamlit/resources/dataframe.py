@@ -78,7 +78,8 @@ class StDataFrame(StResource):
     def update_ui(self):
         """Allow the user to provide their own DataFrame from a file."""
 
-        st.write(f"HERE ({self.key()})")
+        # Increment the UI revision
+        self.ui_revision += 1
 
         # Update the input element
         self.ui.file_uploader(

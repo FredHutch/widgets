@@ -1,8 +1,6 @@
 from inspect import getmro, getsource, isfunction
-import logging
 from pathlib import Path
 from typing import Union
-from uuid import uuid4
 from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.helpers import render_template
@@ -12,8 +10,14 @@ from widgets.base.resource_list import ResourceList
 class Widget(ResourceList):
     """
     Base class used for building interactive widgets.
-    The list of resources will be mapped by .id to the
-    _resource_dict at initialization.
+
+    Attributes:
+            id (str):          The unique key used to identify the resource.
+            label (str):       Label displayed to the user for the resource.
+            help (str):        Help text describing the resource to the user.
+            parent_ids (list): Optional list of all parent element ids.
+            resources (list):  List of resources contained in this object.
+            resource_container: Base container used for the widget.
     """
 
     resource_container = None
@@ -22,12 +26,13 @@ class Widget(ResourceList):
         """
         Primary entrypoint used to launch the widget.
 
-        1. Run the setup_ui() method for all resources defined in the widget;
-        2. Invoke the viz() function;
+        1. Run the prep() method for any tasks which need to happen
+           before the resources are set up;
+        2. Run the setup_ui() method for all resources defined in the widget;
+        3. Invoke the viz() function;
         """
-        self.rand = uuid4()
-        logging.info(f"Widget - run ({self.rand})")
 
+        self.prep()
         self.inputs()
         self.viz()
 
@@ -38,11 +43,16 @@ class Widget(ResourceList):
         """
         self.run()
 
+    def prep(self) -> None:
+        """
+        The prep() method should be overridden by any widget based on this.
+        """
+        pass
+
     def inputs(self) -> None:
         """Read in data from all of the resources defined in the widget."""
 
         # This method will recursively run setup_ui for each Resource
-        logging.info(f"Widget - inputs ({self.rand})")
         self.setup_ui(self.resource_container)
 
     def viz(self) -> None:

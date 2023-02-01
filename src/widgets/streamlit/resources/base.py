@@ -1,5 +1,3 @@
-import logging
-from uuid import uuid4
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.resource import Resource
@@ -15,12 +13,13 @@ class StResource(Resource):
     # Every streamlit-based resource will set up a UI object
     ui: DeltaGenerator = None
 
-    # Keep track of uuid assigned to this resource in the browser
-    uuid: str = None
+    # Keep track of the number of times that the UI element has been updated
+    ui_revision = 0
 
     def key(self):
-        """Format a unique UI key based on the id and uuid."""
-        return f"{self.id}_{self.uuid}"
+        """Format a unique UI key based on the id and ui revision."""
+
+        return f"{'_'.join(self.parent_ids)}_{self.id}_{self.ui_revision}"
 
     def set(self, attr, val, update=True) -> None:
         """Set the value of an attribute for this resource."""
@@ -29,9 +28,6 @@ class StResource(Resource):
         self.__dict__[attr] = val
 
         if update and self.ui is not None:
-
-            # Make a new uuid for the input element
-            self.uuid = uuid4()
 
             # Call the method to setup the input element
             self.update_ui()
@@ -50,13 +46,8 @@ class StResource(Resource):
         Read in the value from the user.
         """
 
-        logging.info(f"StResource {self.id} - setup_ui")
-
         # Set up the placeholder container
         self.ui = container.empty()
-
-        # Populate the .uuid to start
-        self.uuid = uuid4()
 
         # Update the element being displayed in the UI
         self.update_ui()
