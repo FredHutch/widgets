@@ -52,7 +52,7 @@ class Resource:
             # Will be attached to this object
             self.__dict__[attr] = val
 
-    def path_to_root(self) -> List[str]:
+    def _path_to_root(self) -> List[str]:
         """
         Return the list of .id elements for this resource
         and all of its parent elements.
@@ -60,7 +60,7 @@ class Resource:
 
         path = [self.id]
         if self.parent is not None:
-            path.extend(self.parent.path_to_root())
+            path.extend(self.parent._path_to_root())
         return path
 
     def setup_ui(self, container) -> None:

@@ -19,7 +19,7 @@ class StResource(Resource):
     def key(self):
         """Format a unique UI key based on the id and ui revision."""
 
-        return f"{'_'.join(self.path_to_root())}_{self.ui_revision}"
+        return f"{'_'.join(self._path_to_root())}_{self.ui_revision}"
 
     def set(self, attr, val, update=True) -> None:
         """Set the value of an attribute for this resource."""
