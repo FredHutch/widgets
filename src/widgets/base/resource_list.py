@@ -58,6 +58,9 @@ class ResourceList(Resource):
                 raise WidgetConfigurationException(msg)
             self._resource_dict[resource.id] = resource
 
+            # Attach this list as the parent of the resource
+            resource.parent = self
+
     def get(self, resource_id: str, attr: str, *subattrs, **kwargs) -> Any:
         """
         Get the value of an attribute of a resource, optionally

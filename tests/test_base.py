@@ -46,6 +46,21 @@ class TestResources(unittest.TestCase):
             lambda: r.get("missing_attribute")
         )
 
+    def test_isinstance(self):
+
+        # Define a resource
+        r = Resource(id="test")
+
+        try:
+            r._assert_isinstance(Resource)
+        except ResourceConfigurationException:
+            self.fail("Should not have raised ResourceConfigurationException")
+
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._assert_isinstance(Resource, case=False)
+        )
+
 
 class TestResourceList(unittest.TestCase):
 
@@ -108,6 +123,36 @@ class TestResourceList(unittest.TestCase):
                     Resource(id="foo")
                 ]
             )
+        )
+
+    def test_isinstance(self):
+
+        # Define a nested set of resources
+        r = ResourceList(
+            id="top",
+            resources=[
+                ResourceList(
+                    id="middle",
+                    resources=[
+                        Resource(id="last")
+                    ]
+                )
+            ]
+        )
+
+        try:
+            r._get_resource(
+                "middle"
+            )._assert_isinstance(
+                ResourceList,
+                parent=True
+            )
+        except ResourceConfigurationException:
+            self.fail("Should not have raised ResourceConfigurationException")
+
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._get_resource("middle")._assert_isinstance(ResourceList, parent=True, case=False) # noqa
         )
 
 

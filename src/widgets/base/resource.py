@@ -1,5 +1,5 @@
 from inspect import signature
-from typing import Any
+from typing import Any, List
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 
@@ -19,6 +19,7 @@ class Resource:
     value = None
     label = ""
     help = ""
+    parent: 'Resource' = None
 
     def __init__(
         self,
@@ -50,6 +51,38 @@ class Resource:
 
             # Will be attached to this object
             self.__dict__[attr] = val
+
+    def _path_to_root(self) -> List[str]:
+        """
+        Return the list of .id elements for this resource
+        and all of its parent elements.
+        """
+
+        path = [self.id]
+        if self.parent is not None:
+            path.extend(self.parent._path_to_root())
+        return path
+
+    def _assert_isinstance(self, cls, case=True, parent=False):
+        """
+        Assert isinstance(self, cls) is case for this object.
+        Use parent=True to recursively check parents.
+        """
+
+        if case:
+
+            if not isinstance(self, cls):
+                msg = f"{self.id} is not an instance of {cls.__name__}"
+                raise ResourceConfigurationException(msg)
+
+        else:
+
+            if isinstance(self, cls):
+                msg = f"{self.id} is an instance of {cls.__name__}"
+                raise ResourceConfigurationException(msg)
+
+        if parent and self.parent is not None:
+            self.parent._assert_isinstance(cls, case=case, parent=parent)
 
     def setup_ui(self, container) -> None:
         """
