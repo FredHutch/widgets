@@ -69,10 +69,17 @@ class Resource:
         Use parent=True to recursively check parents.
         """
 
-        if not isinstance(self, cls) is case:
-            clause = 'is not' if case else 'is'
-            msg = f"{self.id} {clause} an instance of {cls.__name__}"
-            raise ResourceConfigurationException(msg)
+        if case:
+
+            if not isinstance(self, cls):
+                msg = f"{self.id} is not an instance of {cls.__name__}"
+                raise ResourceConfigurationException(msg)
+
+        else:
+
+            if isinstance(self, cls):
+                msg = f"{self.id} is an instance of {cls.__name__}"
+                raise ResourceConfigurationException(msg)
 
         if parent and self.parent is not None:
             self.parent._assert_isinstance(cls, case=case, parent=parent)

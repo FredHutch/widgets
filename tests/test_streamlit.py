@@ -7,6 +7,8 @@ from widgets.base.io import load_widget
 from widgets.streamlit.resource import StDataFrame
 from widgets.streamlit.resource import StString, StInteger, StFloat
 from widgets.streamlit.widget import StreamlitWidget
+from widgets.streamlit.resource_list import StResourceList
+from widgets.streamlit.resource_list import StExpander
 
 
 class TestStreamlitResources(unittest.TestCase):
@@ -150,6 +152,37 @@ class TestStreamlitWidget(unittest.TestCase):
 
         self.assertIsInstance(html, str)
         self.assertGreater(len(html), 0)
+
+
+class TestStreamlitResourceLists(unittest.TestCase):
+
+    def test_expander(self):
+
+        r = StResourceList(
+            id="top",
+            resources=[
+                StExpander(
+                    id="middle",
+                    resources=[
+                        StExpander(id="bottom")
+                    ]
+                )
+            ]
+        )
+
+        r._assert_isinstance(StExpander, case=False)
+        r._get_resource("middle")._assert_isinstance(StExpander)
+        r._get_resource("middle", "bottom")._assert_isinstance(StExpander)
+        r._get_resource("middle", "bottom")._assert_isinstance(
+            StResourceList,
+            parent=True
+        )
+
+        # Expanders cannot be nested
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r.setup_ui(None)
+        )
 
 
 if __name__ == '__main__':
