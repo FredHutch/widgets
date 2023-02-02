@@ -16,14 +16,9 @@ class StreamlitWidget(StResourceList, Widget):
     requirements: List[str] = ["widgets-lib"]
     imports: List[str] = [
         "import streamlit as st",
-        "from widgets.streamlit.resource import StDataFrame",
-        "from widgets.streamlit.resource import StString",
-        "from widgets.streamlit.resource import StInteger",
-        "from widgets.streamlit.resource import StFloat",
-        "from widgets.streamlit.resource import StSelectString",
-        "from widgets.streamlit.resource import StCheckbox",
-        "from widgets.streamlit.resource_list import StResourceList",
-        "from widgets.streamlit.widget import StreamlitWidget"
+        "from widgets.streamlit.resource import *",
+        "from widgets.streamlit.resource_list import *",
+        "from widgets.streamlit.widget import *"
     ]
     extra_imports: List[str] = []
 
