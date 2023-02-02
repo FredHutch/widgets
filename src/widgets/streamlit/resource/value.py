@@ -56,7 +56,7 @@ class StString(StResource):
                                 the text input is empty
 
         Returns:
-            Resource: The instantiated resource object.
+            StString: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -152,7 +152,7 @@ class StInteger(StResource):
                                 input element
 
         Returns:
-            Resource: The instantiated resource object.
+            StInteger: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -248,7 +248,7 @@ class StFloat(StResource):
                                 input element
 
         Returns:
-            Resource: The instantiated resource object.
+            StFloat: The instantiated resource object.
         """
 
         if not isinstance(value, float):
@@ -347,7 +347,7 @@ class StSelectString(StResource):
             to differ.
 
         Returns:
-            Resource: The instantiated resource object.
+            StSelectString: The instantiated resource object.
         """
 
         # Set up the resource attributes
@@ -472,7 +472,7 @@ class StCheckbox(StResource):
                                 are removed. Default is "visible".
 
         Returns:
-            Resource: The instantiated resource object.
+            StCheckbox: The instantiated resource object.
         """
 
         if not isinstance(value, bool):
@@ -506,6 +506,102 @@ class StCheckbox(StResource):
             value=self.value,
             key=self.key(),
             help=self.help,
+            label_visibility=self.label_visibility,
+            disabled=self.disabled
+        )
+
+        self.on_change()
+
+
+class StSlider(StResource):
+    """Slider resource used for Streamlit-based widgets."""
+
+    value = False
+    disabled: bool = False
+    label_visibility: str = "visible"
+    min_value: float = None
+    max_value: float = None
+    step: float = 1
+    format: str = "%.2f"
+
+    def __init__(
+        self,
+        id="",
+        value=False,
+        label="",
+        help="",
+        disabled: bool = False,
+        label_visibility: str = "visible",
+        min_value: float = None,
+        max_value: float = None,
+        step: float = 1,
+        format: str = "%f",
+        **kwargs
+    ):
+        """
+        Args:
+            id (str):           The unique key for the resource.
+            label (str):        (optional) Label used for user input
+                                display elements
+            help (str):         (optional) Help text used for user input
+                                display elements
+            value (bool):       (optional) The starting value.
+            disabled (bool):    (optional) If True, the input element is
+                                disabled (default: False)
+            label_visibility:   (optional) The visibility of the label.
+                                If "hidden", the label doesn't show but there
+                                is still empty space for it above the widget
+                                (equivalent to label="").
+                                If "collapsed", both the label and the space
+                                are removed. Default is "visible".
+            min_value (int):    (optional) The minimum value used for the
+                                input element
+            max_value (int):    (optional) The maximum value used for the
+                                input element
+            step (int):         (optional) Step size for input element
+            format (str):       (optional) Formatting f-string used for the
+                                input element
+
+        Returns:
+            StSlider: The instantiated resource object.
+        """
+
+        # Set up the resource attributes
+        super().__init__(
+            id=id,
+            label=label,
+            help=help,
+            value=value,
+            **kwargs
+        )
+
+        # Set up the specific attributes for this type of resource
+        self.disabled = disabled
+        self.label_visibility = label_visibility
+        self.min_value = min_value
+        self.max_value = max_value
+        self.step = step
+        self.format = format
+
+    def update_ui(self):
+        """
+        Read in the value from the user.
+        """
+
+        # Increment the UI revision
+        self.ui_revision += 1
+
+        # Update the input element
+        self.ui.slider(
+            self.label,
+            on_change=self.on_change,
+            value=self.value,
+            key=self.key(),
+            help=self.help,
+            min_value=self.min_value,
+            max_value=self.max_value,
+            step=self.step,
+            format=self.format,
             label_visibility=self.label_visibility,
             disabled=self.disabled
         )
