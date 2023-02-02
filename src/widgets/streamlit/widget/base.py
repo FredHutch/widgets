@@ -13,7 +13,7 @@ class StreamlitWidget(StResourceList, Widget):
     Base class used for building interactive widgets using Streamlit.
     """
 
-    requirements: List[str] = ["widgets-lib"]
+    requirements: List[str] = []
     imports: List[str] = [
         "import streamlit as st",
         "from widgets.streamlit.resource import *",
@@ -149,7 +149,7 @@ class StreamlitWidget(StResourceList, Widget):
             title=title,
             stlite_ver=stlite_ver,
             footer=footer,
-            requirements=self.requirements,
+            requirements=self.requirements + ["widgets-lib"],
             imports=self._imports(),
             widget_source=self._source(),
             widget_name=self._name()
