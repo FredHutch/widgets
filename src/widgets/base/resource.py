@@ -63,6 +63,20 @@ class Resource:
             path.extend(self.parent._path_to_root())
         return path
 
+    def _assert_isinstance(self, cls, case=True, parent=False):
+        """
+        Assert isinstance(self, cls) is case for this object.
+        Use parent=True to recursively check parents.
+        """
+
+        if not isinstance(self, cls) is case:
+            clause = 'is not' if case else 'is'
+            msg = f"{self.id} {clause} an instance of {cls.__name__}"
+            raise ResourceConfigurationException(msg)
+
+        if parent and self.parent is not None:
+            self.parent._assert_isinstance(cls, case=case, parent=parent)
+
     def setup_ui(self, container) -> None:
         """
         Method used to provide the option for user input from the GUI.
