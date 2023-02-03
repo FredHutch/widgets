@@ -138,7 +138,7 @@ class StreamlitWidget(StResourceList, Widget):
     def _render_html(
         self,
         title="Widget",
-        footer="Made with widgets-lib (github.com/FredHutch/widgets)"
+        footer="Made with widgets-lib (github.com/FredHutch/widgets)",
         stlite_ver="0.22.2",
     ):
         """Render the widget as HTML"""
