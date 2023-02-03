@@ -5,3 +5,4 @@ from widgets.streamlit.resource.value import StInteger # noqa
 from widgets.streamlit.resource.value import StFloat # noqa
 from widgets.streamlit.resource.value import StSelectString # noqa
 from widgets.streamlit.resource.value import StCheckbox # noqa
+from widgets.streamlit.resource.value import StSlider # noqa

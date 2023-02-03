@@ -5,7 +5,7 @@ import unittest
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.io import load_widget
 from widgets.streamlit.resource import StDataFrame
-from widgets.streamlit.resource import StString, StInteger, StFloat
+from widgets.streamlit.resource import StString, StInteger, StFloat, StSlider
 from widgets.streamlit.widget import StreamlitWidget
 from widgets.streamlit.resource_list import StResourceList
 from widgets.streamlit.resource_list import StExpander
@@ -83,6 +83,19 @@ class TestStreamlitResources(unittest.TestCase):
 
         msg = "Empty value not created correctly"
         self.assertEqual(float(), s.get("value"), msg)
+
+    def test_slider(self):
+
+        s = StSlider(
+            id="test_slider",
+            value=1.0,
+            min_value=0.0,
+            max_value=1.0
+        )
+
+        # Check the default value
+        msg = "Default float does not match"
+        self.assertEqual(s.get("value"), 1.0, msg)
 
 
 class ExampleStreamlitWidget(StreamlitWidget):
