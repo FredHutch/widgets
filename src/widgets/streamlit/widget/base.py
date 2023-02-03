@@ -46,7 +46,7 @@ class StreamlitWidget(StResourceList, Widget):
         with st.sidebar:
             st.download_button(
                 "Download HTML",
-                self._render_html(),
+                self._render_html(title=self._name()),
                 file_name=f"{self._name()}.html",
                 mime="text/html",
                 help="Download this widget as a webpage (HTML)"
@@ -113,7 +113,7 @@ class StreamlitWidget(StResourceList, Widget):
         """
 
         # Create the HTML as a string
-        html = self._render_html()
+        html = self._render_html(title=self._name())
 
         # Write it out to a file (if provided), or return the string
         return self._to_file(html, fp)
@@ -138,8 +138,8 @@ class StreamlitWidget(StResourceList, Widget):
     def _render_html(
         self,
         title="Widget",
-        stlite_ver="0.22.1",
-        footer="Made with widgets-lib (github.com/FredHutch/widgets)"
+        footer="Made with widgets-lib (github.com/FredHutch/widgets)",
+        stlite_ver="0.22.2",
     ):
         """Render the widget as HTML"""
 

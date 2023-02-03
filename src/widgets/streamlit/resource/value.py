@@ -442,7 +442,6 @@ class StCheckbox(StResource):
 
     value = False
     disabled: bool = False
-    label_visibility: str = "visible"
 
     def __init__(
         self,
@@ -451,7 +450,6 @@ class StCheckbox(StResource):
         label="",
         help="",
         disabled: bool = False,
-        label_visibility: str = "visible",
         **kwargs
     ):
         """
@@ -464,12 +462,6 @@ class StCheckbox(StResource):
             value (bool):       (optional) The starting value.
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
-            label_visibility:   (optional) The visibility of the label.
-                                If "hidden", the label doesn't show but there
-                                is still empty space for it above the widget
-                                (equivalent to label="").
-                                If "collapsed", both the label and the space
-                                are removed. Default is "visible".
 
         Returns:
             StCheckbox: The instantiated resource object.
@@ -489,7 +481,6 @@ class StCheckbox(StResource):
 
         # Set up the specific attributes for this type of resource
         self.disabled = disabled
-        self.label_visibility = label_visibility
 
     def update_ui(self):
         """
@@ -506,7 +497,6 @@ class StCheckbox(StResource):
             value=self.value,
             key=self.key(),
             help=self.help,
-            label_visibility=self.label_visibility,
             disabled=self.disabled
         )
 
