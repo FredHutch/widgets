@@ -5,6 +5,14 @@ from widgets.base.exceptions import WidgetConfigurationException
 from widgets.base.resource import Resource
 from widgets.base.resource_list import ResourceList
 from widgets.base.widget import Widget
+import widgets
+
+
+class TestModule(unittest.TestCase):
+
+    def test_version_string(self):
+
+        self.assertIsInstance(widgets.__version__, str)
 
 
 class TestResources(unittest.TestCase):

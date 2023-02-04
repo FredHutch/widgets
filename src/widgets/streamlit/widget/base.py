@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
 from widgets.streamlit.resource_list import StResourceList
+import widgets
 
 
 class StreamlitWidget(StResourceList, Widget):
@@ -138,7 +139,7 @@ class StreamlitWidget(StResourceList, Widget):
     def _render_html(
         self,
         title="Widget",
-        footer="Made with widgets-lib (github.com/FredHutch/widgets)",
+        footer="Widget (github.com/FredHutch/widgets)",
         stlite_ver="0.22.2",
     ):
         """Render the widget as HTML"""
@@ -149,7 +150,9 @@ class StreamlitWidget(StResourceList, Widget):
             title=title,
             stlite_ver=stlite_ver,
             footer=footer,
-            requirements=self.requirements + ["widgets-lib"],
+            requirements=self.requirements + [
+                f"widgets-lib=={widgets.__version__}"
+            ],
             imports=self._imports(),
             widget_source=self._source(),
             widget_name=self._name()
