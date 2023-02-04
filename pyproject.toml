@@ -7,7 +7,7 @@ where = ["src"]
 
 [project]
 name = "widgets-lib"
-version = "1.2.1"
+dynamic = ["version"]
 authors = [
   { name="Samuel Minot", email="sminot@fredhutch.org" },
 ]
@@ -19,6 +19,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[tool.setuptools.dynamic]
+version = {attr = "widgets.__version__"}
 
 [project.urls]
 "Homepage" = "https://github.com/FredHutch/widgets"
