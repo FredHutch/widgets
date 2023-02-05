@@ -1,5 +1,5 @@
 from widgets.base.widget import Widget
-from widgets.streamlit.widget import StreamlitWidget
+from widgets.streamlit.widget.base import StreamlitWidget
 
 
 class SimpleWidget(Widget):

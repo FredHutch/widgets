@@ -2,7 +2,7 @@ import unittest
 from widgets.base.io import load_widget
 from widgets.base.exceptions import IOException, WidgetInitializationException
 from widgets.base.widget import Widget
-from widgets.streamlit.widget import StreamlitWidget
+import widgets.streamlit as wist
 
 
 class TestIO(unittest.TestCase):
@@ -17,7 +17,7 @@ class TestIO(unittest.TestCase):
 
         # Load the test streamlit widget
         w = load_widget("tests/assets/app.py", "SimpleStWidget")
-        self.assertIsInstance(w(), StreamlitWidget)
+        self.assertIsInstance(w(), wist.StreamlitWidget)
 
     def test_load_widget_errors(self):
 

@@ -6,16 +6,12 @@
 
 import pandas as pd
 import streamlit as st
-from widgets.streamlit.widget import StreamlitWidget
-from widgets.streamlit.resource.dataframe import StDataFrame
-from widgets.streamlit.resource.value import StSelectString
-from widgets.streamlit.resource.value import StString
-from widgets.streamlit.resource_list.expander import StExpander
+import widgets.streamlit as wist
 import plotly.express as px
 
 
 # Give the widget a descriptive name
-class SimpleWidget(StreamlitWidget):
+class SimpleWidget(wist.StreamlitWidget):
 
     # This app will prompt the user to provide a set of inputs,
     # one DataFrame (which can be provided as CSV), and
@@ -24,20 +20,34 @@ class SimpleWidget(StreamlitWidget):
     # element, which starts off as being expanded by default.
 
     resources = [
-        StExpander(
+        wist.StExpander(
             id='options_expander',
             label='Options',
             expanded=True,
             resources=[
-                StDataFrame(
+                wist.StDataFrame(
                     id="df",
                     value=pd.DataFrame(dict(x=[], y=[], label=[])),
                     label="Test CSV",
                 ),
-                StSelectString(id="x_col", label="X-axis Column"),
-                StString(id="x_label", label="X-axis Label", value="x-axis"),
-                StSelectString(id="y_col", label="Y-axis Column"),
-                StString(id="y_label", label="Y-axis Label", value="y-axis")
+                wist.StSelectString(
+                    id="x_col",
+                    label="X-axis Column"
+                ),
+                wist.StString(
+                    id="x_label",
+                    label="X-axis Label",
+                    value="x-axis"
+                ),
+                wist.StSelectString(
+                    id="y_col",
+                    label="Y-axis Column"
+                ),
+                wist.StString(
+                    id="y_label",
+                    label="Y-axis Label",
+                    value="y-axis"
+                )
             ]
         )
     ]
@@ -65,9 +75,7 @@ class SimpleWidget(StreamlitWidget):
     # Specify any inputs statements which are needed by the widget
     # beyond the following (which will be executed by default):
     # import streamlit as st
-    # from widgets.streamlit.resource import *
-    # from widgets.streamlit.resource_list import *
-    # from widgets.streamlit.widget import *
+    # from widgets.streamlit import *
 
     extra_imports = [
         "import pandas as pd",

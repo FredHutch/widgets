@@ -1,7 +1,7 @@
 from typing import List
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.resource import Resource
-from widgets.streamlit.resource_list import StResourceList
+from widgets.streamlit.resource_list.base import StResourceList
 
 
 class StExpander(StResourceList):

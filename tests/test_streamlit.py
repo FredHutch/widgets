@@ -4,11 +4,7 @@ import pandas as pd
 import unittest
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.io import load_widget
-from widgets.streamlit.resource import StDataFrame
-from widgets.streamlit.resource import StString, StInteger, StFloat, StSlider
-from widgets.streamlit.widget import StreamlitWidget
-from widgets.streamlit.resource_list import StResourceList
-from widgets.streamlit.resource_list import StExpander
+import widgets.streamlit as wist
 
 
 class TestStreamlitResources(unittest.TestCase):
@@ -17,7 +13,7 @@ class TestStreamlitResources(unittest.TestCase):
 
         df = pd.DataFrame(dict(a=[1, 2, 3], b=['a', 'b', 'c']))
 
-        res = StDataFrame(
+        res = wist.StDataFrame(
             id="test_dataframe",
             value=df
         )
@@ -29,17 +25,17 @@ class TestStreamlitResources(unittest.TestCase):
         # Make sure that an error is raised for an inappropriate type
         self.assertRaises(
             ResourceConfigurationException,
-            lambda: StDataFrame(id="test_dataframe", value="foo")
+            lambda: wist.StDataFrame(id="test_dataframe", value="foo")
         )
 
         # Try an empty value
-        res = StDataFrame(id="test_dataframe")
+        res = wist.StDataFrame(id="test_dataframe")
         msg = "Empty value not created correctly"
         self.assertTrue(pd.DataFrame().equals(res.value), msg)
 
     def test_string(self):
 
-        s = StString(
+        s = wist.StString(
             id="test_string",
             value="value"
         )
@@ -49,13 +45,13 @@ class TestStreamlitResources(unittest.TestCase):
         self.assertEqual(s.get("value"), "value", msg)
 
         # Try an empty value
-        s = StString(id="test_string")
+        s = wist.StString(id="test_string")
         msg = "Empty value not created correctly"
         self.assertIsNone(s.get("value"), msg)
 
     def test_integer(self):
 
-        s = StInteger(
+        s = wist.StInteger(
             id="test_integer",
             value=1
         )
@@ -64,12 +60,12 @@ class TestStreamlitResources(unittest.TestCase):
         self.assertEqual(s.get("value"), 1, "Default integer does not match")
 
         # Try an empty value
-        s = StInteger(id="test_integer")
+        s = wist.StInteger(id="test_integer")
         self.assertEqual(int(), s.get("value"), "Empty value not created")
 
     def test_float(self):
 
-        s = StFloat(
+        s = wist.StFloat(
             id="test_float",
             value=1.0
         )
@@ -79,14 +75,14 @@ class TestStreamlitResources(unittest.TestCase):
         self.assertEqual(s.get("value"), 1.0, msg)
 
         # Try an empty value
-        s = StFloat(id="test_float")
+        s = wist.StFloat(id="test_float")
 
         msg = "Empty value not created correctly"
         self.assertEqual(float(), s.get("value"), msg)
 
     def test_slider(self):
 
-        s = StSlider(
+        s = wist.StSlider(
             id="test_slider",
             value=1.0,
             min_value=0.0,
@@ -98,13 +94,13 @@ class TestStreamlitResources(unittest.TestCase):
         self.assertEqual(s.get("value"), 1.0, msg)
 
 
-class ExampleStreamlitWidget(StreamlitWidget):
+class ExampleStreamlitWidget(wist.StreamlitWidget):
     """Simple widget used for testing purposes"""
 
     resources = [
-        StString(id="s", value="s", label="String"),
-        StInteger(id="i", value=0, label="Integer"),
-        StFloat(id="f", value=0.0, label="Float")
+        wist.StString(id="s", value="s", label="String"),
+        wist.StInteger(id="i", value=0, label="Integer"),
+        wist.StFloat(id="f", value=0.0, label="Float")
     ]
 
     def viz(self):
@@ -171,23 +167,23 @@ class TestStreamlitResourceLists(unittest.TestCase):
 
     def test_expander(self):
 
-        r = StResourceList(
+        r = wist.StResourceList(
             id="top",
             resources=[
-                StExpander(
+                wist.StExpander(
                     id="middle",
                     resources=[
-                        StExpander(id="bottom")
+                        wist.StExpander(id="bottom")
                     ]
                 )
             ]
         )
 
-        r._assert_isinstance(StExpander, case=False)
-        r._get_resource("middle")._assert_isinstance(StExpander)
-        r._get_resource("middle", "bottom")._assert_isinstance(StExpander)
+        r._assert_isinstance(wist.StExpander, case=False)
+        r._get_resource("middle")._assert_isinstance(wist.StExpander)
+        r._get_resource("middle", "bottom")._assert_isinstance(wist.StExpander)
         r._get_resource("middle", "bottom")._assert_isinstance(
-            StResourceList,
+            wist.StResourceList,
             parent=True
         )
 

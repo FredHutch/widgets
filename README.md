@@ -101,9 +101,7 @@ class SimpleWidget(StreamlitWidget):
     # Specify any inputs statements which are needed by the widget
     # beyond the following (which will be executed by default):
     # import streamlit as st
-    # from widgets.streamlit.resource import *
-    # from widgets.streamlit.resource_list import *
-    # from widgets.streamlit.widget import *
+    # from widgets.streamlit import *
 
     extra_imports = [
         "import pandas as pd",

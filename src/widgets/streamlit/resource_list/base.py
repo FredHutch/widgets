@@ -3,7 +3,7 @@ from streamlit.delta_generator import DeltaGenerator
 from typing import Dict, List, Union
 from widgets.base.exceptions import WidgetConfigurationException
 from widgets.base.resource_list import ResourceList
-from widgets.streamlit.resource import StResource
+from widgets.streamlit.resource.base import StResource
 
 
 class StResourceList(ResourceList):

@@ -2,7 +2,7 @@ from typing import Union
 import streamlit as st
 import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.streamlit.resource import StResource
+from widgets.streamlit.resource.base import StResource
 
 
 class StDataFrame(StResource):
