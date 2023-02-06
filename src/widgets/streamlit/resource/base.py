@@ -41,7 +41,7 @@ class StResource(Resource):
         """Set up the UI element (overridden by child classes)."""
         pass
 
-    def setup_ui(self, container: DeltaGenerator):
+    def run(self, container: DeltaGenerator):
         """
         Read in the value from the user.
         """

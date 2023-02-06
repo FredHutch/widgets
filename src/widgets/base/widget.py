@@ -19,46 +19,12 @@ class Widget(ResourceList):
             resource_container: Base container used for the widget.
     """
 
-    resource_container = None
-
-    def run(self) -> None:
-        """
-        Primary entrypoint used to launch the widget.
-
-        1. Run the prep() method for any tasks which need to happen
-           before the resources are set up;
-        2. Run the setup_ui() method for all resources defined in the widget;
-        3. Invoke the viz() function;
-        """
-
-        self.prep()
-        self.inputs()
-        self.viz()
-
     def run_cli(self) -> None:
         """
         Entrypoint used to run the widget from the command line.
         Should be overridden by each specific widget type.
         """
-        self.run()
-
-    def prep(self) -> None:
-        """
-        The prep() method should be overridden by any widget based on this.
-        """
-        pass
-
-    def inputs(self) -> None:
-        """Read in data from all of the resources defined in the widget."""
-
-        # This method will recursively run setup_ui for each Resource
-        self.setup_ui(self.resource_container)
-
-    def viz(self) -> None:
-        """
-        The viz() method should be overridden by any widget based on this.
-        """
-        pass
+        self.run(None)
 
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """

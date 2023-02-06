@@ -190,7 +190,7 @@ class TestStreamlitResourceLists(unittest.TestCase):
         # Expanders cannot be nested
         self.assertRaises(
             ResourceConfigurationException,
-            lambda: r.setup_ui(None)
+            lambda: r.run(None)
         )
 
 

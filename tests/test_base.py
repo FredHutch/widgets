@@ -163,6 +163,28 @@ class TestResourceList(unittest.TestCase):
             lambda: r._get_resource("middle")._assert_isinstance(ResourceList, parent=True, case=False) # noqa
         )
 
+    def test_run(self):
+
+        # Define a nested set of resources
+        r = ResourceList(
+            id="top",
+            resources=[
+                ResourceList(
+                    id="middle",
+                    resources=[
+                        Resource(id="last")
+                    ]
+                )
+            ]
+        )
+
+        # Make sure that the run method doesn't raise an exception
+        try:
+            r.run(None)
+        except Exception as e:
+            self.fail(f"w.run(None) raised: {str(e)}")
+
+
 
 class TestWidget(unittest.TestCase):
 
@@ -181,15 +203,15 @@ class TestWidget(unittest.TestCase):
 
         # Make sure that the run method doesn't raise an exception
         try:
-            w.run()
+            w.run(None)
         except Exception as e:
-            self.fail(f"w.run() raised: {str(e)}")
+            self.fail(f"w.run(None) raised: {str(e)}")
 
         # Make sure that the run_cli method doesn't raise an exception
         try:
             w.run_cli()
         except Exception as e:
-            self.fail(f"w.run() raised: {str(e)}")
+            self.fail(f"w.run(None) raised: {str(e)}")
 
 
 if __name__ == '__main__':

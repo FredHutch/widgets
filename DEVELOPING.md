@@ -31,7 +31,7 @@ The minimal functions on the resource are:
 - `set(attr, val)`: Set a new value for an attribute of the resource
 - `set_value(val)`: Set a new value for the 'value' attribute of the resource
 - `source()`: Return a string with the source code needed to initialize the resource in its current state
-- `setup_ui(container)`: Set up the user interface for modifying the value of the resource within a provided container
+- `run(container)`: Set up the user interface for modifying the value of the resource within a provided container
 
 ### ResourceList
 
@@ -59,9 +59,11 @@ within the resources in the list.
 - `set(resource_id, attr, val)`: Set a new value for an attribute for a resource in the list
 - `set_value(resource_id, val)`: Set a new value for the 'value' attribute for a resource in the list
 - `source()`: Return a string with the source code needed to initialize the resource list in its current state
-- `setup_ui(container)`: Set up the user interface for modifying the value of the resources within a provided container
 - `all_values()`: Create a dict containing the results of `.get_value()` for each Resource in the list (or `.all_values()` for each ResourceList), keyed by `.id`.
-- `setup_ui(container)`: Run the `.setup_ui()` method with the provided `container` for each of the Resources in the list
+- `run(container)`: The `run()` method of the ResourceList invokes three functions: `prep()`, `run_children(container)`, and `viz()`
+- `prep()`: Stub used to perform any tasks which must happen before the children are run
+- `run_children(container)`: Invoke `.run(container)` for all Resources in the `.resources` list
+- `viz()`: Perform any visualization associated with this group of Resources
 
 
 Accessing and manipulating the resource attributes within nested
@@ -132,14 +134,12 @@ override the default functions associated with the widget.
 To customize a widget, create a subclass of Widget which:
 - 1. Overrides the `self.resources` attribute to specify the Resources which are needed for functioning, and
 - 2. Overrides the `.viz()` method to provide interactivity based on the values provided to those Resources.
+- 3. Optionally overrides the `.prep()` method to perform any tasks which must take place before the Resources are run.
 
 To allow for a good amount of flexibility in creating Widgets which are
 based on specific visualization suites (e.g., the StreamlitWidget described below),
 the methods used in each Widget are as follows:
 
-- `.run()`: The primary entry-point, which runs `.inputs()` and `.viz()`
-- `.inputs()`: by default just runs `self.setup_ui(self.resource_container)`, but can be used to provide additional customization of the resource_container object prior to the UI setup
-- `.viz()`: left empty at the base class and should always be overridden
 - `.run_cli()`: Used for functionality when being run from the command line
 - `.to_html()`: Stub for authoring HTML with the live contents of the widget
 - `.to_script()`: Stub for authoring a Python script with the live contents of the widget
@@ -159,7 +159,7 @@ which can be overridden with platform-specific code.
 The Streamlit-based Resource class presents the user with an updated interface
 by:
 
-- 1. Setting up an empty container inside the `container` passed to `setup_ui()`;
+- 1. Setting up an empty container inside the `container` passed to `run()`;
 - 2. Defining an `update_ui()` method which populates that container;
 - 3. Adding an `update=bool` flag to the `set()` method which will trigger the `update_ui()` method;
 - 4. Adding a base `on_change()` method which assigns the value of the Streamlit session state to the `value` attribute of the object.
@@ -170,22 +170,22 @@ The Streamlit-based ResourceList class passes along the `update=` flag to
 the `set()` and `set_value()` methods for the `StResource` objects that it
 contains.
 
-In addition, the `setup_ui(container, sidebar=True)` method has been overridden such that:
+In addition, the `run(container, sidebar=True)` method has been overridden such that:
 - If the `container` is `None`, a new `st.container()` will be set up (optionally in the sidebar)
 - Otherwise, a new container will be created (`container.container()`)
 
-The resulting container will be passed in to the `setup_ui()` method for
+The resulting container will be passed in to the `run()` method for
 each of the Resources in the list.
 
 #### StWidget
 
 The Streamlit-based Widget class provides working examples of the methods for:
 
-- `run_cli`: Run the widget from the command line
-- `download_html_button`: Render a button which allows the user to download the widget as HTML
-- `download_script_button`: Render a button which allows the user to download the widget as code
-- `to_html`: Create an HTML file which will load this widget using the `stlite` library, based on `pyodide`
-- `to_script`: Create a python script which will be used to load this widget
+- `run_cli()`: Run the widget from the command line
+- `download_html_button()`: Render a button which allows the user to download the widget as HTML
+- `download_script_button()`: Render a button which allows the user to download the widget as code
+- `to_html()`: Create an HTML file which will load this widget using the `stlite` library, based on `pyodide`
+- `to_script()`: Create a python script which will be used to load this widget
 
 In addition to the `resources` attribute and the `viz()` method, users can
 override the `requirements` attribute to provide a list of packages which

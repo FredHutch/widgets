@@ -14,13 +14,13 @@ class StResourceList(ResourceList):
     resources: List[StResource] = list()
     _resource_dict: Dict[str, StResource] = dict()
 
-    def setup_ui(
+    def run(
         self,
         container: Union[None, DeltaGenerator],
         sidebar=True
     ) -> None:
         """
-        Run the .setup_ui() method for each Resource in the list.
+        Run the .run() method for each Resource in the list.
         If a container is provided, add a new container to it.
         If no container is provided (is None), then set up a new container.
         """
@@ -49,7 +49,7 @@ class StResourceList(ResourceList):
         # prior to setting up the UI for the child resources
         list_container = self.customize_container(list_container)
 
-        super().setup_ui(list_container)
+        super().run(list_container)
 
     def customize_container(self, container: DeltaGenerator) -> DeltaGenerator:
         """Customize the container prior to setting up the child resources."""

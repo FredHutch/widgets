@@ -98,12 +98,6 @@ class StreamlitWidget(StResourceList, Widget):
         # Return the file object
         return fp
 
-    def viz(self) -> None:
-        """
-        The viz() method should be overridden by any widget based on this.
-        """
-        pass
-
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite

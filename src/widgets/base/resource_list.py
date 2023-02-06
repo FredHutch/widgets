@@ -14,11 +14,13 @@ class ResourceList(Resource):
             label (str):       Label displayed to the user for the resource.
             help (str):        Help text describing the resource to the user.
             resources (list):  List of resources contained in this object.
+            resource_container: Base container used for the resources.
 
     """
 
     resources: List[Resource] = list()
     _resource_dict: Dict[str, Resource] = dict()
+    resource_container = None
 
     def __init__(
         self,
@@ -205,8 +207,34 @@ class ResourceList(Resource):
 
         return r
 
-    def setup_ui(self, container) -> None:
-        """Run the .setup_ui() method for each Resource in the list"""
+    def run(self, container) -> None:
+        """
+        Primary entrypoint used to launch the ResourceList.
+
+        1. Run the prep() method for any tasks which need to happen
+           before the resources are set up;
+        2. Invoke the run() method for all resources defined in the widget;
+        3. Invoke the viz() function;
+        """
+
+        self.prep()
+        self.run_resources(container)
+        self.viz()
+
+    def prep(self) -> None:
+        """
+        The prep() method should be overridden by any widget based on this.
+        """
+        pass
+
+    def run_resources(self, container) -> None:
+        """Run the .run() method for each Resource in the list"""
 
         for r in self.resources:
-            r.setup_ui(container)
+            r.run(container)
+
+    def viz(self) -> None:
+        """
+        The viz() method should be overridden by any widget based on this.
+        """
+        pass
