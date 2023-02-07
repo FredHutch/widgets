@@ -16,7 +16,7 @@ class StResourceList(ResourceList):
 
     def run(
         self,
-        container: Union[None, DeltaGenerator],
+        container: Union[None, DeltaGenerator] = None,
         sidebar=True
     ) -> None:
         """

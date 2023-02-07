@@ -84,7 +84,7 @@ class Resource:
         if parent and self.parent is not None:
             self.parent._assert_isinstance(cls, case=case, parent=parent)
 
-    def run(self, container) -> None:
+    def run(self, container=None) -> None:
         """
         Method used to provide the option for user input from the GUI.
         Should be overridden by each specific resource.

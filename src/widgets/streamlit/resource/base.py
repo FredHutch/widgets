@@ -1,3 +1,4 @@
+from typing import Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.resource import Resource
@@ -41,13 +42,13 @@ class StResource(Resource):
         """Set up the UI element (overridden by child classes)."""
         pass
 
-    def run(self, container: DeltaGenerator):
+    def run(self, container: Union[DeltaGenerator, None] = None):
         """
         Read in the value from the user.
         """
 
         # Set up the placeholder container
-        self.ui = container.empty()
+        self.ui = st.empty() if container is None else container.empty()
 
         # Update the element being displayed in the UI
         self.update_ui()

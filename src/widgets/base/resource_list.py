@@ -207,7 +207,7 @@ class ResourceList(Resource):
 
         return r
 
-    def run(self, container) -> None:
+    def run(self, container=None) -> None:
         """
         Primary entrypoint used to launch the ResourceList.
 
