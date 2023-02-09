@@ -49,19 +49,25 @@ class ResourceList(Resource):
         # Iterate over each resource defined in the widget
         for resource in self.resources:
 
-            # Make sure that the resource is a recognized type
-            if not isinstance(resource, Resource):
-                msg = "All resources must be a derivative of Resource"
-                raise WidgetConfigurationException(msg)
+            # Attach the resource to the list
+            self._attach_resource(resource)
 
-            # Make sure that the id attribute is not repeated
-            if resource.id in self._resource_dict:
-                msg = f"Resource ids must be unique (repeated: {resource.id})"
-                raise WidgetConfigurationException(msg)
-            self._resource_dict[resource.id] = resource
+    def _attach_resource(self, resource: Resource):
+        """Attach a resource to the list."""
 
-            # Attach this list as the parent of the resource
-            resource.parent = self
+        # Make sure that the resource is a recognized type
+        if not isinstance(resource, Resource):
+            msg = "All resources must be a derivative of Resource"
+            raise WidgetConfigurationException(msg)
+
+        # Make sure that the id attribute is not repeated
+        if resource.id in self._resource_dict:
+            msg = f"Resource ids must be unique (repeated: {resource.id})"
+            raise WidgetConfigurationException(msg)
+        self._resource_dict[resource.id] = resource
+
+        # Attach this list as the parent of the resource
+        resource.parent = self
 
     def get(self, resource_id: str, attr: str, *subattrs, **kwargs) -> Any:
         """
