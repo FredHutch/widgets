@@ -253,7 +253,7 @@ class ResourceList(Resource):
             i += 1
         return f"{prefix}{i}"
 
-    def new(self) -> Resource:
+    def new(self, **kwargs) -> Resource:
         """
         Return an instance of a new element.
         Should be overriden by instances of this class.
@@ -261,13 +261,13 @@ class ResourceList(Resource):
 
         # By using the ._new_resource_id() function we can ensure that the
         # id of the new resource will not conflict with any existing
-        return Resource(id=self._new_resource_id())
+        return Resource(id=self._new_resource_id(), **kwargs)
 
-    def append(self) -> None:
+    def append(self, **kwargs) -> None:
         """Add a new element at the end of the list."""
 
         # Make the new element
-        new_elem = self.new()
+        new_elem = self.new(**kwargs)
 
         # Add it to the resource list
         self.resources.append(new_elem)
@@ -275,11 +275,11 @@ class ResourceList(Resource):
         # Attach it to the self._resource_dict and assign the .parent attribute
         self._attach_resource(new_elem)
 
-    def insert(self, ix: int) -> None:
+    def insert(self, ix: int, **kwargs) -> None:
         """Insert a new element at a specific index position."""
 
         # Make the new element
-        new_elem = self.new()
+        new_elem = self.new(**kwargs)
 
         # Insert it within the resource list
         self.resources.insert(ix, new_elem)
