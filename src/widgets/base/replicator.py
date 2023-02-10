@@ -8,7 +8,7 @@ class Replicator(ResourceList):
     and rearrange the order of the existing elements.
     """
 
-    def _new_id(self):
+    def _new_id(self) -> str:
         """Return an id attribute which can be used for a new element."""
 
         i = 0
@@ -16,7 +16,7 @@ class Replicator(ResourceList):
             i += 1
         return f"elem_{i}"
 
-    def new(self):
+    def new(self) -> Resource:
         """
         Return an instance of a new element.
         Should be overriden by instances of this class.
@@ -26,7 +26,7 @@ class Replicator(ResourceList):
         # id of the new resource will not conflict with any existing
         return Resource(id=self._new_id())
 
-    def append(self):
+    def append(self) -> None:
         """Add a new element at the end of the list."""
 
         # Make the new element
@@ -38,7 +38,7 @@ class Replicator(ResourceList):
         # Attach it to the self._resource_dict and assign the .parent attribute
         self._attach_resource(new_elem)
 
-    def insert(self, ix: int):
+    def insert(self, ix: int) -> None:
         """Insert a new element at a specific index position."""
 
         # Make the new element
@@ -50,7 +50,7 @@ class Replicator(ResourceList):
         # Attach it to the self._resource_dict and assign the .parent attribute
         self._attach_resource(new_elem)
 
-    def remove(self, ix: int):
+    def remove(self, ix: int) -> None:
         """Remove an element from a specific index position."""
 
         # Remove the element from the list
