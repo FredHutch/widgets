@@ -244,3 +244,54 @@ class ResourceList(Resource):
         The viz() method should be overridden by any widget based on this.
         """
         pass
+
+    def _new_resource_id(self, prefix="elem_") -> str:
+        """Return an id attribute which can be used for a new element."""
+
+        i = 0
+        while f"{prefix}{i}" in self._resource_dict:
+            i += 1
+        return f"{prefix}{i}"
+
+    def new(self) -> Resource:
+        """
+        Return an instance of a new element.
+        Should be overriden by instances of this class.
+        """
+
+        # By using the ._new_resource_id() function we can ensure that the
+        # id of the new resource will not conflict with any existing
+        return Resource(id=self._new_resource_id())
+
+    def append(self) -> None:
+        """Add a new element at the end of the list."""
+
+        # Make the new element
+        new_elem = self.new()
+
+        # Add it to the resource list
+        self.resources.append(new_elem)
+
+        # Attach it to the self._resource_dict and assign the .parent attribute
+        self._attach_resource(new_elem)
+
+    def insert(self, ix: int) -> None:
+        """Insert a new element at a specific index position."""
+
+        # Make the new element
+        new_elem = self.new()
+
+        # Insert it within the resource list
+        self.resources.insert(ix, new_elem)
+
+        # Attach it to the self._resource_dict and assign the .parent attribute
+        self._attach_resource(new_elem)
+
+    def remove(self, ix: int) -> None:
+        """Remove an element from a specific index position."""
+
+        # Remove the element from the list
+        removed_elem = self.resources.pop(ix)
+
+        # Delete the key from the _resource_dict
+        del self._resource_dict[removed_elem.id]
