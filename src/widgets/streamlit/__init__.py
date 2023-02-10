@@ -9,4 +9,3 @@ from widgets.streamlit.resource.value import StSlider # noqa
 from widgets.streamlit.widget.base import StreamlitWidget # noqa
 from widgets.streamlit.resource_list.base import StResourceList # noqa
 from widgets.streamlit.resource_list.expander import StExpander # noqa
-from widgets.streamlit.resource_list.replicator import StReplicator # noqa

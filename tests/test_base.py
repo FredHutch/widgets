@@ -184,6 +184,52 @@ class TestResourceList(unittest.TestCase):
         except Exception as e:
             self.fail(f"w.run(None) raised: {str(e)}")
 
+    def test_new(self):
+        """Test the functionality to make a new Resource."""
+
+        rl = ResourceList(id='new')
+
+        self.assertIsInstance(
+            rl.new(id='new'),
+            Resource
+        )
+
+    def test_append(self):
+        """Test the functionality to append a Resource to the list."""
+
+        rl = ResourceList(id='append')
+
+        self.assertEqual(len(rl.resources), 0)
+        self.assertEqual(len(rl._resource_dict), 0)
+
+        rl.append(id='append')
+
+        self.assertEqual(len(rl.resources), 1)
+        self.assertEqual(len(rl._resource_dict), 1)
+
+        rl.remove(0)
+
+    def test_remove(self):
+        """Test the functionality to remove a Resource from the list."""
+
+        rl = ResourceList(id='remove')
+        self.assertEqual(
+            len(rl.resources),
+            0,
+            list(map(lambda r: r.source(), rl.resources))
+        )
+        rl.append()
+
+        self.assertEqual(len(rl.resources), 1)
+        self.assertEqual(len(rl._resource_dict), 1)
+
+        try:
+            rl.remove(0)
+        except Exception as e:
+            self.fail(str(e))
+
+        self.assertEqual(len(rl.resources), 0)
+        self.assertEqual(len(rl._resource_dict), 0)
 
 
 class TestWidget(unittest.TestCase):
