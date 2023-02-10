@@ -259,9 +259,20 @@ class ResourceList(Resource):
         Should be overriden by instances of this class.
         """
 
-        # By using the ._new_resource_id() function we can ensure that the
-        # id of the new resource will not conflict with any existing
-        return Resource(id=self._new_resource_id(), **kwargs)
+        # If the user provides an 'id' kwarg, that will take precedence.
+        # Otherwise, by using the ._new_resource_id() function we can ensure
+        # that the id of the new resource will not conflict with any existing.
+        return Resource(
+            id=kwargs.get(
+                'id',
+                self._new_resource_id()
+            ),
+            **{
+                kw: val
+                for kw, val in kwargs.items()
+                if kw != 'id'
+            }
+        )
 
     def append(self, **kwargs) -> None:
         """Add a new element at the end of the list."""
