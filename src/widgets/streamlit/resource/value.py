@@ -1,9 +1,26 @@
 import streamlit as st
+from streamlit.delta_generator import DeltaGenerator
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.streamlit.resource.base import StResource
 
 
-class StString(StResource):
+class StValue(StResource):
+    """Functions shared across single-value-entry resources."""
+
+    sidebar = True
+    disabled = False
+    label_visibility = "visible"
+
+    def ui_container(self) -> DeltaGenerator:
+        """
+        Return the empty element in the sidebar or main container,
+        depending on whether the self.sidebar attribute is True.
+        """
+
+        return self._get_ui_element(empty=True, sidebar=self.sidebar)
+
+
+class StString(StValue):
     """String value resource used for Streamlit-based widgets."""
 
     value: str = None
@@ -24,6 +41,7 @@ class StString(StResource):
         type: str = "default",
         autocomplete=None,
         placeholder: str = None,
+        sidebar=True,
         **kwargs
     ):
         """
@@ -54,6 +72,7 @@ class StString(StResource):
                                 property.
             placeholder (str):  (optional) An optional string displayed when
                                 the text input is empty
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
         Returns:
             StString: The instantiated resource object.
@@ -75,17 +94,18 @@ class StString(StResource):
         self.type = type
         self.autocomplete = autocomplete
         self.placeholder = placeholder
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the string value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.text_input(
+        self.ui_container().text_input(
             self.label,
             on_change=self.on_change,
             value=self.value,
@@ -102,12 +122,10 @@ class StString(StResource):
         self.on_change()
 
 
-class StInteger(StResource):
+class StInteger(StValue):
     """Integer value resource used for Streamlit-based widgets."""
 
     value = 0
-    disabled: bool = False
-    label_visibility: str = "visible"
     min_value: int = None
     max_value: int = None
     step: int = 1
@@ -125,6 +143,7 @@ class StInteger(StResource):
         max_value: int = None,
         step: int = 1,
         format: str = "%d",
+        sidebar=True,
         **kwargs
     ):
         """
@@ -150,6 +169,7 @@ class StInteger(StResource):
             step (int):         (optional) Step size for input element
             format (str):       (optional) Formatting f-string used for the
                                 input element
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
         Returns:
             StInteger: The instantiated resource object.
@@ -171,17 +191,18 @@ class StInteger(StResource):
         self.max_value = max_value
         self.step = step
         self.format = format
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the integer value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.number_input(
+        self.ui_container().number_input(
             self.label,
             on_change=self.on_change,
             value=self.value,
@@ -198,12 +219,10 @@ class StInteger(StResource):
         self.on_change()
 
 
-class StFloat(StResource):
+class StFloat(StValue):
     """Float value resource used for Streamlit-based widgets."""
 
     value = 0.0
-    disabled: bool = False
-    label_visibility: str = "visible"
     min_value: int = None
     max_value: int = None
     step: int = None
@@ -221,6 +240,7 @@ class StFloat(StResource):
         max_value: int = None,
         step: int = None,
         format: str = "%f",
+        sidebar=True,
         **kwargs
     ):
         """
@@ -246,6 +266,7 @@ class StFloat(StResource):
             step (int):         (optional) Step size for input element
             format (str):       (optional) Formatting f-string used for the
                                 input element
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
         Returns:
             StFloat: The instantiated resource object.
@@ -270,17 +291,18 @@ class StFloat(StResource):
         self.max_value = max_value
         self.step = step
         self.format = format
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the integer value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.number_input(
+        self.ui_container().number_input(
             self.label,
             on_change=self.on_change,
             value=self.value,
@@ -297,14 +319,12 @@ class StFloat(StResource):
         self.on_change()
 
 
-class StSelectString(StResource):
+class StSelectString(StValue):
     """
     Select-string-value-from-list resource used for Streamlit-based widgets.
     """
 
     value: str = None
-    disabled: bool = False
-    label_visibility: str = "visible"
     options: list = []
     index: int = 0
 
@@ -318,6 +338,7 @@ class StSelectString(StResource):
         label_visibility: str = "visible",
         options: list = [],
         index: int = 0,
+        sidebar=True,
         **kwargs
     ):
         """
@@ -339,6 +360,7 @@ class StSelectString(StResource):
             options (list):     List of options to select from.
             index (int):        The index of the preselected option on first
                                 render.
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
             Note:
             The value may be defined either using the index position
@@ -364,6 +386,7 @@ class StSelectString(StResource):
         self.label_visibility = label_visibility
         self.options = options
         self.index = index
+        self.sidebar = sidebar
 
         # Resolve any inconsistencies between value and index
         self._resolve_index()
@@ -404,16 +427,16 @@ class StSelectString(StResource):
             # Set the index position of the default element
             self.index = self.options.index(self.value)
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the selected string value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.selectbox(
+        self.ui_container().selectbox(
             self.label,
             on_change=self.on_change,
             key=self.key(),
@@ -437,11 +460,10 @@ class StSelectString(StResource):
             self.index = self.options.index(self.value)
 
 
-class StCheckbox(StResource):
+class StCheckbox(StValue):
     """Checkbox resource used for Streamlit-based widgets."""
 
     value = False
-    disabled: bool = False
 
     def __init__(
         self,
@@ -450,6 +472,7 @@ class StCheckbox(StResource):
         label="",
         help="",
         disabled: bool = False,
+        sidebar=True,
         **kwargs
     ):
         """
@@ -462,6 +485,7 @@ class StCheckbox(StResource):
             value (bool):       (optional) The starting value.
             disabled (bool):    (optional) If True, the input element is
                                 disabled (default: False)
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
         Returns:
             StCheckbox: The instantiated resource object.
@@ -481,17 +505,18 @@ class StCheckbox(StResource):
 
         # Set up the specific attributes for this type of resource
         self.disabled = disabled
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the bool value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.checkbox(
+        self.ui_container().checkbox(
             self.label,
             on_change=self.on_change,
             value=self.value,
@@ -503,12 +528,10 @@ class StCheckbox(StResource):
         self.on_change()
 
 
-class StSlider(StResource):
+class StSlider(StValue):
     """Slider resource used for Streamlit-based widgets."""
 
     value = False
-    disabled: bool = False
-    label_visibility: str = "visible"
     min_value: float = None
     max_value: float = None
     step: float = 1
@@ -526,6 +549,7 @@ class StSlider(StResource):
         max_value: float = None,
         step: float = 1,
         format: str = "%f",
+        sidebar=True,
         **kwargs
     ):
         """
@@ -551,6 +575,7 @@ class StSlider(StResource):
             step (int):         (optional) Step size for input element
             format (str):       (optional) Formatting f-string used for the
                                 input element
+            sidebar (bool):     Set up UI in the sidebar vs. the main container
 
         Returns:
             StSlider: The instantiated resource object.
@@ -572,17 +597,18 @@ class StSlider(StResource):
         self.max_value = max_value
         self.step = step
         self.format = format
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """
         Read in the value from the user.
         """
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.slider(
+        self.ui_container().slider(
             self.label,
             on_change=self.on_change,
             value=self.value,

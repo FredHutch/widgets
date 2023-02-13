@@ -42,12 +42,12 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Check the default value
         msg = "Default string does not match"
-        self.assertEqual(s.get("value"), "value", msg)
+        self.assertEqual(s.get_value(), "value", msg)
 
         # Try an empty value
         s = wist.StString(id="test_string")
         msg = "Empty value not created correctly"
-        self.assertIsNone(s.get("value"), msg)
+        self.assertIsNone(s.get_value(), msg)
 
     def test_integer(self):
 
@@ -57,11 +57,11 @@ class TestStreamlitResources(unittest.TestCase):
         )
 
         # Check the default value
-        self.assertEqual(s.get("value"), 1, "Default integer does not match")
+        self.assertEqual(s.get_value(), 1, "Default integer does not match")
 
         # Try an empty value
         s = wist.StInteger(id="test_integer")
-        self.assertEqual(int(), s.get("value"), "Empty value not created")
+        self.assertEqual(int(), s.get_value(), "Empty value not created")
 
     def test_float(self):
 
@@ -72,13 +72,13 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Check the default value
         msg = "Default float does not match"
-        self.assertEqual(s.get("value"), 1.0, msg)
+        self.assertEqual(s.get_value(), 1.0, msg)
 
         # Try an empty value
         s = wist.StFloat(id="test_float")
 
         msg = "Empty value not created correctly"
-        self.assertEqual(float(), s.get("value"), msg)
+        self.assertEqual(float(), s.get_value(), msg)
 
     def test_slider(self):
 
@@ -91,21 +91,17 @@ class TestStreamlitResources(unittest.TestCase):
 
         # Check the default value
         msg = "Default float does not match"
-        self.assertEqual(s.get("value"), 1.0, msg)
+        self.assertEqual(s.get_value(), 1.0, msg)
 
 
 class ExampleStreamlitWidget(wist.StreamlitWidget):
     """Simple widget used for testing purposes"""
 
-    resources = [
+    children = [
         wist.StString(id="s", value="s", label="String"),
         wist.StInteger(id="i", value=0, label="Integer"),
         wist.StFloat(id="f", value=0.0, label="Float")
     ]
-
-    def viz(self):
-
-        pass
 
 
 class TestStreamlitWidget(unittest.TestCase):
@@ -115,9 +111,9 @@ class TestStreamlitWidget(unittest.TestCase):
 
         # Create a widget with default values
         w_def = ExampleStreamlitWidget()
-        self.assertEqual(w_def.get_value("s"), "s")
-        self.assertEqual(w_def.get_value("i"), 0)
-        self.assertEqual(w_def.get_value("f"), 0.0)
+        self.assertEqual(w_def.get(path=["s"]), "s")
+        self.assertEqual(w_def.get(path=["i"]), 0)
+        self.assertEqual(w_def.get(path=["f"]), 0.0)
 
     def test_script(self):
         """Test whether widgets can be saved to a file and loaded again."""
@@ -126,9 +122,9 @@ class TestStreamlitWidget(unittest.TestCase):
         w = ExampleStreamlitWidget()
 
         # Change the data value
-        w.set_value("s", "t")
-        w.set_value("i", 1)
-        w.set_value("f", 1.0)
+        w.set(path=["s"], value="t", update=False)
+        w.set(path=["i"], value=1, update=False)
+        w.set(path=["f"], value=1.0, update=False)
 
         # Make a tempfile for the script
         with NamedTemporaryFile(suffix=".py") as tmp:
@@ -146,9 +142,9 @@ class TestStreamlitWidget(unittest.TestCase):
             s = saved_widget()
 
             # Make sure that the data values were changed
-            self.assertEqual(s.get_value("s"), "t")
-            self.assertEqual(s.get_value("i"), 1)
-            self.assertEqual(s.get_value("f"), 1.0)
+            self.assertEqual(s.get(path=["s"]), "t", w.to_script())
+            self.assertEqual(s.get(path=["i"]), 1)
+            self.assertEqual(s.get(path=["f"]), 1.0)
 
     def test_html(self):
         # Test if the to_html method returns a non-zero length string
@@ -161,37 +157,6 @@ class TestStreamlitWidget(unittest.TestCase):
 
         self.assertIsInstance(html, str)
         self.assertGreater(len(html), 0)
-
-
-class TestStreamlitResourceLists(unittest.TestCase):
-
-    def test_expander(self):
-
-        r = wist.StResourceList(
-            id="top",
-            resources=[
-                wist.StExpander(
-                    id="middle",
-                    resources=[
-                        wist.StExpander(id="bottom")
-                    ]
-                )
-            ]
-        )
-
-        r._assert_isinstance(wist.StExpander, case=False)
-        r._get_resource("middle")._assert_isinstance(wist.StExpander)
-        r._get_resource("middle", "bottom")._assert_isinstance(wist.StExpander)
-        r._get_resource("middle", "bottom")._assert_isinstance(
-            wist.StResourceList,
-            parent=True
-        )
-
-        # Expanders cannot be nested
-        self.assertRaises(
-            ResourceConfigurationException,
-            lambda: r.run(None)
-        )
 
 
 if __name__ == '__main__':
