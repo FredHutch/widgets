@@ -56,14 +56,14 @@ class SimpleWidget(wist.StreamlitWidget):
     # For example:
     #   self.get(path=["x_col"]) -> "x"
     #   or
-    #   self.set(path=["x_col"], "new_value")
+    #   self.set(path=["x_col"], value="new_value")
     # Additionally, self.all_values() creates a dict with the values
     # for all of the resources.
 
     # The attributes of the resources can also be modified, using the
     # .set() and .get() functions.
     # For example, to update the options displayed for the x_col menu:
-    #   self.set("x_col", "options", ["x", "y", "label"])
+    #   self.set(path=["x_col"], attr="options", value=["x", "y", "label"])
 
     # Specify any packages which should be installed prior to loading
 
