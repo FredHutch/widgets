@@ -1,5 +1,5 @@
 import unittest
-from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.exceptions import CLIExecutionException, ResourceConfigurationException, WidgetFunctionException
 from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.resource import Resource
 from widgets.base.widget import Widget
@@ -20,6 +20,11 @@ class TestResources(unittest.TestCase):
         # Default id is "resource"
         r = Resource()
         self.assertEqual(r.id, "resource")
+
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: Resource(id="")
+        )
 
     def test_value_assignment(self):
 
@@ -107,6 +112,23 @@ class TestResources(unittest.TestCase):
         self.assertEqual(v['first_resource'], 'FOO')
         self.assertEqual(v['second_list']['second_resource'], 'BAR')
         self.assertEqual(v['second_list']['third_list']['third_resource'], 'HOWDY') # noqa
+
+        # Get all of the values after the first one
+        v = r.all_values(path=['second_list'])
+        self.assertEqual(v['second_resource'], 'BAR')
+        self.assertEqual(v['third_list']['third_resource'], 'HOWDY')
+
+        # Test the _path_to_root method
+        self.assertEqual(
+            r._get_child('second_list', 'third_list', 'third_resource')._path_to_root(), # noqa
+            ['third_resource', 'third_list', 'second_list', 'top_list']
+        )
+
+        # Test the exception raised when an attribute doesn't exist
+        self.assertRaises(
+            ResourceExecutionException,
+            lambda: r.get(attr='missing_attribute')
+        )
 
     def test_init_exceptions(self):
 
@@ -203,6 +225,26 @@ class TestResources(unittest.TestCase):
 
         rl.remove_child(0)
 
+    def test_insert(self):
+        """Test the functionality to insert a Resource to the list."""
+
+        rl = Resource(id='insert')
+
+        self.assertEqual(len(rl.children), 0)
+        self.assertEqual(len(rl._children_dict), 0)
+
+        rl.append_child(id='appended')
+
+        self.assertEqual(len(rl.children), 1)
+        self.assertEqual(len(rl._children_dict), 1)
+
+        rl.insert_child(0, id='inserted')
+        self.assertEqual(rl.children[0].id, "inserted")
+        self.assertEqual(rl.children[1].id, "appended")
+
+        rl.remove_child(0)
+        rl.remove_child(0)
+
     def test_remove(self):
         """Test the functionality to remove a Resource from the list."""
 
@@ -224,6 +266,24 @@ class TestResources(unittest.TestCase):
 
         self.assertEqual(len(rl.children), 0)
         self.assertEqual(len(rl._children_dict), 0)
+
+    def test_attach_child(self):
+
+        r = Resource()
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._attach_child("foo")
+        )
+
+    def test_new_child_id(self):
+
+        r = Resource(children=[Resource(id="elem_0")])
+        self.assertEqual(r._new_child_id(), "elem_1")
+
+
+class ExampleWidget(Widget):
+
+    children = [Resource(id="elem_0"), Resource(id="elem_1")]
 
 
 class TestWidget(unittest.TestCase):
@@ -252,6 +312,44 @@ class TestWidget(unittest.TestCase):
             w.run_cli()
         except Exception as e:
             self.fail(f"w.run() raised: {str(e)}")
+
+    def test_stubs(self):
+        w = Widget()
+
+        try:
+            w.to_html()
+        except Exception as e:
+            self.fail(f"Command fails: to_html - {str(e)}")
+
+        try:
+            w.to_script()
+        except Exception as e:
+            self.fail(f"Command fails: to_script - {str(e)}")
+
+        try:
+            w.download_html_button()
+        except Exception as e:
+            self.fail(f"Command fails: download_html_button - {str(e)}")
+
+        try:
+            w.download_script_button()
+        except Exception as e:
+            self.fail(f"Command fails: download_script_button - {str(e)}")
+
+    def test_exceptions(self):
+        w = ExampleWidget()
+        w.children = []
+
+        self.assertRaises(
+            WidgetFunctionException,
+            lambda: w._to_file(w.source(), fp=0)
+        )
+
+        base_w = Widget()
+        self.assertRaises(
+            CLIExecutionException,
+            lambda: base_w._source()
+        )
 
 
 if __name__ == '__main__':

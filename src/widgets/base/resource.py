@@ -206,9 +206,6 @@ class Resource:
         # Attach it to the self._resource_dict and assign the .parent attribute
         self._attach_child(new_elem)
 
-        # Invoke the .run() function on the new resource
-        new_elem.run(**kwargs)
-
     def remove_child(self, ix: int) -> None:
         """Remove a child element from a specific index position."""
 
