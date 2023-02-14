@@ -439,7 +439,7 @@ class Resource:
         """
         Return a dict with the values of every child Resource.
         The keys of the dict will be the .id element, while the
-        value will be 
+        value will be:
         (a) the results of .get_value() for each Resource
             which does not have any children, and
         (b) the results of .all_values() for each Resource which
