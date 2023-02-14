@@ -1,5 +1,7 @@
 import unittest
-from widgets.base.exceptions import CLIExecutionException, ResourceConfigurationException, WidgetFunctionException
+from widgets.base.exceptions import CLIExecutionException
+from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.resource import Resource
 from widgets.base.widget import Widget
