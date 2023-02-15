@@ -1,15 +1,14 @@
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
-import streamlit as st
 from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
-from widgets.streamlit.resource_list.base import StResourceList
+from widgets.streamlit.resource.base import StResource
 import widgets
 
 
-class StreamlitWidget(StResourceList, Widget):
+class StreamlitWidget(StResource, Widget):
     """
     Base class used for building interactive widgets using Streamlit.
     """
@@ -37,33 +36,37 @@ class StreamlitWidget(StResourceList, Widget):
             # Launch the script with Streamlit
             _main_run(script.name, args, flag_options=flag_options)
 
-    def download_html_button(self):
+    def download_html_button(self, sidebar=True):
         """
         Render a button which allows the user to download the widget as HTML.
         """
 
-        with st.sidebar:
-            st.download_button(
-                "Download HTML",
-                self._render_html(title=self._name()),
-                file_name=f"{self._name()}.html",
-                mime="text/html",
-                help="Download this widget as a webpage (HTML)"
-            )
+        self._get_ui_element(
+            sidebar=sidebar,
+            empty=False
+        ).download_button(
+            "Download HTML",
+            self._render_html(title=self._name()),
+            file_name=f"{self._name()}.html",
+            mime="text/html",
+            help="Download this widget as a webpage (HTML)"
+        )
 
-    def download_script_button(self):
+    def download_script_button(self, sidebar=True):
         """
         Render a button which allows the user to download the widget as code.
         """
 
-        with st.sidebar:
-            st.download_button(
-                "Download Script",
-                self._render_script(),
-                file_name=f"{self._name()}.py",
-                mime="text/x-python",
-                help="Download this widget as a script (Python)"
-            )
+        self._get_ui_element(
+            sidebar=sidebar,
+            empty=False
+        ).download_button(
+            "Download Script",
+            self._render_script(),
+            file_name=f"{self._name()}.py",
+            mime="text/x-python",
+            help="Download this widget as a script (Python)"
+        )
 
     def _render_script(self, title="Widget") -> str:
         """
@@ -97,12 +100,6 @@ class StreamlitWidget(StResourceList, Widget):
 
         # Return the file object
         return fp
-
-    def viz(self) -> None:
-        """
-        The viz() method should be overridden by any widget based on this.
-        """
-        pass
 
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """

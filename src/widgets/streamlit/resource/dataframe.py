@@ -2,15 +2,13 @@ from typing import Union
 import streamlit as st
 import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.streamlit.resource.base import StResource
+from widgets.streamlit.resource.value import StValue
 
 
-class StDataFrame(StResource):
+class StDataFrame(StValue):
     """DataFrame resource used in a Streamlit-based widget."""
 
     value = pd.DataFrame()
-    disabled: bool = False
-    label_visibility: str = "visible"
     sep = ","
 
     def __init__(
@@ -22,6 +20,7 @@ class StDataFrame(StResource):
         disabled: bool = False,
         label_visibility: str = "visible",
         sep=",",
+        sidebar=True,
         **kwargs
     ):
         """
@@ -40,10 +39,11 @@ class StDataFrame(StResource):
                             still empty space for it above the widget
                             (equivalent to label=""). If "collapsed", both
                             the label and the space are removed.
-                            Default is "visible".
+                            Default is "visible"
+            sidebar (bool): Set up UI in the sidebar vs. the main container
 
         Returns:
-            StreamlitResource: The instantiated resource object.
+            StResource:     The instantiated resource object.
         """
 
         # If the value is a dict, convert it
@@ -76,20 +76,22 @@ class StDataFrame(StResource):
         self.disabled = disabled
         self.label_visibility = label_visibility
         self.sep = sep
+        self.sidebar = sidebar
 
-    def update_ui(self):
+    def run_self(self):
         """Allow the user to provide their own DataFrame from a file."""
 
         # Increment the UI revision
-        self.ui_revision += 1
+        self.revision += 1
 
         # Update the input element
-        self.ui.file_uploader(
+        self.ui_container().file_uploader(
             self.label,
             accept_multiple_files=False,
             help=self.help,
             key=self.key(),
-            disabled=self.disabled
+            disabled=self.disabled,
+            label_visibility=self.label_visibility
         )
 
         # If a file was provided

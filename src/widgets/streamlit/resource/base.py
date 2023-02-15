@@ -1,3 +1,4 @@
+from typing import Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.resource import Resource
@@ -6,51 +7,82 @@ from widgets.base.resource import Resource
 class StResource(Resource):
     """
     Base class for Streamlit-based resources.
-    Attribute values in the session state will take precedence
-    over the attributes on the resource object.
+    In the main and sidebar containers of the parent, this Resource
+    will set up:
+        1. An st.empty() object, which will be used to house
+        2. An st.container() object.
+    Calling self.reset_container() will replace the contents of
+    the top-level st.empty() object with a new container which
+    does not contain any elements.
     """
 
-    # Every streamlit-based resource will set up a UI object
-    ui: DeltaGenerator = None
+    # Every streamlit-based resource will attach UI containers
+    # which will be used to house the browser elements which
+    # allow the user to modify the Resource value
+    main_empty: DeltaGenerator = None
+    main_container: DeltaGenerator = None
+    sidebar_empty: DeltaGenerator = None
+    sidebar_container: DeltaGenerator = None
 
     # Keep track of the number of times that the UI element has been updated
-    ui_revision = 0
+    revision = 0
+
+    # Parent element (if any)
+    parent: Union['StResource', None] = None
+
+    def _get_ui_element(self, sidebar=False, empty=False):
+        """Return the appropriate UI element."""
+
+        if sidebar:
+            if empty:
+                return self.sidebar_empty
+            else:
+                return self.sidebar_container
+        else:
+            if empty:
+                return self.main_empty
+            else:
+                return self.main_container
 
     def key(self):
         """Format a unique UI key based on the id and ui revision."""
 
-        return f"{'_'.join(self._path_to_root())}_{self.ui_revision}"
+        return f"{'_'.join(self._path_to_root())}_{self.revision}"
 
-    def set(self, attr, val, update=True) -> None:
-        """Set the value of an attribute for this resource."""
-
-        # Set the attribute value on the resource object
-        self.__dict__[attr] = val
-
-        if update and self.ui is not None:
-
-            # Call the method to setup the input element
-            self.update_ui()
-
-    def set_value(self, val, update=True, **kwargs) -> None:
-        """Set the value of the 'value' attribute for this resource."""
-
-        self.set("value", val, update=update, **kwargs)
-
-    def update_ui(self) -> None:
-        """Set up the UI element (overridden by child classes)."""
-        pass
-
-    def setup_ui(self, container: DeltaGenerator):
+    def prep(self):
         """
-        Read in the value from the user.
+        If this Resource is housed within a parent Resource / Widget,
+        then self.main_container and self.sidebar_container will be created
+        within the corresponding elements of the parent.
+        Otherwise, if this Resource has no parent, then those
+        containers will be instantiated in the top-level namespace.
         """
 
-        # Set up the placeholder container
-        self.ui = container.empty()
+        # If there is a parent element assigned
+        if self.parent is not None:
 
-        # Update the element being displayed in the UI
-        self.update_ui()
+            # Set up the main and sidebar containers inside the parent
+            self.main_empty = self.parent.main_container.empty()
+            self.sidebar_empty = self.parent.sidebar_container.empty()
+
+        # If there is no parent
+        else:
+
+            # Set up the main and sidebar containers in the global namespace
+            self.main_empty = st.empty()
+            self.sidebar_empty = st.sidebar.empty()
+
+        # Set up a new container inside the top-level st.empty() objects
+        self.reset_container()
+
+    def reset_container(self, main=True, sidebar=True):
+        """Replace the contents of the top-level st.empty() object."""
+
+        if main:
+            self.main_container = self.main_empty.container()
+
+        if sidebar:
+            self.sidebar_container = self.sidebar_empty.container()
 
     def on_change(self):
         """Function optionally called when the ui element is changed."""

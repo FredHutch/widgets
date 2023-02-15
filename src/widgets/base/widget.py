@@ -4,10 +4,10 @@ from typing import Union
 from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.helpers import render_template
-from widgets.base.resource_list import ResourceList
+from widgets.base.resource import Resource
 
 
-class Widget(ResourceList):
+class Widget(Resource):
     """
     Base class used for building interactive widgets.
 
@@ -15,25 +15,8 @@ class Widget(ResourceList):
             id (str):          The unique key used to identify the resource.
             label (str):       Label displayed to the user for the resource.
             help (str):        Help text describing the resource to the user.
-            resources (list):  List of resources contained in this object.
-            resource_container: Base container used for the widget.
+            children (list):   List of child resources contained within.
     """
-
-    resource_container = None
-
-    def run(self) -> None:
-        """
-        Primary entrypoint used to launch the widget.
-
-        1. Run the prep() method for any tasks which need to happen
-           before the resources are set up;
-        2. Run the setup_ui() method for all resources defined in the widget;
-        3. Invoke the viz() function;
-        """
-
-        self.prep()
-        self.inputs()
-        self.viz()
 
     def run_cli(self) -> None:
         """
@@ -42,30 +25,11 @@ class Widget(ResourceList):
         """
         self.run()
 
-    def prep(self) -> None:
-        """
-        The prep() method should be overridden by any widget based on this.
-        """
-        pass
-
-    def inputs(self) -> None:
-        """Read in data from all of the resources defined in the widget."""
-
-        # This method will recursively run setup_ui for each Resource
-        self.setup_ui(self.resource_container)
-
-    def viz(self) -> None:
-        """
-        The viz() method should be overridden by any widget based on this.
-        """
-        pass
-
     def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
         """
         Create an HTML file which will load this widget.
         Should be overriden by each child class
         """
-
         pass
 
     def to_script(self, fp: Union[Path, None] = None) -> Union[None, str]:
@@ -74,7 +38,6 @@ class Widget(ResourceList):
         If fp is None, return a string.
         Should be overridden by each child class.
         """
-
         pass
 
     def _to_file(

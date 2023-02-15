@@ -59,37 +59,51 @@ class SimpleWidget(StreamlitWidget):
     # The list of resources will be wrapped in an expand/collapse
     # element, which starts off as being expanded by default.
 
-    resources = [
+    children = [
         StExpander(
             id='options_expander',
             label='Options',
             expanded=True,
-            resources=[
+            children=[
                 StDataFrame(
                     id="df",
                     value=pd.DataFrame(dict(x=[], y=[], label=[])),
                     label="Test CSV",
                 ),
-                StSelectString(id="x_col", label="X-axis Column"),
-                StString(id="x_label", label="X-axis Label", value="x-axis"),
-                StSelectString(id="y_col", label="Y-axis Column"),
-                StString(id="y_label", label="Y-axis Label", value="y-axis")
+                StSelectString(
+                    id="x_col",
+                    label="X-axis Column"
+                ),
+                StString(
+                    id="x_label",
+                    label="X-axis Label",
+                    value="x-axis"
+                ),
+                StSelectString(
+                    id="y_col",
+                    label="Y-axis Column"
+                ),
+                StString(
+                    id="y_label",
+                    label="Y-axis Label",
+                    value="y-axis"
+                )
             ]
         )
     ]
     # The updated values for each of these resources can be accessed
-    # and modified using the .get_value() and .set_value() functions
+    # and modified using the .get() and .set() functions
     # For example:
-    #   self.get_value("x_col") -> "x"
+    #   self.get(path=["x_col"]) -> "x"
     #   or
-    #   self.set_value("x_col", "new_value")
+    #   self.set(path=["x_col"], value="new_value")
     # Additionally, self.all_values() creates a dict with the values
     # for all of the resources.
 
     # The attributes of the resources can also be modified, using the
     # .set() and .get() functions.
     # For example, to update the options displayed for the x_col menu:
-    #   self.set("x_col", "options", ["x", "y", "label"])
+    #   self.set(path=["x_col"], attr="options", value=["x", "y", "label"])
 
     # Specify any packages which should be installed prior to loading
 
@@ -111,10 +125,10 @@ class SimpleWidget(StreamlitWidget):
     # The visualization defined in the viz function will be run and
     # updated every time a user changes the inputs, showing a simple
     # scatterplot.
-    def viz(self):
+    def run_self(self):
 
         # Get the updated DataFrame from the UI
-        df = self.get_value("options_expander", "df")
+        df = self.get(path=["options_expander", "df"])
 
         # If a table has been uploaded
         if df is not None and df.shape[0] > 0:
@@ -125,7 +139,7 @@ class SimpleWidget(StreamlitWidget):
             # After making that update, get the complete set of values
             # It is a nuance of streamlit that this object will not be
             # updated appropriately if called before .update_options()
-            vals = self.all_values("options_expander")
+            vals = self.all_values(path=["options_expander"])
 
             # Make a plot
             fig = px.scatter(
@@ -159,8 +173,11 @@ class SimpleWidget(StreamlitWidget):
         for resource_id in ["x_col", "y_col"]:
 
             # Update the options attribute of the resource
-            self.set("options_expander", resource_id, "options", list(options))
-
+            self.set(
+                path=["options_expander", resource_id],
+                attr="options",
+                value=list(options)
+            )
 
 ```
 
