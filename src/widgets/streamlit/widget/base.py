@@ -1,5 +1,6 @@
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
+import streamlit as st
 from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
@@ -19,6 +20,23 @@ class StreamlitWidget(StResource, Widget):
         "from widgets.streamlit import *"
     ]
     extra_imports: List[str] = []
+
+    title = ""
+    subtitle = ""
+
+    def prep(self) -> None:
+        """
+        Set up a Streamlit-based widget
+        """
+
+        # Display any title/subtitle provided by the user
+        if isinstance(self.title, str) and len(self.title) > 0:
+            st.markdown(f"## {self.title}")
+        if isinstance(self.subtitle, str) and len(self.subtitle) > 0:
+            st.markdown(f"### {self.subtitle}")
+
+        # Instantiate the base container elements
+        super().prep()
 
     def run_cli(
         self,
@@ -76,7 +94,7 @@ class StreamlitWidget(StResource, Widget):
         # Render the template for this script
         script = render_template(
             "streamlit_single.py.j2",
-            title=title,
+            title=title if len(self.title) == 0 else self.title,
             imports=self._imports(),
             widget_source=self._source(),
             widget_name=self._name()
