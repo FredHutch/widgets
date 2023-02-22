@@ -295,6 +295,8 @@ class Resource:
 
         if isinstance(val, str):
             return f'"{val}"'
+        if isinstance(val, int) or isinstance(val, float):
+            return f'{val}'
         elif isinstance(val, list):
             return f"""[{', '.join([
                 self._source_val(i, indent=indent)
