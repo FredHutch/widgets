@@ -77,6 +77,12 @@ class Resource:
             # Attach the resource list to the object
             self.children = children
 
+        # Otherwise
+        else:
+
+            # Use the children defined by the class
+            self.children = self.__class__.children
+
         # Iterate over each resource defined as a child element
         for child in self.children:
 
