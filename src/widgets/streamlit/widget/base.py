@@ -29,14 +29,14 @@ class StreamlitWidget(StResource, Widget):
         Set up a Streamlit-based widget
         """
 
-        # Display any title/subtitle provided by the user
-        if isinstance(self.title, str) and len(self.title) > 0:
-            st.markdown(f"## {self.title}")
-        if isinstance(self.subtitle, str) and len(self.subtitle) > 0:
-            st.markdown(f"### {self.subtitle}")
-
         # Instantiate the base container elements
         super().prep()
+
+        # Display any title/subtitle provided by the user
+        if isinstance(self.title, str) and len(self.title) > 0:
+            self._get_ui_element(sidebar=False, empty=False).markdown(f"## {self.title}")
+        if isinstance(self.subtitle, str) and len(self.subtitle) > 0:
+            self._get_ui_element(sidebar=False, empty=False).markdown(f"### {self.subtitle}")
 
     def run_cli(
         self,
