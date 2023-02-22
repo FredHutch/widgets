@@ -360,11 +360,20 @@ class Resource:
     def get_attr(self, attr, **kwargs) -> Any:
         """Return the value of the attribute for this resource."""
 
-        if attr not in self.__dict__:
-            msg = f"Attribute does not exist {attr} for {self.id}"
-            raise ResourceExecutionException(msg)
+        # First get the attribute defined in the object
+        if attr in self.__dict__:
+            return self.__dict__.get(attr)
 
-        return self.__dict__.get(attr)
+        else:
+
+            # Next try to get the attribute defined in the class
+            if attr in self.__class__.__dict__:
+                return self.__class__.__dict__.get(attr)
+
+            # If it isn't present in either place, raise an error
+            else:
+                msg = f"Attribute does not exist {attr} for {self.id}"
+                raise ResourceExecutionException(msg)
 
     def get_value(self, **kwargs) -> Any:
         """
