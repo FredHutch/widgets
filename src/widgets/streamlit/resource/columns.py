@@ -1,4 +1,3 @@
-import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from typing import List, Union
 from widgets.base.exceptions import ResourceConfigurationException

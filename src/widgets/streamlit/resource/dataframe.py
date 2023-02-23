@@ -1,7 +1,9 @@
+import json
 from typing import Union
 import streamlit as st
 import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.helpers import compress_string, decompress_string
 from widgets.streamlit.resource.value import StValue
 
 
@@ -50,8 +52,19 @@ class StDataFrame(StValue):
             StResource:     The instantiated resource object.
         """
 
+        # If the value is a string, try to decompress it
+        if isinstance(value, str):
+            try:
+                value = pd.DataFrame(
+                    json.loads(
+                        decompress_string(value)
+                    )
+                )
+            except Exception as e:
+                msg = f"value could not be decompressed from string ({str(e)})"
+                raise ResourceConfigurationException(msg)
         # If the value is a dict, convert it
-        if isinstance(value, dict):
+        elif isinstance(value, dict):
             try:
                 value = pd.DataFrame(value)
             except Exception as e:
@@ -117,12 +130,31 @@ class StDataFrame(StValue):
         which can be used in source code initializing this resource.
         The value attribute is a DataFrame which can be serialized
         as a dict of lists.
+        That dict of list will be serialized to JSON and compressed
+        with zlib to reduce the total file size.
         """
 
         if isinstance(val, str):
             return f'"{val}"'
         elif isinstance(val, pd.DataFrame):
-            return val.to_dict(orient="list")
+            # Convert to dict
+            val_dict = val.to_dict(orient="list")
+            # Convert to string
+            val_str = json.dumps(val_dict)
+            # Compress the string
+            val_comp = compress_string(val_str)
+
+            # If the compressed string is shorter
+            if len(val_comp) < len(val_str):
+
+                # Return the compressed version,
+                # embedded in quotes
+                return f'"{val_comp}"'
+            # If the compressed string is longer
+            else:
+                # Return the JSON serialization
+                return val_str
+
         else:
             return val
 
