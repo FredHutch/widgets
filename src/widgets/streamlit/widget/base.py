@@ -1,6 +1,5 @@
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
-import streamlit as st
 from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
@@ -34,9 +33,19 @@ class StreamlitWidget(StResource, Widget):
 
         # Display any title/subtitle provided by the user
         if isinstance(self.title, str) and len(self.title) > 0:
-            self._get_ui_element(sidebar=False, empty=False).markdown(f"## {self.title}")
+            self._get_ui_element(
+                sidebar=False,
+                empty=False
+            ).markdown(
+                f"## {self.title}"
+            )
         if isinstance(self.subtitle, str) and len(self.subtitle) > 0:
-            self._get_ui_element(sidebar=False, empty=False).markdown(f"### {self.subtitle}")
+            self._get_ui_element(
+                sidebar=False,
+                empty=False
+            ).markdown(
+                f"### {self.subtitle}"
+            )
 
     def run_cli(
         self,
