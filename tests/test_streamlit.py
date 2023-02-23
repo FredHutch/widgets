@@ -100,6 +100,13 @@ class TestStreamlitResources(unittest.TestCase):
         msg = "Empty value not created correctly"
         self.assertEqual(float(), s.get_value(), msg)
 
+    def test_float_exception(self):
+
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StFloat(id="invalid_float", value='foobar')
+        )
+
     def test_slider(self):
 
         s = wist.StSlider(
