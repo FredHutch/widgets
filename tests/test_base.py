@@ -72,6 +72,11 @@ class TestResources(unittest.TestCase):
             lambda: r._assert_isinstance(Resource, case=False)
         )
 
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._assert_isinstance(str, case=True)
+        )
+
     def test_child_value_assignment(self):
 
         # Define a Resource

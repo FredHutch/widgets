@@ -47,7 +47,7 @@ class StColumns(StResource):
                     raise ResourceConfigurationException(msg)
 
             # The length must match the number of children
-            if not len(spec) == len(self.children):
+            if len(spec) != len(children):
                 msg = "StColumns: spec length must match children"
                 raise ResourceConfigurationException(msg)
 

@@ -30,6 +30,7 @@ class SimpleWidget(wist.StreamlitWidget):
                     value=pd.DataFrame(dict(x=[], y=[], label=[])),
                     label="Test CSV",
                 ),
+                wist.StDownloadDataFrame(target='df'),
                 wist.StSelectString(
                     id="x_col",
                     label="X-axis Column"
@@ -47,6 +48,24 @@ class SimpleWidget(wist.StreamlitWidget):
                     id="y_label",
                     label="Y-axis Label",
                     value="y-axis"
+                ),
+                wist.StColumns(
+                    id="columns_a",
+                    children=[
+                        wist.StMarkdown(value="Testing the markdown"),
+                        wist.StCheckbox(id="checkbox")
+                    ]
+                ),
+                wist.StColumns(
+                    id="columns_b",
+                    spec=[3, 1],
+                    children=[
+                        wist.StFloat(id="float"),
+                        wist.StMultiSelect(
+                            id="multiselect",
+                            options=['x', 'y', 'z']
+                        )
+                    ]
                 )
             ]
         )
