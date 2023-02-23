@@ -33,6 +33,26 @@ class TestStreamlitResources(unittest.TestCase):
         msg = "Empty value not created correctly"
         self.assertTrue(pd.DataFrame().equals(res.value), msg)
 
+    def test_dataframe_fromdict(self):
+
+        df = pd.DataFrame(dict(a=[1, 2, 3], b=['a', 'b', 'c']))
+
+        # Make an StDataFrame based on the dict of that DataFrame
+        res = wist.StDataFrame(
+            id="test_dataframe",
+            value=df.to_dict(orient="list")
+        )
+
+        # Make sure that the values are equal
+        self.assertTrue(df.equals(res.value))
+
+    def test_dataframe_exception(self):
+
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StDataFrame(id="invalid_dataframe", value=0)
+        )
+
     def test_string(self):
 
         s = wist.StString(
