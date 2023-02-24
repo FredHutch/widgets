@@ -1,4 +1,4 @@
-from typing import Union
+from typing import List, Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.resource import Resource
@@ -15,6 +15,9 @@ class StResource(Resource):
     the top-level st.empty() object with a new container which
     does not contain any elements.
     """
+
+    # Child element will all be StResources
+    children: List['StResource'] = list()
 
     # Every streamlit-based resource will attach UI containers
     # which will be used to house the browser elements which
@@ -62,8 +65,12 @@ class StResource(Resource):
         if self.parent is not None:
 
             # Set up the main and sidebar containers inside the parent
-            self.main_empty = self.parent.main_container.empty()
-            self.sidebar_empty = self.parent.sidebar_container.empty()
+            # If they have not already been assigned
+            if self.main_empty is None:
+                self.main_empty = self.parent.main_container.empty()
+
+            if self.sidebar_empty is None:
+                self.sidebar_empty = self.parent.sidebar_container.empty()
 
         # If there is no parent
         else:

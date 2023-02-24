@@ -72,6 +72,11 @@ class TestResources(unittest.TestCase):
             lambda: r._assert_isinstance(Resource, case=False)
         )
 
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._assert_isinstance(str, case=True)
+        )
+
     def test_child_value_assignment(self):
 
         # Define a Resource
@@ -254,7 +259,7 @@ class TestResources(unittest.TestCase):
         self.assertEqual(
             len(rl.children),
             0,
-            list(map(lambda r: r.source(), rl.children))
+            list(map(lambda r: r.source_init(), rl.children))
         )
         rl.append_child()
 
@@ -344,13 +349,7 @@ class TestWidget(unittest.TestCase):
 
         self.assertRaises(
             WidgetFunctionException,
-            lambda: w._to_file(w.source(), fp=0)
-        )
-
-        base_w = Widget()
-        self.assertRaises(
-            CLIExecutionException,
-            lambda: base_w._source()
+            lambda: w._to_file(w.source_init(), fp=0)
         )
 
 

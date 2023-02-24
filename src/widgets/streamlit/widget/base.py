@@ -20,6 +20,33 @@ class StreamlitWidget(StResource, Widget):
     ]
     extra_imports: List[str] = []
 
+    title = ""
+    subtitle = ""
+
+    def prep(self) -> None:
+        """
+        Set up a Streamlit-based widget
+        """
+
+        # Instantiate the base container elements
+        super().prep()
+
+        # Display any title/subtitle provided by the user
+        if isinstance(self.title, str) and len(self.title) > 0:
+            self._get_ui_element(
+                sidebar=False,
+                empty=False
+            ).markdown(
+                f"## {self.title}"
+            )
+        if isinstance(self.subtitle, str) and len(self.subtitle) > 0:
+            self._get_ui_element(
+                sidebar=False,
+                empty=False
+            ).markdown(
+                f"### {self.subtitle}"
+            )
+
     def run_cli(
         self,
         args: List[str] = [],
@@ -76,9 +103,9 @@ class StreamlitWidget(StResource, Widget):
         # Render the template for this script
         script = render_template(
             "streamlit_single.py.j2",
-            title=title,
+            title=title if len(self.title) == 0 else self.title,
             imports=self._imports(),
-            widget_source=self._source(),
+            widget_source=self.source_all(),
             widget_name=self._name()
         )
 
@@ -149,7 +176,7 @@ class StreamlitWidget(StResource, Widget):
                 f"widgets-lib=={widgets.__version__}"
             ],
             imports=self._imports(),
-            widget_source=self._source(),
+            widget_source=self.source_all(),
             widget_name=self._name()
         )
 

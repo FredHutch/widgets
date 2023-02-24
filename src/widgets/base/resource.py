@@ -1,7 +1,9 @@
-from inspect import signature
+from inspect import getmro, getsource, isfunction, signature
 from typing import Any, Dict, List, Union
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
+from widgets.base.exceptions import CLIExecutionException
+from widgets.base.helpers import render_template
 
 
 class Resource:
@@ -76,6 +78,12 @@ class Resource:
 
             # Attach the resource list to the object
             self.children = children
+
+        # Otherwise
+        else:
+
+            # Use the children defined by the class
+            self.children = self.__class__.children
 
         # Iterate over each resource defined as a child element
         for child in self.children:
@@ -256,7 +264,7 @@ class Resource:
     ##########
     # SOURCE #
     ##########
-    def source(self, indent=4, skip=["self", "kwargs"]) -> str:
+    def source_init(self, indent=4, skip=["self", "kwargs"]) -> str:
         """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
@@ -281,6 +289,124 @@ class Resource:
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
+    def source_self(self) -> str:
+        """
+        Return the source code for this live widget as a string.
+        """
+
+        source = render_template(
+            "source.py.j2",
+            name=self._name(),
+            parent_name=self._parent_name(),
+            attributes=self._source_attributes(),
+            functions=self._source_functions()
+        )
+
+        # Backticks in the source code will cause errors in HTML
+        if "`" in source:
+            raise CLIExecutionException("Script may not contain backticks (`)")
+
+        return source
+
+    def source_all(self) -> str:
+        """
+        Return the source code for this live widget as a string,
+        including the source code for any other custom Resource-based classes
+        which are defined in the __main__ scope.
+        """
+
+        return "\n\n".join(
+            source
+            for source in self._recursive_source(gathered_source={}).values()
+        )
+
+    def _recursive_source(self, gathered_source=dict()) -> dict:
+        """
+        Recursively traverse child elements to gather the source code for all
+        Resource-based classes which are defined in the main scope.
+        """
+
+        # If this element was not defined in the widgets module
+        if not self.__class__.__module__.startswith('widget'):
+
+            # If this element has not been added
+            if self._name() not in gathered_source:
+
+                # Add it
+                gathered_source[self._name()] = self.source_self()
+
+            # Recursively add the parent element
+            p = self._parent_class()()
+            gathered_source = p._recursive_source(
+                gathered_source=gathered_source
+            )
+
+            # For all child elements
+            for child in self.children:
+
+                # Add any source code which they may reference
+                gathered_source = child._recursive_source(
+                    gathered_source=gathered_source
+                )
+
+        # Return the complete set of sources which were found
+        return gathered_source
+
+    def _name(self) -> str:
+        """Return the name of this widget."""
+
+        return self.__class__.__name__
+
+    def _parent_name(self) -> str:
+        """Return the name of the parent class for this object."""
+
+        return self._parent_class().__name__
+
+    def _parent_class(self):
+        """Return the parent class for this object."""
+
+        for cls in getmro(self.__class__):
+            if cls != self.__class__:
+                return cls
+
+    def _class_items(self, filter_functions=False):
+        """
+        Yield the items associated with the class of this widget.
+        If filter_functions is True, yield only functions, otherwise
+        do not yield any functions.
+        """
+        for kw, val in self.__class__.__dict__.items():
+            if kw.startswith("__"):
+                continue
+            if filter_functions == isfunction(val):
+                yield kw, val
+
+    def _source_attributes(self) -> str:
+        """
+        Return a text block which captures the attributes of this class.
+        """
+
+        attributes = []
+
+        # Iterate over the attributes of this class
+        for kw, attrib in self._class_items(filter_functions=False):
+
+            # Add it to the list
+            attributes.append(f"    {kw} = {self._source_val(attrib)}")
+
+        return "\n\n".join(attributes)
+
+    def _source_functions(self) -> str:
+        """
+        Return a text block with source code for all functions of this widget
+        which do not match the parent class.
+        """
+
+        return "\n\n".join([
+            getsource(func)
+            for _, func in self._class_items(filter_functions=True)
+        ])
+
     def _source_val(self, val, indent=4) -> Any:
         """
         Return a string representation of an attribute value
@@ -289,13 +415,15 @@ class Resource:
 
         if isinstance(val, str):
             return f'"{val}"'
+        if isinstance(val, int) or isinstance(val, float):
+            return f'{val}'
         elif isinstance(val, list):
             return f"""[{', '.join([
                 self._source_val(i, indent=indent)
                 for i in val
             ])}]"""
         elif isinstance(val, Resource):
-            return val.source(indent=indent)
+            return val.source_init(indent=indent)
         else:
             return val
 
@@ -360,11 +488,20 @@ class Resource:
     def get_attr(self, attr, **kwargs) -> Any:
         """Return the value of the attribute for this resource."""
 
-        if attr not in self.__dict__:
-            msg = f"Attribute does not exist {attr} for {self.id}"
-            raise ResourceExecutionException(msg)
+        # First get the attribute defined in the object
+        if attr in self.__dict__:
+            return self.__dict__.get(attr)
 
-        return self.__dict__.get(attr)
+        else:
+
+            # Next try to get the attribute defined in the class
+            if attr in self.__class__.__dict__:
+                return self.__class__.__dict__.get(attr)
+
+            # If it isn't present in either place, raise an error
+            else:
+                msg = f"Attribute does not exist {attr} for {self.id}"
+                raise ResourceExecutionException(msg)
 
     def get_value(self, **kwargs) -> Any:
         """
