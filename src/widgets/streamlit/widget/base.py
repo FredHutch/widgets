@@ -23,6 +23,9 @@ class StreamlitWidget(StResource, Widget):
     # "auto" or "expanded" or "collapsed"
     initial_sidebar_state = "auto"
 
+    # "centered" or "wide"
+    layout = "centered"
+
     title = ""
     subtitle = ""
 
@@ -107,6 +110,7 @@ class StreamlitWidget(StResource, Widget):
         script = render_template(
             "streamlit_single.py.j2",
             title=title if len(self.title) == 0 else self.title,
+            layout=self.layout,
             initial_sidebar_state=self.initial_sidebar_state,
             imports=self._imports(),
             widget_source=self.source_all(),
