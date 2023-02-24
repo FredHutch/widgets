@@ -317,7 +317,9 @@ class Resource:
 
         return "\n\n".join(
             source
-            for source in self._recursive_source(gathered_source={}).values()
+            for source in list(self._recursive_source(
+                gathered_source={}
+            ).values())[::-1]
         )
 
     def _recursive_source(self, gathered_source=dict()) -> dict:
