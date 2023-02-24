@@ -20,6 +20,12 @@ class StreamlitWidget(StResource, Widget):
     ]
     extra_imports: List[str] = []
 
+    # "auto" or "expanded" or "collapsed"
+    initial_sidebar_state = "auto"
+
+    # "centered" or "wide"
+    layout = "centered"
+
     title = ""
     subtitle = ""
 
@@ -104,6 +110,8 @@ class StreamlitWidget(StResource, Widget):
         script = render_template(
             "streamlit_single.py.j2",
             title=title if len(self.title) == 0 else self.title,
+            layout=self.layout,
+            initial_sidebar_state=self.initial_sidebar_state,
             imports=self._imports(),
             widget_source=self.source_all(),
             widget_name=self._name()
@@ -176,7 +184,7 @@ class StreamlitWidget(StResource, Widget):
                 f"widgets-lib=={widgets.__version__}"
             ],
             imports=self._imports(),
-            widget_source=self.source_all(),
+            widget_source=self.source_all().replace("\\", "\\\\"),
             widget_name=self._name()
         )
 
