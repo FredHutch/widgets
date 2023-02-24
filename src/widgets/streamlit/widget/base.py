@@ -176,7 +176,7 @@ class StreamlitWidget(StResource, Widget):
                 f"widgets-lib=={widgets.__version__}"
             ],
             imports=self._imports(),
-            widget_source=self.source_all(),
+            widget_source=self.source_all().replace("\\", "\\\\"),
             widget_name=self._name()
         )
 
