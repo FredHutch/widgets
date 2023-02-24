@@ -42,8 +42,10 @@ The minimal functions on the resource are:
 - `get_value()`: Get the value of the 'value' attribute of the resource
 - `set()`: Set a new value for an attribute of the resource or its child
 - `set_value()`: Set a new value for the 'value' attribute of the resource
-- `source()`: Return a string with the source code needed to initialize the resource in its current state
 - `all_values()`: Create a dict containing the results of `.get_value()` for each Resource in the list, keyed by `.id`.
+- `source_init()`: Return a string with the source code needed to initialize the resource in its current state
+- `source_self()`: Return a string with the source code needed to define the class of the resource
+- `source_all()`: Combined results of source_self() for all child / parent elements which are defined outside of the widgets library
 - `run()`: Run the three main functions: `prep()`, `run_children()`, and `run_self()`
 - `prep()`: Stub used to perform any tasks which must happen before the children are run
 - `run_children()`: Invoke `.run()` for all Resources in the `.children` list
@@ -129,7 +131,6 @@ the methods used in each Widget are as follows:
 - `.to_script()`: Stub for authoring a Python script with the live contents of the widget
 - `.download_html_button()`: Render a button allowing the user to download the live widget as HTML
 - `.download_script_button()`: Render a button allowing the user to download the live widget as a Python script
-- `._source()`: Return the source code for this live widget as a string
 
 ### Streamlit-Based Widgets
 

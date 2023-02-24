@@ -160,10 +160,15 @@ class TestStreamlitWidget(unittest.TestCase):
             w.to_script(Path(tmp.name))
 
             # Load the script
-            saved_widget = load_widget(
-                Path(tmp.name),
-                "ExampleStreamlitWidget"
-            )
+            try:
+                saved_widget = load_widget(
+                    Path(tmp.name),
+                    "ExampleStreamlitWidget"
+                )
+            except Exception as e:
+                error_str = f"{str(e)}\n{w._render_script()}"
+                msg = f"Could not load ExampleStreamlitWidget\n{error_str}"
+                self.fail(msg)
 
             # Instantiate the widget
             s = saved_widget()

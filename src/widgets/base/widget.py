@@ -1,9 +1,6 @@
-from inspect import getmro, getsource, isfunction
 from pathlib import Path
 from typing import Union
-from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import WidgetFunctionException
-from widgets.base.helpers import render_template
 from widgets.base.resource import Resource
 
 
@@ -78,77 +75,3 @@ class Widget(Resource):
         Render a button which allows the user to download the widget as code.
         """
         pass
-
-    def _source(self) -> str:
-        """
-        Return the source code for this live widget as a string.
-        """
-
-        source = render_template(
-            "source.py.j2",
-            name=self._name(),
-            parent_name=self._parent_name(),
-            attributes=self._source_attributes(),
-            functions=self._source_functions()
-        )
-
-        # Backticks in the source code will cause errors in HTML
-        if "`" in source:
-            raise CLIExecutionException("Script may not contain backticks (`)")
-
-        return source
-
-    def _name(self) -> str:
-        """Return the name of this widget."""
-
-        return self.__class__.__name__
-
-    def _parent_name(self) -> str:
-        """Return the name of the parent class for this object."""
-
-        return self._parent_class().__name__
-
-    def _parent_class(self):
-        """Return the parent class for this object."""
-
-        for cls in getmro(self.__class__):
-            if cls != self.__class__:
-                return cls
-
-    def _class_items(self, filter_functions=False):
-        """
-        Yield the items associated with the class of this widget.
-        If filter_functions is True, yield only functions, otherwise
-        do not yield any functions.
-        """
-        for kw, val in self.__class__.__dict__.items():
-            if kw.startswith("__"):
-                continue
-            if filter_functions == isfunction(val):
-                yield kw, val
-
-    def _source_attributes(self) -> str:
-        """
-        Return a text block which captures the attributes of this class.
-        """
-
-        attributes = []
-
-        # Iterate over the attributes of this class
-        for kw, attrib in self._class_items(filter_functions=False):
-
-            # Add it to the list
-            attributes.append(f"    {kw} = {self._source_val(attrib)}")
-
-        return "\n\n".join(attributes)
-
-    def _source_functions(self) -> str:
-        """
-        Return a text block with source code for all functions of this widget
-        which do not match the parent class.
-        """
-
-        return "\n\n".join([
-            getsource(func)
-            for _, func in self._class_items(filter_functions=True)
-        ])

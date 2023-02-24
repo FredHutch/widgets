@@ -105,7 +105,7 @@ class StreamlitWidget(StResource, Widget):
             "streamlit_single.py.j2",
             title=title if len(self.title) == 0 else self.title,
             imports=self._imports(),
-            widget_source=self._source(),
+            widget_source=self.source_all(),
             widget_name=self._name()
         )
 
@@ -176,7 +176,7 @@ class StreamlitWidget(StResource, Widget):
                 f"widgets-lib=={widgets.__version__}"
             ],
             imports=self._imports(),
-            widget_source=self._source(),
+            widget_source=self.source_all(),
             widget_name=self._name()
         )
 
