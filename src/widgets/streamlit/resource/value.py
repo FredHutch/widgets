@@ -436,6 +436,11 @@ class StSelectString(StValue):
         # Increment the UI revision
         self.revision += 1
 
+        # Make sure to resolve the index
+        if self.value not in self.options:
+            self.value = self.options[0]
+        self._resolve_index()
+
         # Update the input element
         self.ui_container().selectbox(
             self.label,
