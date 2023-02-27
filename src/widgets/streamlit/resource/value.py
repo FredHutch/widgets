@@ -437,7 +437,7 @@ class StSelectString(StValue):
         self.revision += 1
 
         # Make sure to resolve the index
-        if self.value not in self.options:
+        if self.value not in self.options and len(self.options) > 0:
             self.value = self.options[0]
         self._resolve_index()
 

@@ -1,6 +1,5 @@
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
-from streamlit.web.cli import _main_run
 from typing import Any, Dict, List, Union
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
@@ -67,6 +66,7 @@ class StreamlitWidget(StResource, Widget):
         with self._script_tempfile(title=title) as script:
 
             # Launch the script with Streamlit
+            from streamlit.web.cli import _main_run
             _main_run(script.name, args, flag_options=flag_options)
 
     def download_html_button(self, sidebar=True):
@@ -106,12 +106,17 @@ class StreamlitWidget(StResource, Widget):
         Return the script for this widget as a string.
         """
 
+        if self.disable_sidebar:
+            initial_sidebar_state = "collapsed"
+        else:
+            initial_sidebar_state = self.initial_sidebar_state
+
         # Render the template for this script
         script = render_template(
             "streamlit_single.py.j2",
             title=title if len(self.title) == 0 else self.title,
             layout=self.layout,
-            initial_sidebar_state=self.initial_sidebar_state,
+            initial_sidebar_state=initial_sidebar_state,
             imports=self._imports(),
             widget_source=self.source_all(),
             widget_name=self._name()
@@ -170,7 +175,7 @@ class StreamlitWidget(StResource, Widget):
         self,
         title="Widget",
         footer="Widget (github.com/FredHutch/widgets)",
-        stlite_ver="0.22.2",
+        stlite_ver="0.27.0",
     ):
         """Render the widget as HTML"""
 

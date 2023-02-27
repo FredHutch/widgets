@@ -27,6 +27,11 @@ class StResource(Resource):
     sidebar_empty: DeltaGenerator = None
     sidebar_container: DeltaGenerator = None
 
+    # If set to True, then the contents of the sidebar_ elements
+    # will never be populated.
+    # Additionally, all children will have .sidebar=False assigned.
+    disable_sidebar = False
+
     # Keep track of the number of times that the UI element has been updated
     revision = 0
 
@@ -36,7 +41,7 @@ class StResource(Resource):
     def _get_ui_element(self, sidebar=False, empty=False):
         """Return the appropriate UI element."""
 
-        if sidebar:
+        if sidebar and not self.disable_sidebar:
             if empty:
                 return self.sidebar_empty
             else:
@@ -69,15 +74,30 @@ class StResource(Resource):
             if self.main_empty is None:
                 self.main_empty = self.parent.main_container.empty()
 
-            if self.sidebar_empty is None:
-                self.sidebar_empty = self.parent.sidebar_container.empty()
+            # If the parent element has .disable_sidebar=True
+            if self.parent.disable_sidebar:
+
+                # Set the same attribute on this resource
+                self.disable_sidebar = True
+
+                # Also disable the sidebar flag on this element
+                self.sidebar = False
+
+            # If the sidebar has not been disabled
+            if not self.disable_sidebar:
+
+                if self.sidebar_empty is None:
+                    self.sidebar_empty = self.parent.sidebar_container.empty()
 
         # If there is no parent
         else:
 
             # Set up the main and sidebar containers in the global namespace
             self.main_empty = st.empty()
-            self.sidebar_empty = st.sidebar.empty()
+
+            # Only if the sidebar has not been disabled
+            if not self.disable_sidebar:
+                self.sidebar_empty = st.sidebar.empty()
 
         # Set up a new container inside the top-level st.empty() objects
         self.reset_container()
@@ -89,7 +109,8 @@ class StResource(Resource):
             self.main_container = self.main_empty.container()
 
         if sidebar:
-            self.sidebar_container = self.sidebar_empty.container()
+            if not self.disable_sidebar:
+                self.sidebar_container = self.sidebar_empty.container()
 
     def on_change(self):
         """Function optionally called when the ui element is changed."""

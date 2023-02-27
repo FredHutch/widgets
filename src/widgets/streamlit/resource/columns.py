@@ -79,11 +79,13 @@ class StColumns(StResource):
         self.main_columns = self.main_empty.columns(
             self.spec, gap=self.gap
         )
-        self.sidebar_columns = self.sidebar_empty.columns(
-            self.spec, gap=self.gap
-        )
+        if not self.disable_sidebar:
+            self.sidebar_columns = self.sidebar_empty.columns(
+                self.spec, gap=self.gap
+            )
 
         # Set up the children within those containers
         for ix, child in enumerate(self.children):
             child.main_empty = self.main_columns[ix]
-            child.sidebar_empty = self.sidebar_columns[ix]
+            if not self.disable_sidebar:
+                child.sidebar_empty = self.sidebar_columns[ix]
