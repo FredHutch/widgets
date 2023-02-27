@@ -109,7 +109,7 @@ class StreamlitWidget(StResource, Widget):
         if self.disable_sidebar:
             initial_sidebar_state = "collapsed"
         else:
-             initial_sidebar_state = self.initial_sidebar_state
+            initial_sidebar_state = self.initial_sidebar_state
 
         # Render the template for this script
         script = render_template(
