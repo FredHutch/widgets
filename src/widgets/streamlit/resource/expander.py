@@ -42,7 +42,7 @@ class StExpander(StResource):
         # Instantiate the base container elements
         super().prep()
 
-        if self.sidebar:
+        if self.sidebar and not self.disable_sidebar:
             self.sidebar_container = self.sidebar_empty.expander(
                 self.label,
                 expanded=self.expanded
