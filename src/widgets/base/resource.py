@@ -163,7 +163,10 @@ class Resource:
 
         # Get the potential prefix of this object's .id element
         # Does the id of this element end in an _123 pattern?
-        if '_' in self.id and all([c in list(map(str, range(10))) for c in self.id.split("_")[-1]]):
+        if '_' in self.id and all([
+            c in list(map(str, range(10)))
+            for c in self.id.split("_")[-1]
+        ]):
 
             # Use the prefix as everything before that last '_'
             id_prefix = self.id.rsplit('_', 1)[0]
@@ -252,18 +255,23 @@ class Resource:
             self.parent._assert_isinstance(cls, case=case, parent=parent)
 
     def _is_final_child(self) -> bool:
-        """Whether this element is the final element in the list of children."""
+        """
+        Whether this element is the final element in the list of children.
+        """
 
         assert self.parent is not None, "Is not a child element"
 
-        assert len(self.parent.children) > 0, "Parent does not have any children"
+        msg = "Parent does not have any children"
+        assert len(self.parent.children) > 0, msg
 
         return self.id == self.parent.children[-1].id
 
     def _ix(self) -> int:
-        """Return the index position of this element in the list of children."""
+        """
+        Return the index position of this element in the list of children.
+        """
 
-        assert self.parent is not None, f"Is not a child element"
+        assert self.parent is not None, "Cannot get ix - is not a child"
 
         return [
             r.id
