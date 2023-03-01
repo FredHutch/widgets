@@ -158,73 +158,63 @@ class Resource:
     #################
     # EDIT CHILDREN #
     #################
-    def _new_child_id(self, id_prefix="elem_") -> str:
-        """Return an id attribute which can be used for a new child element."""
+    def _twin_id(self) -> str:
+        """Return an id attribute which can be used for a new twin element."""
 
+        # Get the potential prefix of this object's .id element
+        # Does the id of this element end in an _123 pattern?
+        if '_' in self.id and all([c in list(map(str, range(10))) for c in self.id.split("_")[-1]]):
+
+            # Use the prefix as everything before that last '_'
+            id_prefix = self.id.rsplit('_', 1)[0]
+
+        # If not
+        else:
+
+            # Use the entire .id as the prefix for the twin
+            id_prefix = self.id
+
+        # Find the numeric suffix which does not collide
         i = 0
-        while f"{id_prefix}{i}" in self._children_dict:
+        while f"{id_prefix}_{i}" in self.parent._children_dict:
             i += 1
-        return f"{id_prefix}{i}"
+        return f"{id_prefix}_{i}"
 
-    def new_child(self, **kwargs) -> 'Resource':
+    def duplicate(self) -> None:
         """
-        Return an instance of a new child Resource.
-        Should be overriden by instances of this class.
+        Make a copy of this resource within the list of children
+        of its parent, placed immediately following itself.
         """
 
-        # If the user provides an 'id' kwarg, that will take precedence.
-        # Otherwise, by using the ._new_child_id() function we can ensure
-        # that the id of the new resource will not conflict with any existing.
-        # If the 'id_prefix' kwarg is provided, that will be used.
-        return Resource(
-            id=kwargs.get(
-                'id',
-                self._new_child_id(
-                    id_prefix=kwargs.get('id_prefix', 'elem_')
-                )
-            ),
-            **{
-                kw: val
-                for kw, val in kwargs.items()
-                if kw not in ['id', 'id_prefix']
-            }
+        msg = "Cannot duplicate, is not a child element"
+        assert self.parent is not None, msg
+
+        # Make the new element
+        new_elem = self._create_twin()
+
+        # Insert it in the list as the next object
+        self.parent.children.insert(
+            self._ix() + 1,
+            new_elem
         )
 
-    def append_child(self, **kwargs) -> None:
-        """Add a new element at the end of the list of children."""
+        # Attach it to the parent._resource_dict and assign its .parent
+        self.parent._attach_child(new_elem)
 
-        # Make the new element
-        new_elem = self.new_child(**kwargs)
+    def remove(self) -> None:
+        """Remove this element from its parent."""
 
-        # Add it to the resource list
-        self.children.append(new_elem)
-
-        # Attach it to the self._resource_dict and assign the .parent attribute
-        self._attach_child(new_elem)
-
-    def insert_child(self, ix: int, **kwargs) -> None:
-        """Insert a new child element at a specific index position."""
-
-        # Make the new element
-        new_elem = self.new_child(**kwargs)
-
-        # Insert it within the resource list
-        self.children.insert(ix, new_elem)
-
-        # Attach it to the self._resource_dict and assign the .parent attribute
-        self._attach_child(new_elem)
-
-    def remove_child(self, ix: int) -> None:
-        """Remove a child element from a specific index position."""
+        msg = "Cannot remove, is not a child element"
+        assert self.parent is not None, msg
 
         # Remove the element from the list
-        removed_elem = self.children.pop(ix)
+        removed_elem = self.parent.children.pop(self._ix())
 
         # Stop the operations of the Resource
         removed_elem.stop()
 
         # Delete the key from the _resource_dict
-        del self._children_dict[removed_elem.id]
+        del self.parent._children_dict[removed_elem.id]
 
     #############
     # UTILITIES #
@@ -261,13 +251,63 @@ class Resource:
         if parent and self.parent is not None:
             self.parent._assert_isinstance(cls, case=case, parent=parent)
 
+    def _is_final_child(self) -> bool:
+        """Whether this element is the final element in the list of children."""
+
+        assert self.parent is not None, "Is not a child element"
+
+        assert len(self.parent.children) > 0, "Parent does not have any children"
+
+        return self.id == self.parent.children[-1].id
+
+    def _ix(self) -> int:
+        """Return the index position of this element in the list of children."""
+
+        assert self.parent is not None, f"Is not a child element"
+
+        return [
+            r.id
+            for r in self.parent.children
+        ].index(
+            self.id
+        )
+
+    def _create_twin(self) -> 'Resource':
+        """
+        Return an object which duplicates this resource.
+        """
+
+        # Get the parameters used to initialize the object
+        params = self.source_init_params(
+            skip=["self", "kwargs", "id"]
+        )
+
+        return self.__class__(
+            id=self._twin_id(),
+            **params
+        )
+
     ##########
     # SOURCE #
     ##########
-    def source_init(self, indent=4, skip=["self", "kwargs"]) -> str:
+    def source_init(self, indent=4) -> str:
         """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
+
+        # Get the parameters used to initialize the object
+        params = self.source_init_params()
+
+        # Format the params as a string
+        params_str = f',\n{spacer}{spacer}{spacer}'.join([
+            f"{kw}={self._source_val(val, indent=indent+4)}"
+            for kw, val in params.items()
+        ])
+
+        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
+
+    def source_init_params(self, skip=["self", "kwargs"]):
+        """Format the set of params used to initialize the object."""
 
         # Get the signature of the initialization function
         sig = signature(self.__class__.__init__)
@@ -281,13 +321,7 @@ class Resource:
             else:
                 params[kw] = self.get(attr=kw)
 
-        # Format the params as a string
-        params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self._source_val(val, indent=indent+4)}"
-            for kw, val in params.items()
-        ])
-
-        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
+        return params
 
     def source_self(self) -> str:
         """

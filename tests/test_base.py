@@ -1,5 +1,4 @@
 import unittest
-from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import ResourceExecutionException
@@ -207,72 +206,80 @@ class TestResources(unittest.TestCase):
         except Exception as e:
             self.fail(f"w.run() raised: {str(e)}")
 
-    def test_new(self):
+    def test_make_twin(self):
         """Test the functionality to make a new Resource."""
 
-        rl = Resource(id='new')
+        w = Widget(
+            children=[
+                Resource(id='resource_0')
+            ]
+        )
+
+        # Make the twin
+        try:
+            twin = w._get_child('resource_0')._create_twin()
+        except Exception as e:
+            self.fail(f"Could not create twin: {str(e)}")
 
         self.assertIsInstance(
-            rl.new_child(id='new'),
+            twin,
             Resource
         )
 
-    def test_append(self):
-        """Test the functionality to append a Resource to the list."""
+        # Make sure that the ID was created as expected
+        self.assertEqual(
+            twin.id,
+            "resource_1"
+        )
 
-        rl = Resource(id='append')
+    def test_duplicate(self):
+        """Test the functionality to duplicate a Resource."""
 
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
+        w = Widget(
+            children=[
+                Resource(id='resource_0')
+            ]
+        )
 
-        rl.append_child(id='append')
+        self.assertEqual(len(w.children), 1)
+        self.assertEqual(len(w._children_dict), 1)
 
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
+        # Duplicate the child element
+        w._get_child('resource_0').duplicate()
 
-        rl.remove_child(0)
+        self.assertEqual(len(w.children), 2)
+        self.assertEqual(len(w._children_dict), 2)
 
-    def test_insert(self):
-        """Test the functionality to insert a Resource to the list."""
+        # Duplicate the child element again
+        w._get_child('resource_0').duplicate()
 
-        rl = Resource(id='insert')
+        self.assertEqual(len(w.children), 3)
+        self.assertEqual(len(w._children_dict), 3)
 
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
-
-        rl.append_child(id='appended')
-
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
-
-        rl.insert_child(0, id='inserted')
-        self.assertEqual(rl.children[0].id, "inserted")
-        self.assertEqual(rl.children[1].id, "appended")
-
-        rl.remove_child(0)
-        rl.remove_child(0)
+        # Make sure that the order of IDs is as expected
+        self.assertEqual(
+            [r.id for r in w.children],
+            ['resource_0', 'resource_2', 'resource_1']
+        )
 
     def test_remove(self):
         """Test the functionality to remove a Resource from the list."""
 
-        rl = Resource(id='remove')
-        self.assertEqual(
-            len(rl.children),
-            0,
-            list(map(lambda r: r.source_init(), rl.children))
+        w = Widget(
+            children=[
+                Resource(id='resource_0')
+            ]
         )
-        rl.append_child()
 
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
+        self.assertEqual(
+            len(w.children),
+            1,
+            list(map(lambda r: r.source_init(), w.children))
+        )
+        w._get_child('resource_0').remove()
 
-        try:
-            rl.remove_child(0)
-        except Exception as e:
-            self.fail(str(e))
-
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
+        self.assertEqual(len(w.children), 0)
+        self.assertEqual(len(w._children_dict), 0)
 
     def test_attach_child(self):
 
@@ -281,11 +288,6 @@ class TestResources(unittest.TestCase):
             ResourceConfigurationException,
             lambda: r._attach_child("foo")
         )
-
-    def test_new_child_id(self):
-
-        r = Resource(children=[Resource(id="elem_0")])
-        self.assertEqual(r._new_child_id(), "elem_1")
 
 
 class ExampleWidget(Widget):
