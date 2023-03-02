@@ -511,23 +511,17 @@ class Resource:
         if len(path) > 0:
 
             # Get the indicated resource
-            r = self._get_child(path[0])
+            r = self._get_child(*path)
 
-            # Recursively run this get function on that object
-            return r.get(
-                path=path[1:],
-                attr=attr,
-                **kwargs
-            )
-
+        # Otherwise, use this element
         else:
+            r = self
 
-            # Otherwise, get an attribute of this element
-            # The .value attribute may be a special case in child classes
-            if attr == "value":
-                return self.get_value(**kwargs)
-            else:
-                return self.get_attr(attr, **kwargs)
+        # The .value attribute may be a special case in child classes
+        if attr == "value":
+            return r.get_value(**kwargs)
+        else:
+            return r.get_attr(attr, **kwargs)
 
     def get_attr(self, attr, **kwargs) -> Any:
         """Return the value of the attribute for this resource."""
@@ -577,31 +571,23 @@ class Resource:
         if len(path) > 0:
 
             # Get the indicated resource
-            r = self._get_child(path[0])
+            r = self._get_child(*path)
 
-            # Recursively run this set function on that object
-            r.set(
-                path=path[1:],
-                attr=attr,
-                value=value,
-                update=update,
-                **kwargs
-            )
-
+        # Otherwise, use this element
         else:
+            r = self
 
-            # Otherwise, set an attribute of this element
-            # The .value attribute may be a special case in child classes
-            if attr == "value":
-                self.set_value(value, **kwargs)
-            else:
-                self.set_attr(attr, value, **kwargs)
+        # The .value attribute may be a special case in child classes
+        if attr == "value":
+            r.set_value(value, **kwargs)
+        else:
+            r.set_attr(attr, value, **kwargs)
 
-            # If the update flag was set
-            if update:
+        # If the update flag was set
+        if update:
 
-                # Invoke the .run_self() function
-                self.run_self()
+            # Invoke the .run_self() function
+            r.run_self()
 
     def set_attr(self, attr, val, **kwargs) -> None:
         """Set the value of an attribute for this resource."""
