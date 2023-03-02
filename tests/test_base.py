@@ -130,6 +130,25 @@ class TestResources(unittest.TestCase):
             ['third_resource', 'third_list', 'second_list', 'top_list']
         )
 
+        # Test the _root method
+        self.assertEqual(
+            r._get_child('second_list', 'third_list', 'third_resource')._root().id, # noqa
+            'top_list'
+        )
+
+        # Test the _descendents method
+        self.assertEqual(
+            r._descendents(),
+            [
+                [],
+                ['first_resource'],
+                ['second_list'],
+                ['second_list', 'second_resource'],
+                ['second_list', 'third_list'],
+                ['second_list', 'third_list', 'third_resource'], # noqa
+            ]
+        )
+
         # Test the exception raised when an attribute doesn't exist
         self.assertRaises(
             ResourceExecutionException,

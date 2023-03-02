@@ -222,6 +222,14 @@ class Resource:
     #############
     # UTILITIES #
     #############
+    def _root(self) -> 'Resource':
+        """Return the recursive parent element which does not have a parent."""
+
+        if self.parent is None:
+            return self
+        else:
+            return self.parent._root()
+
     def _path_to_root(self) -> List[str]:
         """
         Return the list of .id elements for this resource
@@ -232,6 +240,23 @@ class Resource:
         if self.parent is not None:
             path.extend(self.parent._path_to_root())
         return path
+
+    def _descendents(self, prefix=[]) -> List[List[str]]:
+        """Return a list of the paths to all child resources."""
+
+        # Add an element for the self resource
+        descendents = [prefix]
+
+        # Extend the list by the descendents of the children
+        for child in self.children:
+
+            descendents.extend(
+                child._descendents(
+                    prefix=prefix + [child.id]
+                )
+            )
+
+        return descendents
 
     def _assert_isinstance(self, cls, case=True, parent=False):
         """
