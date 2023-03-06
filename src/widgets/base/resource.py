@@ -70,6 +70,11 @@ class Resource:
     def _attach_children(self, children):
         """Attach all provided children to the Resource"""
 
+        # Children must be a list
+        if not isinstance(children, list):
+            msg = f"children must be a list, not {type(children)}"
+            raise ResourceConfigurationException(msg)
+
         # The _resource_dict must be empty at initialization
         self._children_dict = dict()
 
