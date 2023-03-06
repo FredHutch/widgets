@@ -177,7 +177,7 @@ class StreamlitWidget(StResource, Widget):
         self,
         title="Widget",
         footer="Widget (github.com/FredHutch/widgets)",
-        stlite_ver="0.27.0",
+        stlite_ver="0.27.3",
     ):
         """Render the widget as HTML"""
 
