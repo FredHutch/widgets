@@ -1,6 +1,8 @@
+from importlib.metadata import PackageNotFoundError, version
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
 from typing import Any, Dict, List, Union
+from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
 from widgets.streamlit.resource.base import StResource
@@ -179,18 +181,35 @@ class StreamlitWidget(StResource, Widget):
     ):
         """Render the widget as HTML"""
 
+        # Pin the version of all requirements
+        requirements = [
+            self._pin_module_version(module)
+            for module in self.requirements
+        ] + [
+            f"widgets-lib=={widgets.__version__}"
+        ]
+
         # Render the template for this HTML
         html = render_template(
             "streamlit_single.html.j2",
             title=title,
             stlite_ver=stlite_ver,
             footer=footer,
-            requirements=self.requirements + [
-                f"widgets-lib=={widgets.__version__}"
-            ],
+            requirements=requirements,
             imports=self._imports(),
             widget_source=self.source_all().replace("\\", "\\\\"),
             widget_name=self._name()
         )
 
         return html
+
+    def _pin_module_version(self, module):
+        """Pin a module version, if possible."""
+
+        try:
+            module_ver = version(module)
+        except PackageNotFoundError:
+            msg = f"Module is not installed: {module}"
+            raise WidgetFunctionException(msg)
+
+        return f"{module}=={module_ver}"
