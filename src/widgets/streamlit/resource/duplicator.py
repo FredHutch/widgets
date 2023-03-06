@@ -93,7 +93,7 @@ class StDuplicator(wist.StResource):
         else:
 
             # Initialize the values
-            value = [True for _ in children]
+            value = [False for _ in children]
 
         # For each of the button elements
         for attr, attr_lab in [
@@ -218,7 +218,7 @@ class StDuplicator(wist.StResource):
             else:
                 if not self.middle_button[ix]:
                     return
-            
+
         # If it is not at the end or in the middle
         else:
 
