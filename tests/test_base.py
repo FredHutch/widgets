@@ -136,19 +136,6 @@ class TestResources(unittest.TestCase):
             'top_list'
         )
 
-        # Test the _descendents method
-        self.assertEqual(
-            r._descendents(),
-            [
-                [],
-                ['first_resource'],
-                ['second_list'],
-                ['second_list', 'second_resource'],
-                ['second_list', 'third_list'],
-                ['second_list', 'third_list', 'third_resource'], # noqa
-            ]
-        )
-
         # Test the exception raised when an attribute doesn't exist
         self.assertRaises(
             ResourceExecutionException,
@@ -225,80 +212,13 @@ class TestResources(unittest.TestCase):
         except Exception as e:
             self.fail(f"w.run() raised: {str(e)}")
 
-    def test_make_twin(self):
-        """Test the functionality to make a new Resource."""
+    def test_attach_children(self):
 
-        w = Widget(
-            children=[
-                Resource(id='resource_0')
-            ]
+        r = Resource()
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._attach_children("foo")
         )
-
-        # Make the twin
-        try:
-            twin = w._get_child('resource_0')._create_twin()
-        except Exception as e:
-            self.fail(f"Could not create twin: {str(e)}")
-
-        self.assertIsInstance(
-            twin,
-            Resource
-        )
-
-        # Make sure that the ID was created as expected
-        self.assertEqual(
-            twin.id,
-            "resource_1"
-        )
-
-    def test_duplicate(self):
-        """Test the functionality to duplicate a Resource."""
-
-        w = Widget(
-            children=[
-                Resource(id='resource_0')
-            ]
-        )
-
-        self.assertEqual(len(w.children), 1)
-        self.assertEqual(len(w._children_dict), 1)
-
-        # Duplicate the child element
-        w._get_child('resource_0').duplicate()
-
-        self.assertEqual(len(w.children), 2)
-        self.assertEqual(len(w._children_dict), 2)
-
-        # Duplicate the child element again
-        w._get_child('resource_0').duplicate()
-
-        self.assertEqual(len(w.children), 3)
-        self.assertEqual(len(w._children_dict), 3)
-
-        # Make sure that the order of IDs is as expected
-        self.assertEqual(
-            [r.id for r in w.children],
-            ['resource_0', 'resource_2', 'resource_1']
-        )
-
-    def test_remove(self):
-        """Test the functionality to remove a Resource from the list."""
-
-        w = Widget(
-            children=[
-                Resource(id='resource_0')
-            ]
-        )
-
-        self.assertEqual(
-            len(w.children),
-            1,
-            list(map(lambda r: r.source_init(), w.children))
-        )
-        w._get_child('resource_0').remove()
-
-        self.assertEqual(len(w.children), 0)
-        self.assertEqual(len(w._children_dict), 0)
 
     def test_attach_child(self):
 

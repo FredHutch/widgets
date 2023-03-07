@@ -160,70 +160,6 @@ class Resource:
         """
         pass
 
-    #################
-    # EDIT CHILDREN #
-    #################
-    def _twin_id(self) -> str:
-        """Return an id attribute which can be used for a new twin element."""
-
-        # Get the potential prefix of this object's .id element
-        # Does the id of this element end in an _123 pattern?
-        if '_' in self.id and all([
-            c in list(map(str, range(10)))
-            for c in self.id.split("_")[-1]
-        ]):
-
-            # Use the prefix as everything before that last '_'
-            id_prefix = self.id.rsplit('_', 1)[0]
-
-        # If not
-        else:
-
-            # Use the entire .id as the prefix for the twin
-            id_prefix = self.id
-
-        # Find the numeric suffix which does not collide
-        i = 0
-        while f"{id_prefix}_{i}" in self.parent._children_dict:
-            i += 1
-        return f"{id_prefix}_{i}"
-
-    def duplicate(self) -> None:
-        """
-        Make a copy of this resource within the list of children
-        of its parent, placed immediately following itself.
-        """
-
-        msg = "Cannot duplicate, is not a child element"
-        assert self.parent is not None, msg
-
-        # Make the new element
-        new_elem = self._create_twin()
-
-        # Insert it in the list as the next object
-        self.parent.children.insert(
-            self._ix() + 1,
-            new_elem
-        )
-
-        # Attach it to the parent._resource_dict and assign its .parent
-        self.parent._attach_child(new_elem)
-
-    def remove(self) -> None:
-        """Remove this element from its parent."""
-
-        msg = "Cannot remove, is not a child element"
-        assert self.parent is not None, msg
-
-        # Remove the element from the list
-        removed_elem = self.parent.children.pop(self._ix())
-
-        # Stop the operations of the Resource
-        removed_elem.stop()
-
-        # Delete the key from the _resource_dict
-        del self.parent._children_dict[removed_elem.id]
-
     #############
     # UTILITIES #
     #############
@@ -246,23 +182,6 @@ class Resource:
             path.extend(self.parent._path_to_root())
         return path
 
-    def _descendents(self, prefix=[]) -> List[List[str]]:
-        """Return a list of the paths to all child resources."""
-
-        # Add an element for the self resource
-        descendents = [prefix]
-
-        # Extend the list by the descendents of the children
-        for child in self.children:
-
-            descendents.extend(
-                child._descendents(
-                    prefix=prefix + [child.id]
-                )
-            )
-
-        return descendents
-
     def _assert_isinstance(self, cls, case=True, parent=False):
         """
         Assert isinstance(self, cls) is case for this object.
@@ -284,18 +203,6 @@ class Resource:
         if parent and self.parent is not None:
             self.parent._assert_isinstance(cls, case=case, parent=parent)
 
-    def _is_final_child(self) -> bool:
-        """
-        Whether this element is the final element in the list of children.
-        """
-
-        assert self.parent is not None, "Is not a child element"
-
-        msg = "Parent does not have any children"
-        assert len(self.parent.children) > 0, msg
-
-        return self.id == self.parent.children[-1].id
-
     def _ix(self) -> int:
         """
         Return the index position of this element in the list of children.
@@ -308,21 +215,6 @@ class Resource:
             for r in self.parent.children
         ].index(
             self.id
-        )
-
-    def _create_twin(self) -> 'Resource':
-        """
-        Return an object which duplicates this resource.
-        """
-
-        # Get the parameters used to initialize the object
-        params = self.source_init_params(
-            skip=["self", "kwargs", "id"]
-        )
-
-        return self.__class__(
-            id=self._twin_id(),
-            **params
         )
 
     ##########
