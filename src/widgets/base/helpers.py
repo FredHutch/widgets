@@ -1,5 +1,8 @@
 import binascii
 from jinja2 import Environment, PackageLoader
+import json
+import pandas as pd
+from widgets.base.exceptions import ResourceConfigurationException
 import zlib
 
 
@@ -44,3 +47,36 @@ def decompress_string(string_to_decompress: str):
     original_string = original_string.decode()
 
     return original_string
+
+
+def parse_dataframe_string(value) -> pd.DataFrame:
+
+    # If the value is a string, try to decompress it
+    if isinstance(value, str):
+        try:
+            value = pd.DataFrame(
+                json.loads(
+                    decompress_string(value)
+                )
+            )
+        except Exception as e:
+            msg = f"value could not be decompressed from string ({str(e)})"
+            raise ResourceConfigurationException(msg)
+    # If the value is a dict, convert it
+    elif isinstance(value, dict):
+        try:
+            value = pd.DataFrame(value)
+        except Exception as e:
+            msg = f"value could not be converted to DataFrame ({str(e)})"
+            raise ResourceConfigurationException(msg)
+    # If the value is a DataFrame, keep it
+    elif isinstance(value, pd.DataFrame):
+        pass
+    # If the value is None, make an empty DataFrame
+    elif value is None:
+        value = pd.DataFrame()
+    else:
+        msg = f"value must be None, dict, or DataFrame, not {type(value)}"
+        raise ResourceConfigurationException(msg)
+
+    return value

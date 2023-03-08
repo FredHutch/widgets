@@ -2,8 +2,7 @@ import json
 from typing import Union
 import streamlit as st
 import pandas as pd
-from widgets.base.exceptions import ResourceConfigurationException
-from widgets.base.helpers import compress_string, decompress_string
+from widgets.base.helpers import compress_string, parse_dataframe_string
 from widgets.streamlit.resource.value import StValue
 
 
@@ -46,39 +45,12 @@ class StDataFrame(StValue):
                             Default is "visible"
             sidebar (bool): Set up UI in the sidebar vs. the main container
             show_uploader:  Show / hide the uploader element
-            show_downloader: Show / hide the downloader element
 
         Returns:
             StResource:     The instantiated resource object.
         """
 
-        # If the value is a string, try to decompress it
-        if isinstance(value, str):
-            try:
-                value = pd.DataFrame(
-                    json.loads(
-                        decompress_string(value)
-                    )
-                )
-            except Exception as e:
-                msg = f"value could not be decompressed from string ({str(e)})"
-                raise ResourceConfigurationException(msg)
-        # If the value is a dict, convert it
-        elif isinstance(value, dict):
-            try:
-                value = pd.DataFrame(value)
-            except Exception as e:
-                msg = f"value could not be converted to DataFrame ({str(e)})"
-                raise ResourceConfigurationException(msg)
-        # If the value is a DataFrame, keep it
-        elif isinstance(value, pd.DataFrame):
-            pass
-        # If the value is None, make an empty DataFrame
-        elif value is None:
-            value = pd.DataFrame()
-        else:
-            msg = f"value must be None, dict, or DataFrame, not {type(value)}"
-            raise ResourceConfigurationException(msg)
+        value = parse_dataframe_string(value)
 
         # Set up the resource attributes
         super().__init__(
