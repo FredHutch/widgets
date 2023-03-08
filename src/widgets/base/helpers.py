@@ -80,3 +80,24 @@ def parse_dataframe_string(value) -> pd.DataFrame:
         raise ResourceConfigurationException(msg)
 
     return value
+
+
+def encode_dataframe_string(val: pd.DataFrame) -> str:
+
+    # Convert to dict
+    val_dict = val.to_dict(orient="list")
+    # Convert to string
+    val_str = json.dumps(val_dict)
+    # Compress the string
+    val_comp = compress_string(val_str)
+
+    # If the compressed string is shorter
+    if len(val_comp) < len(val_str):
+
+        # Return the compressed version,
+        # embedded in quotes
+        return f'"{val_comp}"'
+    # If the compressed string is longer
+    else:
+        # Return the JSON serialization
+        return val_str

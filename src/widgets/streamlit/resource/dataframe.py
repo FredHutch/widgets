@@ -1,8 +1,8 @@
-import json
 from typing import Union
 import streamlit as st
 import pandas as pd
-from widgets.base.helpers import compress_string, parse_dataframe_string
+from widgets.base.helpers import parse_dataframe_string
+from widgets.base.helpers import encode_dataframe_string
 from widgets.streamlit.resource.value import StValue
 
 
@@ -50,6 +50,8 @@ class StDataFrame(StValue):
             StResource:     The instantiated resource object.
         """
 
+        # Parse the provided value, converting from a gzip-compressed
+        # string if necessary
         value = parse_dataframe_string(value)
 
         # Set up the resource attributes
@@ -109,23 +111,7 @@ class StDataFrame(StValue):
         if isinstance(val, str):
             return f'"{val}"'
         elif isinstance(val, pd.DataFrame):
-            # Convert to dict
-            val_dict = val.to_dict(orient="list")
-            # Convert to string
-            val_str = json.dumps(val_dict)
-            # Compress the string
-            val_comp = compress_string(val_str)
-
-            # If the compressed string is shorter
-            if len(val_comp) < len(val_str):
-
-                # Return the compressed version,
-                # embedded in quotes
-                return f'"{val_comp}"'
-            # If the compressed string is longer
-            else:
-                # Return the JSON serialization
-                return val_str
+            return encode_dataframe_string(val)
 
         else:
             return val
