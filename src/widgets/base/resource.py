@@ -52,11 +52,38 @@ class Resource:
 
         # Save the id and starting value for this particular resource
         self.id = id
-        self.value = value
 
-        # If no label is provided, default to the id
-        self.label = id.title() if label == "" else label
-        self.help = help
+        # If a value was provided
+        if value is not None:
+            # Assign it
+            self.value = value
+        # If a value was not provided
+        else:
+            # Assign the class attribute
+            self.value = self.__class__.value
+
+        # If no label is provided
+        if label == "":
+            # If the class does not have a label defined
+            if self.__class__.label == "":
+                # default to the id
+                self.label = id.title()
+            # If the class does have a label defined
+            else:
+                # Assign it
+                self.label = self.__class__.label
+
+        # If a label is provided
+        else:
+            # Assign it to the class
+            self.label = label
+
+        # Assign the help text, if any is provided
+        if help != "":
+            self.help = help
+        # Otherwise default to the class attribute
+        else:
+            self.help = self.__class__.help
 
         # Any additional keyword arguments
         for attr, val in kwargs.items():
