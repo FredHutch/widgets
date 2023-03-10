@@ -31,7 +31,7 @@ class StDuplicator(wist.StResource):
     attribute of the StDuplicator resource.
 
     end_button:     Show a button after the last visible element
-                    which will show the next element. 
+                    which will show the next element.
                     If no elements are visible, it will be shown
                     for the first element in the list.
     middle_button:  Show a button for every hidden element which
