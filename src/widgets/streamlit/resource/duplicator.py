@@ -49,6 +49,8 @@ class StDuplicator(wist.StResource):
     end_button: Union[bool, List[bool]]
     middle_button: Union[bool, List[bool]]
     hide_button: Union[bool, List[bool]]
+    remove_label = "Remove"
+    add_label = "Add"
 
     def __init__(
         self,
@@ -61,7 +63,9 @@ class StDuplicator(wist.StResource):
         init_n: int = None,
         end_button: Union[bool, List[bool]] = True,
         middle_button: Union[bool, List[bool]] = False,
-        hide_button: Union[bool, List[bool]] = True
+        hide_button: Union[bool, List[bool]] = True,
+        remove_label = "Remove",
+        add_label = "Add"
     ):
 
         # If a list of children was not provided
@@ -119,7 +123,9 @@ class StDuplicator(wist.StResource):
             init_n=init_n,
             end_button=end_button,
             middle_button=middle_button,
-            hide_button=hide_button
+            hide_button=hide_button,
+            remove_label=remove_label,
+            add_label=add_label,
         )
 
     def _assert_bool_list(self, attr, attr_lab):
@@ -188,7 +194,7 @@ class StDuplicator(wist.StResource):
                 return
 
         self.main_container.button(
-            label="Remove",
+            label=self.remove_label,
             key=f"{self.key()}_hide_{ix}",
             on_click=self._toggle_element,
             args=(ix,)
@@ -228,7 +234,7 @@ class StDuplicator(wist.StResource):
         # Implicitly, the middle/end button is enabled
         # and this position is in the middel/end
         self.main_container.button(
-            label="Add",
+            label=self.add_label,
             key=f"{self.key()}_add_{ix}",
             on_click=self._toggle_element,
             args=(ix,)
