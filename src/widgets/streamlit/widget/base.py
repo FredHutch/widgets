@@ -76,10 +76,12 @@ class StreamlitWidget(StResource, Widget):
         Render a button which allows the user to download the widget as HTML.
         """
 
-        self._get_ui_element(
+        col1, col2, col3 = self._get_ui_element(
             sidebar=sidebar,
             empty=False
-        ).download_button(
+        ).columns(3)
+
+        col2.download_button(
             "Download HTML",
             self._render_html(title=self._name()),
             file_name=f"{self._name()}.html",
@@ -92,10 +94,12 @@ class StreamlitWidget(StResource, Widget):
         Render a button which allows the user to download the widget as code.
         """
 
-        self._get_ui_element(
+        col1, col2, col3 = self._get_ui_element(
             sidebar=sidebar,
             empty=False
-        ).download_button(
+        ).columns(3)
+
+        col2.download_button(
             "Download Script",
             self._render_script(),
             file_name=f"{self._name()}.py",
