@@ -1,6 +1,7 @@
 from typing import List, Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
+from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.resource import Resource
 
 
@@ -72,6 +73,10 @@ class StResource(Resource):
             # Set up the main and sidebar containers inside the parent
             # If they have not already been assigned
             if self.main_empty is None:
+                if self.parent.main_container is None:
+                    pid = self.parent.id
+                    msg = f"Parent ({pid}) of {self.id} is not prepared"
+                    raise ResourceExecutionException(msg)
                 self.main_empty = self.parent.main_container.empty()
 
             # If the parent element has .disable_sidebar=True

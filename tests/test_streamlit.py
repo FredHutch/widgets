@@ -178,6 +178,40 @@ class TestStreamlitWidget(unittest.TestCase):
             self.assertEqual(s.get(path=["i"]), 1)
             self.assertEqual(s.get(path=["f"]), 1.0)
 
+    def test_select_string(self):
+
+        # Options must be a list
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelectString(id='test', options="foo")
+        )
+
+        # Must provide value or index
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelectString(id='test', value=None, index=None)
+        )
+
+        # Index must be a positive integer
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelectString(id='test', value=None, index=-1)
+        )
+
+        # Set the value from the index
+        r = wist.StSelectString(options=['foo', 'bar'], index=1, id='test')
+        self.assertEqual(r.get_value(), 'bar')
+
+        # To select by value, the value must be in the list
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelectString(id='t', options=['foo'], value='FOO')
+        )
+
+        # Set the index from the value
+        r = wist.StSelectString(options=['foo', 'bar'], value='bar', id='test')
+        self.assertEqual(r.index, 1)
+
     def test_html(self):
         # Test if the to_html method returns a non-zero length string
 

@@ -52,11 +52,38 @@ class Resource:
 
         # Save the id and starting value for this particular resource
         self.id = id
-        self.value = value
 
-        # If no label is provided, default to the id
-        self.label = id.title() if label == "" else label
-        self.help = help
+        # If a value was provided
+        if value is not None:
+            # Assign it
+            self.value = value
+        # If a value was not provided
+        else:
+            # Assign the class attribute
+            self.value = self.__class__.value
+
+        # If no label is provided
+        if label == "":
+            # If the class does not have a label defined
+            if self.__class__.label == "":
+                # default to the id
+                self.label = id.title()
+            # If the class does have a label defined
+            else:
+                # Assign it
+                self.label = self.__class__.label
+
+        # If a label is provided
+        else:
+            # Assign it to the class
+            self.label = label
+
+        # Assign the help text, if any is provided
+        if help != "":
+            self.help = help
+        # Otherwise default to the class attribute
+        else:
+            self.help = self.__class__.help
 
         # Any additional keyword arguments
         for attr, val in kwargs.items():
@@ -69,6 +96,11 @@ class Resource:
 
     def _attach_children(self, children):
         """Attach all provided children to the Resource"""
+
+        # Children must be a list
+        if not isinstance(children, list):
+            msg = f"children must be a list, not {type(children)}"
+            raise ResourceConfigurationException(msg)
 
         # The _resource_dict must be empty at initialization
         self._children_dict = dict()
@@ -155,80 +187,17 @@ class Resource:
         """
         pass
 
-    #################
-    # EDIT CHILDREN #
-    #################
-    def _new_child_id(self, id_prefix="elem_") -> str:
-        """Return an id attribute which can be used for a new child element."""
-
-        i = 0
-        while f"{id_prefix}{i}" in self._children_dict:
-            i += 1
-        return f"{id_prefix}{i}"
-
-    def new_child(self, **kwargs) -> 'Resource':
-        """
-        Return an instance of a new child Resource.
-        Should be overriden by instances of this class.
-        """
-
-        # If the user provides an 'id' kwarg, that will take precedence.
-        # Otherwise, by using the ._new_child_id() function we can ensure
-        # that the id of the new resource will not conflict with any existing.
-        # If the 'id_prefix' kwarg is provided, that will be used.
-        return Resource(
-            id=kwargs.get(
-                'id',
-                self._new_child_id(
-                    id_prefix=kwargs.get('id_prefix', 'elem_')
-                )
-            ),
-            **{
-                kw: val
-                for kw, val in kwargs.items()
-                if kw not in ['id', 'id_prefix']
-            }
-        )
-
-    def append_child(self, **kwargs) -> None:
-        """Add a new element at the end of the list of children."""
-
-        # Make the new element
-        new_elem = self.new_child(**kwargs)
-
-        # Add it to the resource list
-        self.children.append(new_elem)
-
-        # Attach it to the self._resource_dict and assign the .parent attribute
-        self._attach_child(new_elem)
-
-    def insert_child(self, ix: int, **kwargs) -> None:
-        """Insert a new child element at a specific index position."""
-
-        # Make the new element
-        new_elem = self.new_child(**kwargs)
-
-        # Insert it within the resource list
-        self.children.insert(ix, new_elem)
-
-        # Attach it to the self._resource_dict and assign the .parent attribute
-        self._attach_child(new_elem)
-
-    def remove_child(self, ix: int) -> None:
-        """Remove a child element from a specific index position."""
-
-        # Remove the element from the list
-        removed_elem = self.children.pop(ix)
-
-        # Stop the operations of the Resource
-        removed_elem.stop()
-
-        # Delete the key from the _resource_dict
-        del self._children_dict[removed_elem.id]
-
     #############
     # UTILITIES #
     #############
+    def _root(self) -> 'Resource':
+        """Return the recursive parent element which does not have a parent."""
+
+        if self.parent is None:
+            return self
+        else:
+            return self.parent._root()
+
     def _path_to_root(self) -> List[str]:
         """
         Return the list of .id elements for this resource
@@ -261,13 +230,41 @@ class Resource:
         if parent and self.parent is not None:
             self.parent._assert_isinstance(cls, case=case, parent=parent)
 
+    def _ix(self) -> int:
+        """
+        Return the index position of this element in the list of children.
+        """
+
+        assert self.parent is not None, "Cannot get ix - is not a child"
+
+        return [
+            r.id
+            for r in self.parent.children
+        ].index(
+            self.id
+        )
+
     ##########
     # SOURCE #
     ##########
-    def source_init(self, indent=4, skip=["self", "kwargs"]) -> str:
+    def source_init(self, indent=4) -> str:
         """Return the code used to initialize this resource."""
 
         spacer = "".join([" " for _ in range(indent)])
+
+        # Get the parameters used to initialize the object
+        params = self.source_init_params()
+
+        # Format the params as a string
+        params_str = f',\n{spacer}{spacer}{spacer}'.join([
+            f"{kw}={self._source_val(val, indent=indent+4)}"
+            for kw, val in params.items()
+        ])
+
+        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
+
+    def source_init_params(self, skip=["self", "kwargs"]):
+        """Format the set of params used to initialize the object."""
 
         # Get the signature of the initialization function
         sig = signature(self.__class__.__init__)
@@ -281,13 +278,7 @@ class Resource:
             else:
                 params[kw] = self.get(attr=kw)
 
-        # Format the params as a string
-        params_str = f',\n{spacer}{spacer}{spacer}'.join([
-            f"{kw}={self._source_val(val, indent=indent+4)}"
-            for kw, val in params.items()
-        ])
-
-        return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
+        return params
 
     def source_self(self) -> str:
         """
@@ -440,7 +431,7 @@ class Resource:
 
         # If no key exists for child_id
         if r is None:
-            msg = f"No child resource exists: {child_id}"
+            msg = f"No child resource exists within {self.id}: {child_id}"
             raise ResourceExecutionException(msg)
 
         # If additional levels of nesting were specified
@@ -469,23 +460,17 @@ class Resource:
         if len(path) > 0:
 
             # Get the indicated resource
-            r = self._get_child(path[0])
+            r = self._get_child(*path)
 
-            # Recursively run this get function on that object
-            return r.get(
-                path=path[1:],
-                attr=attr,
-                **kwargs
-            )
-
+        # Otherwise, use this element
         else:
+            r = self
 
-            # Otherwise, get an attribute of this element
-            # The .value attribute may be a special case in child classes
-            if attr == "value":
-                return self.get_value(**kwargs)
-            else:
-                return self.get_attr(attr, **kwargs)
+        # The .value attribute may be a special case in child classes
+        if attr == "value":
+            return r.get_value(**kwargs)
+        else:
+            return r.get_attr(attr, **kwargs)
 
     def get_attr(self, attr, **kwargs) -> Any:
         """Return the value of the attribute for this resource."""
@@ -535,31 +520,23 @@ class Resource:
         if len(path) > 0:
 
             # Get the indicated resource
-            r = self._get_child(path[0])
+            r = self._get_child(*path)
 
-            # Recursively run this set function on that object
-            r.set(
-                path=path[1:],
-                attr=attr,
-                value=value,
-                update=update,
-                **kwargs
-            )
-
+        # Otherwise, use this element
         else:
+            r = self
 
-            # Otherwise, set an attribute of this element
-            # The .value attribute may be a special case in child classes
-            if attr == "value":
-                self.set_value(value, **kwargs)
-            else:
-                self.set_attr(attr, value, **kwargs)
+        # The .value attribute may be a special case in child classes
+        if attr == "value":
+            r.set_value(value, **kwargs)
+        else:
+            r.set_attr(attr, value, **kwargs)
 
-            # If the update flag was set
-            if update:
+        # If the update flag was set
+        if update:
 
-                # Invoke the .run_self() function
-                self.run_self()
+            # Invoke the .run_self() function
+            r.run_self()
 
     def set_attr(self, attr, val, **kwargs) -> None:
         """Set the value of an attribute for this resource."""
@@ -571,7 +548,7 @@ class Resource:
 
         self.set_attr("value", val, **kwargs)
 
-    def all_values(self, path=[], **kwargs) -> dict:
+    def all_values(self, path=[], flatten=False, **kwargs) -> dict:
         """
         Return a dict with the values of every child Resource.
         The keys of the dict will be the .id element, while the
@@ -580,6 +557,14 @@ class Resource:
             which does not have any children, and
         (b) the results of .all_values() for each Resource which
             does have children.
+
+        Alternately, if flatten=True then the output will be
+        a single dict with keys given as the .id element and
+        values as the results of .get_value() for each Resource,
+        regardless of whether or not it has children.
+
+        NOTE: flatten=True will raise an error if duplicate .id
+        elements are encountered.
 
         Providing a list to the path= argument will return the
         output of all_values() for the nested child resource
@@ -598,7 +583,7 @@ class Resource:
             r = self._get_child(child_id)
 
             # Return the all_values() result for that resource
-            return r.all_values(path=path, **kwargs)
+            return r.all_values(path=path, flatten=flatten, **kwargs)
 
         # If no path was provided
         else:
@@ -608,13 +593,42 @@ class Resource:
 
                 # Return a dict with the results of all_values()
                 # for that set of child Resources
-                return {
+                values = {
                     child_id: child.all_values(**kwargs)
                     for child_id, child in self._children_dict.items()
                 }
+
+                if flatten:
+
+                    # Flatten the dict
+                    return self._flatten(values, _running={})
+
+                else:
+
+                    # Return the nested dict
+                    return values
 
             # Otherwise, if there are no child elements
             else:
 
                 # Just return the value from .get_value()
                 return self.get_value(**kwargs)
+
+    def _flatten(self, values: dict, _running={}):
+        """Internal method to flatten the values of a dict."""
+
+        for kw, val in values.items():
+
+            if isinstance(val, dict):
+                _running = self._flatten(val, _running=_running)
+
+            else:
+
+                if kw in _running:
+                    msg = f"Cannot flatten, duplicate .id found: {kw}"
+                    raise ResourceExecutionException(msg)
+
+                else:
+                    _running[kw] = val
+
+        return _running

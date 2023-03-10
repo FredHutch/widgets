@@ -1,5 +1,4 @@
 import unittest
-from widgets.base.exceptions import CLIExecutionException
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.exceptions import ResourceExecutionException
@@ -113,6 +112,51 @@ class TestResources(unittest.TestCase):
         r.set(path=['second_list', 'third_list', 'third_resource'], value='HOWDY') # noqa
         self.assertEqual(r.get(path=['second_list', 'third_list', 'third_resource']), 'HOWDY') # noqa
 
+        # Test the _path_to_root method
+        self.assertEqual(
+            r._get_child('second_list', 'third_list', 'third_resource')._path_to_root(), # noqa
+            ['third_resource', 'third_list', 'second_list', 'top_list']
+        )
+
+        # Test the _root method
+        self.assertEqual(
+            r._get_child('second_list', 'third_list', 'third_resource')._root().id, # noqa
+            'top_list'
+        )
+
+        # Test the exception raised when an attribute doesn't exist
+        self.assertRaises(
+            ResourceExecutionException,
+            lambda: r.get(attr='missing_attribute')
+        )
+
+    def test_all_values(self):
+
+        # Define a Resource
+        r = Resource(
+            id='top_list',
+            children=[
+                Resource(id='first_resource', value='foo'),
+                Resource(
+                    id='second_list',
+                    children=[
+                        Resource(id='second_resource', value='bar'),
+                        Resource(
+                            id='third_list',
+                            children=[
+                                Resource(id='third_resource', value='howdy')
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+
+        # Change the values
+        r.set(path=['first_resource'], value='FOO')
+        r.set(path=['second_list', 'second_resource'], value='BAR')
+        r.set(path=['second_list', 'third_list', 'third_resource'], value='HOWDY') # noqa
+
         # Get all of the values
         v = r.all_values()
 
@@ -125,16 +169,39 @@ class TestResources(unittest.TestCase):
         self.assertEqual(v['second_resource'], 'BAR')
         self.assertEqual(v['third_list']['third_resource'], 'HOWDY')
 
-        # Test the _path_to_root method
-        self.assertEqual(
-            r._get_child('second_list', 'third_list', 'third_resource')._path_to_root(), # noqa
-            ['third_resource', 'third_list', 'second_list', 'top_list']
+        # Get the flat values
+        v = r.all_values(flatten=True)
+        self.assertEqual(v['first_resource'], 'FOO')
+        self.assertEqual(v['second_resource'], 'BAR')
+        self.assertEqual(v['third_resource'], 'HOWDY')
+
+        # Define a resource which cannot be flattened
+        r = Resource(
+            children=[
+                Resource(
+                    id='list_a',
+                    children=[
+                        Resource(
+                            id='duplicated_id',
+                            value='foo'
+                        )
+                    ]
+                ),
+                Resource(
+                    id='list_b',
+                    children=[
+                        Resource(
+                            id='duplicated_id',
+                            value='bar'
+                        )
+                    ]
+                )
+            ]
         )
 
-        # Test the exception raised when an attribute doesn't exist
         self.assertRaises(
             ResourceExecutionException,
-            lambda: r.get(attr='missing_attribute')
+            lambda: r.all_values(flatten=True)
         )
 
     def test_init_exceptions(self):
@@ -207,72 +274,13 @@ class TestResources(unittest.TestCase):
         except Exception as e:
             self.fail(f"w.run() raised: {str(e)}")
 
-    def test_new(self):
-        """Test the functionality to make a new Resource."""
+    def test_attach_children(self):
 
-        rl = Resource(id='new')
-
-        self.assertIsInstance(
-            rl.new_child(id='new'),
-            Resource
+        r = Resource()
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: r._attach_children("foo")
         )
-
-    def test_append(self):
-        """Test the functionality to append a Resource to the list."""
-
-        rl = Resource(id='append')
-
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
-
-        rl.append_child(id='append')
-
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
-
-        rl.remove_child(0)
-
-    def test_insert(self):
-        """Test the functionality to insert a Resource to the list."""
-
-        rl = Resource(id='insert')
-
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
-
-        rl.append_child(id='appended')
-
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
-
-        rl.insert_child(0, id='inserted')
-        self.assertEqual(rl.children[0].id, "inserted")
-        self.assertEqual(rl.children[1].id, "appended")
-
-        rl.remove_child(0)
-        rl.remove_child(0)
-
-    def test_remove(self):
-        """Test the functionality to remove a Resource from the list."""
-
-        rl = Resource(id='remove')
-        self.assertEqual(
-            len(rl.children),
-            0,
-            list(map(lambda r: r.source_init(), rl.children))
-        )
-        rl.append_child()
-
-        self.assertEqual(len(rl.children), 1)
-        self.assertEqual(len(rl._children_dict), 1)
-
-        try:
-            rl.remove_child(0)
-        except Exception as e:
-            self.fail(str(e))
-
-        self.assertEqual(len(rl.children), 0)
-        self.assertEqual(len(rl._children_dict), 0)
 
     def test_attach_child(self):
 
@@ -281,11 +289,6 @@ class TestResources(unittest.TestCase):
             ResourceConfigurationException,
             lambda: r._attach_child("foo")
         )
-
-    def test_new_child_id(self):
-
-        r = Resource(children=[Resource(id="elem_0")])
-        self.assertEqual(r._new_child_id(), "elem_1")
 
 
 class ExampleWidget(Widget):
