@@ -37,6 +37,9 @@ class StSelector(StResource):
             msg = "Selector options must have unique labels"
             raise ResourceConfigurationException(msg)
 
+        # Attach the options
+        self.options = options
+
         # The value is the label of the first one
         value = options[0].label
 
