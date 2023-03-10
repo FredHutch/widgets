@@ -1,6 +1,5 @@
 from importlib.util import spec_from_file_location
 from importlib.util import module_from_spec
-from inspect import getsource
 import sys
 from widgets.base.widget import Widget
 from widgets.base.exceptions import IOException, WidgetInitializationException
