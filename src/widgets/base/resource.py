@@ -334,11 +334,22 @@ class Resource:
                 gathered_source=gathered_source
             )
 
-            # For all child elements
-            for child in self.children:
+        # For all child elements
+        for child in self.children:
+
+            # Add any source code which they may reference
+            gathered_source = child._recursive_source(
+                gathered_source=gathered_source
+            )
+
+        # If there are any option elements
+        for option in getattr(self, 'options', []):
+
+            # And those option elements are Resources
+            if isinstance(option, Resource):
 
                 # Add any source code which they may reference
-                gathered_source = child._recursive_source(
+                gathered_source = option._recursive_source(
                     gathered_source=gathered_source
                 )
 
