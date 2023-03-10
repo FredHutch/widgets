@@ -193,7 +193,8 @@ class StDuplicator(wist.StResource):
             if not self.hide_button[ix]:
                 return
 
-        self.main_container.button(
+        col1, col2, col3 = self.main_container.columns(3)
+        col2.button(
             label=self.remove_label,
             key=f"{self.key()}_hide_{ix}",
             on_click=self._toggle_element,
@@ -233,7 +234,8 @@ class StDuplicator(wist.StResource):
 
         # Implicitly, the middle/end button is enabled
         # and this position is in the middel/end
-        self.main_container.button(
+        col1, col2, col3 = self.main_container.columns(3)
+        col2.button(
             label=self.add_label,
             key=f"{self.key()}_add_{ix}",
             on_click=self._toggle_element,
