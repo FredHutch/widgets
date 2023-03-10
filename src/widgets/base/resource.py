@@ -601,7 +601,7 @@ class Resource:
                 if flatten:
 
                     # Flatten the dict
-                    return self._flatten(values)
+                    return self._flatten(values, _running={})
 
                 else:
 
