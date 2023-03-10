@@ -64,8 +64,8 @@ class StDuplicator(wist.StResource):
         end_button: Union[bool, List[bool]] = True,
         middle_button: Union[bool, List[bool]] = False,
         hide_button: Union[bool, List[bool]] = True,
-        remove_label = "Remove",
-        add_label = "Add"
+        remove_label="Remove",
+        add_label="Add"
     ):
 
         # If a list of children was not provided
