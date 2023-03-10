@@ -53,6 +53,20 @@ class StSelector(StResource):
             ] + options
         )
 
+    def all_values(self, path=[], flatten=False, **kwargs) -> dict:
+        """
+        Return the .all_values() call of the child resource
+        which is currently selected.
+        """
+
+        for r in self.children:
+            if r.label == self.get(['_selector_menu']):
+                return r.all_values(
+                    path=path,
+                    flatten=flatten,
+                    **kwargs
+                )
+
     def run_children(self, **kwargs) -> None:
         """Only run the selected child element."""
 
