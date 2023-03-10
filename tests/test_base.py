@@ -112,18 +112,6 @@ class TestResources(unittest.TestCase):
         r.set(path=['second_list', 'third_list', 'third_resource'], value='HOWDY') # noqa
         self.assertEqual(r.get(path=['second_list', 'third_list', 'third_resource']), 'HOWDY') # noqa
 
-        # Get all of the values
-        v = r.all_values()
-
-        self.assertEqual(v['first_resource'], 'FOO')
-        self.assertEqual(v['second_list']['second_resource'], 'BAR')
-        self.assertEqual(v['second_list']['third_list']['third_resource'], 'HOWDY') # noqa
-
-        # Get all of the values after the first one
-        v = r.all_values(path=['second_list'])
-        self.assertEqual(v['second_resource'], 'BAR')
-        self.assertEqual(v['third_list']['third_resource'], 'HOWDY')
-
         # Test the _path_to_root method
         self.assertEqual(
             r._get_child('second_list', 'third_list', 'third_resource')._path_to_root(), # noqa
@@ -140,6 +128,80 @@ class TestResources(unittest.TestCase):
         self.assertRaises(
             ResourceExecutionException,
             lambda: r.get(attr='missing_attribute')
+        )
+
+    def test_all_values(self):
+
+        # Define a Resource
+        r = Resource(
+            id='top_list',
+            children=[
+                Resource(id='first_resource', value='foo'),
+                Resource(
+                    id='second_list',
+                    children=[
+                        Resource(id='second_resource', value='bar'),
+                        Resource(
+                            id='third_list',
+                            children=[
+                                Resource(id='third_resource', value='howdy')
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+
+        # Change the values
+        r.set(path=['first_resource'], value='FOO')
+        r.set(path=['second_list', 'second_resource'], value='BAR')
+        r.set(path=['second_list', 'third_list', 'third_resource'], value='HOWDY') # noqa
+
+        # Get all of the values
+        v = r.all_values()
+
+        self.assertEqual(v['first_resource'], 'FOO')
+        self.assertEqual(v['second_list']['second_resource'], 'BAR')
+        self.assertEqual(v['second_list']['third_list']['third_resource'], 'HOWDY') # noqa
+
+        # Get all of the values after the first one
+        v = r.all_values(path=['second_list'])
+        self.assertEqual(v['second_resource'], 'BAR')
+        self.assertEqual(v['third_list']['third_resource'], 'HOWDY')
+
+        # Get the flat values
+        v = r.all_values(flatten=True)
+        self.assertEqual(v['first_resource'], 'FOO')
+        self.assertEqual(v['second_resource'], 'BAR')
+        self.assertEqual(v['third_resource'], 'HOWDY')
+
+        # Define a resource which cannot be flattened
+        r = Resource(
+            children=[
+                Resource(
+                    id='list_a',
+                    children=[
+                        Resource(
+                            id='duplicated_id',
+                            value='foo'
+                        )
+                    ]
+                ),
+                Resource(
+                    id='list_b',
+                    children=[
+                        Resource(
+                            id='duplicated_id',
+                            value='bar'
+                        )
+                    ]
+                )
+            ]
+        )
+
+        self.assertRaises(
+            ResourceExecutionException,
+            lambda: r.all_values(flatten=True)
         )
 
     def test_init_exceptions(self):

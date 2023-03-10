@@ -548,7 +548,7 @@ class Resource:
 
         self.set_attr("value", val, **kwargs)
 
-    def all_values(self, path=[], **kwargs) -> dict:
+    def all_values(self, path=[], flatten=False, **kwargs) -> dict:
         """
         Return a dict with the values of every child Resource.
         The keys of the dict will be the .id element, while the
@@ -557,6 +557,14 @@ class Resource:
             which does not have any children, and
         (b) the results of .all_values() for each Resource which
             does have children.
+
+        Alternately, if flatten=True then the output will be
+        a single dict with keys given as the .id element and
+        values as the results of .get_value() for each Resource,
+        regardless of whether or not it has children.
+
+        NOTE: flatten=True will raise an error if duplicate .id
+        elements are encountered.
 
         Providing a list to the path= argument will return the
         output of all_values() for the nested child resource
@@ -575,7 +583,7 @@ class Resource:
             r = self._get_child(child_id)
 
             # Return the all_values() result for that resource
-            return r.all_values(path=path, **kwargs)
+            return r.all_values(path=path, flatten=flatten, **kwargs)
 
         # If no path was provided
         else:
@@ -585,13 +593,42 @@ class Resource:
 
                 # Return a dict with the results of all_values()
                 # for that set of child Resources
-                return {
+                values = {
                     child_id: child.all_values(**kwargs)
                     for child_id, child in self._children_dict.items()
                 }
+
+                if flatten:
+
+                    # Flatten the dict
+                    return self._flatten(values)
+
+                else:
+
+                    # Return the nested dict
+                    return values
 
             # Otherwise, if there are no child elements
             else:
 
                 # Just return the value from .get_value()
                 return self.get_value(**kwargs)
+
+    def _flatten(self, values: dict, _running={}):
+        """Internal method to flatten the values of a dict."""
+
+        for kw, val in values.items():
+
+            if isinstance(val, dict):
+                _running = self._flatten(val, _running=_running)
+
+            else:
+
+                if kw in _running:
+                    msg = f"Cannot flatten, duplicate .id found: {kw}"
+                    raise ResourceExecutionException(msg)
+
+                else:
+                    _running[kw] = val
+
+        return _running
