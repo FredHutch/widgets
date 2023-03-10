@@ -431,7 +431,7 @@ class Resource:
 
         # If no key exists for child_id
         if r is None:
-            msg = f"No child resource exists: {child_id}"
+            msg = f"No child resource exists within {self.id}: {child_id}"
             raise ResourceExecutionException(msg)
 
         # If additional levels of nesting were specified
