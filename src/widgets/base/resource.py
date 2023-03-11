@@ -1,3 +1,4 @@
+from copy import deepcopy
 from inspect import getmro, getsource, isfunction, signature
 from typing import Any, Dict, List, Union
 from widgets.base.exceptions import ResourceConfigurationException
@@ -115,7 +116,7 @@ class Resource:
         else:
 
             # Use the children defined by the class
-            self.children = self.__class__.children
+            self.children = deepcopy(self.__class__.children)
 
         # Iterate over each resource defined as a child element
         for child in self.children:
