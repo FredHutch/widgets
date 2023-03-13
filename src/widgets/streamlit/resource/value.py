@@ -349,8 +349,8 @@ class StSelectString(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=None). If "collapsed", both
-                                the label and the space are removed.
+                                (equivalent to label=None). If "collapsed",
+                                both the label and the space are removed.
                                 Default is "visible".
             options (list):     List of options to select from.
             index (int):        The index of the preselected option on first
@@ -492,8 +492,8 @@ class StMultiSelect(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=None). If "collapsed", both
-                                the label and the space are removed.
+                                (equivalent to label=None). If "collapsed",
+                                both the label and the space are removed.
                                 Default is "visible".
             index (int):        The index of the preselected option on first
                                 render.
