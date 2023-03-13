@@ -101,3 +101,36 @@ def encode_dataframe_string(val: pd.DataFrame) -> str:
     else:
         # Return the JSON serialization
         return val_str
+
+
+def parse_options_string(options) -> list:
+
+    # If the options is a string, try to decompress it
+    if isinstance(options, str):
+        try:
+            options = json.loads(
+                decompress_string(options)
+            )
+        except Exception as e:
+            msg = f"options could not be decompressed from string ({str(e)})"
+            raise ResourceConfigurationException(msg)
+    # If the options is a list, keep it
+    elif isinstance(options, list):
+        pass
+    else:
+        msg = f"options must be a list, not {type(options)}"
+        raise ResourceConfigurationException(msg)
+
+    return options
+
+
+def encode_options_string(options: list) -> str:
+
+    # Convert to string
+    options_str = json.dumps(options)
+    # Compress the string
+    options_comp = compress_string(options_str)
+
+    # Return the compressed version,
+    # embedded in quotes
+    return f'"{options_comp}"'

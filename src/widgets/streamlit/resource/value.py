@@ -2,6 +2,7 @@ from typing import Any, List
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.helpers import parse_options_string
 from widgets.streamlit.resource.base import StResource
 
 
@@ -366,6 +367,10 @@ class StSelectString(StValue):
         Returns:
             StSelectString: The instantiated resource object.
         """
+
+        # Parse the provided options, converting from a gzip-compressed
+        # string if necessary
+        options = parse_options_string(options)
 
         # Set up the resource attributes
         super().__init__(
