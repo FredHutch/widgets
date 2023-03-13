@@ -150,6 +150,7 @@ class TestStreamlitWidget(unittest.TestCase):
 
         # Change the data value
         w.set(path=["s"], value="t", update=False)
+        self.assertEqual(w.get(["s"]), "t")
         w.set(path=["i"], value=1, update=False)
         w.set(path=["f"], value=1.0, update=False)
 
@@ -223,6 +224,14 @@ class TestStreamlitWidget(unittest.TestCase):
 
         self.assertIsInstance(html, str)
         self.assertGreater(len(html), 0)
+
+    def test_StDownloadDataFrame(self):
+
+        # StDownloadDataFrame must have a target
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StDownloadDataFrame()
+        )
 
 
 if __name__ == '__main__':

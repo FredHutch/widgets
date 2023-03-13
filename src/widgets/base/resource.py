@@ -20,10 +20,10 @@ class Resource:
             help (str):        Help text describing the resource to the user.
     """
 
-    id = ""
-    value = None
-    label = ""
-    help = ""
+    id: Union[str, None] = None
+    value: Union[Any, None] = None
+    label: Union[str, None] = None
+    help: Union[str, None] = None
     parent: Union['Resource', None] = None
     children: List['Resource'] = list()
     _children_dict: Dict[str, 'Resource'] = dict()
@@ -36,10 +36,10 @@ class Resource:
     def __init__(
         self,
         id="resource",
-        value=None,
+        value: Union[Any, None] = None,
         children: List['Resource'] = [],
-        label="",
-        help="",
+        label: Union[str, None] = None,
+        help: Union[str, None] = None,
         **kwargs
     ) -> None:
         """
@@ -60,37 +60,37 @@ class Resource:
             self.value = value
         # If a value was not provided
         else:
-            # Assign the class attribute
-            self.value = self.__class__.value
+            # Assign a copy of the class attribute
+            self.value = deepcopy(self.__class__.value)
 
         # If no label is provided
-        if label == "":
+        if label is None:
             # If the class does not have a label defined
-            if self.__class__.label == "":
+            if self.__class__.label is None:
                 # default to the id
                 self.label = id.title()
             # If the class does have a label defined
             else:
                 # Assign it
-                self.label = self.__class__.label
+                self.label = deepcopy(self.__class__.label)
 
         # If a label is provided
         else:
             # Assign it to the class
-            self.label = label
+            self.label = deepcopy(label)
 
         # Assign the help text, if any is provided
-        if help != "":
-            self.help = help
+        if help is not None:
+            self.help = deepcopy(help)
         # Otherwise default to the class attribute
         else:
-            self.help = self.__class__.help
+            self.help = deepcopy(self.__class__.help)
 
         # Any additional keyword arguments
         for attr, val in kwargs.items():
 
             # Will be attached to this object
-            self.__dict__[attr] = val
+            self.__dict__[attr] = deepcopy(val)
 
         # Attach the children
         self._attach_children(children)
@@ -107,7 +107,7 @@ class Resource:
         self._children_dict = dict()
 
         # If children were provided
-        if len(children) > 0:
+        if isinstance(children, list) and len(children) > 0:
 
             # Attach the resource list to the object
             self.children = children
@@ -380,10 +380,24 @@ class Resource:
         If filter_functions is True, yield only functions, otherwise
         do not yield any functions.
         """
-        for kw, val in self.__class__.__dict__.items():
-            if kw.startswith("__"):
+
+        # Get the value associated with the instance, not the class
+        for kw, val in self.__dict__.items():
+
+            # If the attribute name is not defined by the class
+            if kw not in self.__class__.__dict__.keys():
+                # Skip it
                 continue
+
+            # If the attribute name is something like __dict__
+            if kw.startswith("__"):
+                # Skip it
+                continue
+
+            # If we pass the filter_functions test
             if filter_functions == isfunction(val):
+
+                # Yield the kw/value
                 yield kw, val
 
     def _source_attributes(self) -> str:

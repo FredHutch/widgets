@@ -32,10 +32,10 @@ class StString(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=None,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         max_chars: int = None,
@@ -58,7 +58,7 @@ class StString(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for
-                                it above the widget (equivalent to label="").
+                                it above the widget (equivalent to label=None).
                                 If "collapsed", both the label and the space
                                 are removed. Default is "visible".
             max_chars (int):    (optional) Max number of characters allowed in
@@ -85,17 +85,15 @@ class StString(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            max_chars=max_chars,
+            type=type,
+            autocomplete=autocomplete,
+            placeholder=placeholder,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.max_chars = max_chars
-        self.type = type
-        self.autocomplete = autocomplete
-        self.placeholder = placeholder
-        self.sidebar = sidebar
 
     def run_self(self):
         """
@@ -134,10 +132,10 @@ class StInteger(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=0,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         min_value: int = None,
@@ -160,8 +158,8 @@ class StInteger(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=""). If "collapsed", both
-                                the label and the space are removed.
+                                (equivalent to label=None). If "collapsed",
+                                both the label and the space are removed.
                                 Default is "visible".
             min_value (int):    (optional) The minimum value used for the
                                 input element
@@ -182,17 +180,15 @@ class StInteger(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            min_value=min_value,
+            max_value=max_value,
+            step=step,
+            format=format,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.min_value = min_value
-        self.max_value = max_value
-        self.step = step
-        self.format = format
-        self.sidebar = sidebar
 
     def run_self(self):
         """
@@ -231,10 +227,10 @@ class StFloat(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=0.0,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         min_value: int = None,
@@ -257,7 +253,7 @@ class StFloat(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label="").
+                                (equivalent to label=None).
                                 If "collapsed", both the label and the space
                                 are removed. Default is "visible".
             min_value (int):    (optional) The minimum value used for the
@@ -282,17 +278,15 @@ class StFloat(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            min_value=min_value,
+            max_value=max_value,
+            step=step,
+            format=format,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.min_value = min_value
-        self.max_value = max_value
-        self.step = step
-        self.format = format
-        self.sidebar = sidebar
 
     def run_self(self):
         """
@@ -331,10 +325,10 @@ class StSelectString(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=None,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         options: list = [],
@@ -355,7 +349,7 @@ class StSelectString(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=""). If "collapsed", both
+                                (equivalent to label=None). If "collapsed", both
                                 the label and the space are removed.
                                 Default is "visible".
             options (list):     List of options to select from.
@@ -379,15 +373,13 @@ class StSelectString(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            options=options,
+            index=index,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.options = options
-        self.index = index
-        self.sidebar = sidebar
 
         # Resolve any inconsistencies between value and index
         self._resolve_index()
@@ -476,10 +468,10 @@ class StMultiSelect(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value: list = [],
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         options: list = [],
@@ -500,7 +492,7 @@ class StMultiSelect(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label=""). If "collapsed", both
+                                (equivalent to label=None). If "collapsed", both
                                 the label and the space are removed.
                                 Default is "visible".
             index (int):        The index of the preselected option on first
@@ -518,14 +510,12 @@ class StMultiSelect(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            options=options,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.options = options
-        self.sidebar = sidebar
 
     def run_self(self):
         """
@@ -557,10 +547,10 @@ class StCheckbox(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=False,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         sidebar=True,
         **kwargs
@@ -590,12 +580,10 @@ class StCheckbox(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.sidebar = sidebar
 
     def run_self(self):
         """
@@ -629,10 +617,10 @@ class StSlider(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=False,
-        label="",
-        help="",
+        label=None,
+        help=None,
         disabled: bool = False,
         label_visibility: str = "visible",
         min_value: float = None,
@@ -655,7 +643,7 @@ class StSlider(StValue):
             label_visibility:   (optional) The visibility of the label.
                                 If "hidden", the label doesn't show but there
                                 is still empty space for it above the widget
-                                (equivalent to label="").
+                                (equivalent to label=None).
                                 If "collapsed", both the label and the space
                                 are removed. Default is "visible".
             min_value (int):    (optional) The minimum value used for the
@@ -677,17 +665,15 @@ class StSlider(StValue):
             label=label,
             help=help,
             value=value,
+            disabled=disabled,
+            label_visibility=label_visibility,
+            min_value=min_value,
+            max_value=max_value,
+            step=step,
+            format=format,
+            sidebar=sidebar,
             **kwargs
         )
-
-        # Set up the specific attributes for this type of resource
-        self.disabled = disabled
-        self.label_visibility = label_visibility
-        self.min_value = min_value
-        self.max_value = max_value
-        self.step = step
-        self.format = format
-        self.sidebar = sidebar
 
     def run_self(self):
         """

@@ -1,6 +1,7 @@
 from typing import Union
 import streamlit as st
 import pandas as pd
+from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.helpers import parse_dataframe_string
 from widgets.base.helpers import encode_dataframe_string
 from widgets.streamlit.resource.value import StValue
@@ -15,9 +16,9 @@ class StDataFrame(StValue):
 
     def __init__(
         self,
-        id="",
+        id=None,
         value=None,
-        label="",
+        label=None,
         help: Union[str, None] = None,
         disabled: bool = False,
         label_visibility: str = "visible",
@@ -122,7 +123,7 @@ class StDownloadDataFrame(StValue):
 
     def __init__(
         self,
-        target="",
+        target: Union[str, None] = None,
         label="",
         sidebar=True
     ):
@@ -135,6 +136,9 @@ class StDownloadDataFrame(StValue):
         Returns:
             StResource:     The instantiated resource object.
         """
+
+        if target is None:
+            raise ResourceConfigurationException("Must provide target")
 
         # Set up the id based on the target
         id = f"download_{target}"

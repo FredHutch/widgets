@@ -13,8 +13,8 @@ class StExpander(StResource):
         self,
         id="expander",
         children: List[Resource] = [],
-        label="",
-        help="",
+        label=None,
+        help=None,
         expanded=False,
         sidebar=True,
         **kwargs

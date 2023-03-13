@@ -21,10 +21,8 @@ class StMarkdown(StResource):
             id=id,
             value=value,
             children=[],
-            label='',
-            help=''
+            sidebar=sidebar
         )
-        self.sidebar = sidebar
 
     def run_self(self):
 
