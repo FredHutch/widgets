@@ -1,4 +1,5 @@
 import binascii
+from typing import Any
 from jinja2 import Environment, PackageLoader
 import json
 import pandas as pd
@@ -101,3 +102,32 @@ def encode_dataframe_string(val: pd.DataFrame) -> str:
     else:
         # Return the JSON serialization
         return val_str
+
+
+def decompress_json(vals) -> Any:
+
+    # If the input is a string, try to decompress it
+    if isinstance(vals, str):
+        try:
+            vals = json.loads(
+                decompress_string(vals)
+            )
+        except Exception as e:
+            msg = f"vals could not be decompressed from string ({str(e)})"
+            raise ResourceConfigurationException(msg)
+
+    # If the input is not a string, just return it
+
+    return vals
+
+
+def compress_json(vals) -> str:
+
+    # Convert to string
+    vals_str = json.dumps(vals)
+    # Compress the string
+    vals_comp = compress_string(vals_str)
+
+    # Return the compressed version,
+    # embedded in quotes
+    return f'"{vals_comp}"'

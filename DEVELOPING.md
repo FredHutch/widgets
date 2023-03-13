@@ -138,3 +138,7 @@ All of the framework provided for the `Widget` object above is intended to make
 it easier to develop widgets which are based on different visualization frameworks.
 By itself, the `Widget` object is likely useless, but it provides a base class
 which can be overridden with platform-specific code.
+
+### Notes
+
+- Function decorators like `@st.cache_data` may not work as intended

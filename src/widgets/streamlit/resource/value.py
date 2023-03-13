@@ -2,6 +2,7 @@ from typing import Any, List
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.exceptions import ResourceConfigurationException
+from widgets.base.helpers import compress_json, decompress_json
 from widgets.streamlit.resource.base import StResource
 
 
@@ -367,6 +368,10 @@ class StSelectString(StValue):
             StSelectString: The instantiated resource object.
         """
 
+        # Parse the provided options, converting from a gzip-compressed
+        # string if necessary
+        options = decompress_json(options)
+
         # Set up the resource attributes
         super().__init__(
             id=id,
@@ -457,6 +462,16 @@ class StSelectString(StValue):
             # Update the starting index position (used in update_ui())
             self.index = self.options.index(self.value)
 
+    def _source_val(self, val, **kwargs):
+        """
+        Use gzip encoding for any list elements
+        """
+
+        if isinstance(val, list):
+            return compress_json(val)
+        else:
+            return super()._source_val(val, **kwargs)
+
 
 class StMultiSelect(StValue):
     """
@@ -504,6 +519,11 @@ class StMultiSelect(StValue):
             StMultiSelect: The instantiated resource object.
         """
 
+        # Parse the provided value or options, converting from a
+        # gzip-compressed string if necessary
+        options = decompress_json(options)
+        value = decompress_json(value)
+
         # Set up the resource attributes
         super().__init__(
             id=id,
@@ -538,6 +558,16 @@ class StMultiSelect(StValue):
         )
 
         self.on_change()
+
+    def _source_val(self, val, **kwargs):
+        """
+        Use gzip encoding for any list elements
+        """
+
+        if isinstance(val, list):
+            return compress_json(val)
+        else:
+            return super()._source_val(val, **kwargs)
 
 
 class StCheckbox(StValue):

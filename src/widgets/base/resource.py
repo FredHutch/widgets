@@ -381,18 +381,17 @@ class Resource:
         do not yield any functions.
         """
 
-        # Get the value associated with the instance, not the class
-        for kw, val in self.__dict__.items():
-
-            # If the attribute name is not defined by the class
-            if kw not in self.__class__.__dict__.keys():
-                # Skip it
-                continue
+        # Iterate through attributes defined for this class
+        for kw in self.__class__.__dict__.keys():
 
             # If the attribute name is something like __dict__
             if kw.startswith("__"):
                 # Skip it
                 continue
+
+            # Get the value from the instance, falling back to the
+            # value from the class
+            val = self.__dict__.get(kw, self.__class__.__dict__[kw])
 
             # If we pass the filter_functions test
             if filter_functions == isfunction(val):
