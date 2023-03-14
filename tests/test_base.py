@@ -296,6 +296,11 @@ class ExampleWidget(Widget):
     children = [Resource(id="elem_0"), Resource(id="elem_1")]
 
 
+class ExampleSubWidget(ExampleWidget):
+
+    label = "FOOBAR"
+
+
 class TestWidget(unittest.TestCase):
 
     def test_init(self):
@@ -353,6 +358,35 @@ class TestWidget(unittest.TestCase):
         self.assertRaises(
             WidgetFunctionException,
             lambda: w._to_file(w.source_init(), fp=0)
+        )
+
+    def test_parent_class_chain(self):
+
+        w = ExampleSubWidget()
+
+        self.assertEqual(
+            w.__class__.__name__,
+            "ExampleSubWidget"
+        )
+
+        self.assertEqual(
+            w._parent_class().__name__,
+            "ExampleWidget"
+        )
+
+        self.assertEqual(
+            list([c.__name__ for c in w._parent_class_chain()]),
+            ["ExampleWidget", "Widget", "Resource"]
+        )
+
+    def test_source_attributes(self):
+
+        w = ExampleSubWidget(id='foo')
+        w.label = 'BAR'
+
+        self.assertTrue(
+            'label = "BAR"' in w._source_attributes(),
+            w._source_attributes()
         )
 
 

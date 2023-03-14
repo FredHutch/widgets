@@ -146,7 +146,10 @@ class TestStreamlitWidget(unittest.TestCase):
         """Test whether widgets can be saved to a file and loaded again."""
 
         # Create a widget with default values
-        w = ExampleStreamlitWidget()
+        w = ExampleStreamlitWidget(label="FOOBAR")
+
+        # Make sure that the label attribute was set
+        self.assertEqual(w.label, "FOOBAR")
 
         # Change the data value
         w.set(path=["s"], value="t", update=False)
@@ -173,6 +176,10 @@ class TestStreamlitWidget(unittest.TestCase):
 
             # Instantiate the widget
             s = saved_widget()
+
+            # Make sure that the label attribute was saved
+            msg = s._source_attributes()
+            self.assertEqual(s.label, "FOOBAR", msg) # FIXME
 
             # Make sure that the data values were changed
             self.assertEqual(s.get(path=["s"]), "t", w.to_script())
