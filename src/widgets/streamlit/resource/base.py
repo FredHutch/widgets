@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Any, List, Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.exceptions import ResourceExecutionException
@@ -38,6 +38,31 @@ class StResource(Resource):
 
     # Parent element (if any)
     parent: Union['StResource', None] = None
+
+    def __init__(
+        self,
+        id="resource",
+        value: Union[Any, None] = None,
+        children: List['StResource'] = [],
+        label: Union[str, None] = None,
+        help: Union[str, None] = None,
+        disable_sidebar=None,
+        **kwargs
+    ) -> None:
+        
+        if disable_sidebar is not None:
+            kwargs['disable_sidebar'] = disable_sidebar
+        else:
+            kwargs['disable_sidebar'] = self.__class__.disable_sidebar
+        
+        super().__init__(
+            id=id,
+            value=value,
+            children=children,
+            label=label,
+            help=help,
+            **kwargs
+        )
 
     def _get_ui_element(self, sidebar=False, empty=False):
         """Return the appropriate UI element."""
