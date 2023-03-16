@@ -198,7 +198,8 @@ class StDuplicator(wist.StResource):
             label=self.remove_label,
             key=f"{self.key()}_hide_{ix}",
             on_click=self._toggle_element,
-            args=(ix,)
+            args=(ix,),
+            use_container_width=True
         )
 
     def _show_button(self, ix):
@@ -239,7 +240,8 @@ class StDuplicator(wist.StResource):
             label=self.add_label,
             key=f"{self.key()}_add_{ix}",
             on_click=self._toggle_element,
-            args=(ix,)
+            args=(ix,),
+            use_container_width=True
         )
 
     def _final_ix(self):
