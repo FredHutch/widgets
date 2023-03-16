@@ -63,6 +63,7 @@ class StSelector(StResource):
         super().__init__(
             id=id,
             value=value,
+            label=label,
             children=[
                 StSelectString(
                     id='_selector_menu',
