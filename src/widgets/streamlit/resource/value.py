@@ -210,6 +210,14 @@ class StTextArea(StValue):
 
         self.on_change()
 
+    def _source_val(self, val, indent=4) -> Any:
+        """Triple quote strings to wrap new lines."""
+
+        if isinstance(val, str):
+            return f'"""{val}"""'
+        else:
+            return super()._source_val(val, indent)
+
 
 class StInteger(StValue):
     """Integer value resource used for Streamlit-based widgets."""
