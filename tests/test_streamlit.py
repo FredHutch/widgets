@@ -146,7 +146,10 @@ class TestStreamlitWidget(unittest.TestCase):
         """Test whether widgets can be saved to a file and loaded again."""
 
         # Create a widget with default values
-        w = ExampleStreamlitWidget()
+        w = ExampleStreamlitWidget(label="FOOBAR")
+
+        # Make sure that the label attribute was set
+        self.assertEqual(w.label, "FOOBAR")
 
         # Change the data value
         w.set(path=["s"], value="t", update=False)
@@ -173,6 +176,10 @@ class TestStreamlitWidget(unittest.TestCase):
 
             # Instantiate the widget
             s = saved_widget()
+
+            # Make sure that the label attribute was saved
+            msg = s._source_attributes()
+            self.assertEqual(s.label, "FOOBAR", msg)
 
             # Make sure that the data values were changed
             self.assertEqual(s.get(path=["s"]), "t", w.to_script())
@@ -232,6 +239,93 @@ class TestStreamlitWidget(unittest.TestCase):
             ResourceConfigurationException,
             lambda: wist.StDownloadDataFrame()
         )
+
+    def test_StSelector(self):
+
+        # Must define options
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelector()
+        )
+
+        # options must be a list
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelector(options='foo')
+        )
+
+        # options must be a list of Resources
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelector(options=['foo'])
+        )
+
+        # options must be a list of unique Resources
+        self.assertRaises(
+            ResourceConfigurationException,
+            lambda: wist.StSelector(options=[wist.StResource(), wist.StResource()]) # noqa
+        )
+
+        # Make a Selector
+        w = ExampleSelectorWidget()
+
+        # Test all_values
+        self.assertEqual(
+            w.all_values(),
+            {"selector": "foo"}
+        )
+
+        # Change the selected value
+        w.set(["selector"], value='Option 2', update=False)
+
+        # Make sure that the selected option has changed
+        self.assertEqual(
+            w.all_values(),
+            {"selector": "bar"}
+        )
+
+        # Make a tempfile for the script
+        with NamedTemporaryFile(suffix=".py") as tmp:
+
+            # Save the file
+            w.to_script(Path(tmp.name))
+
+            # Load the script
+            try:
+                saved_widget = load_widget(
+                    Path(tmp.name),
+                    "ExampleSelectorWidget"
+                )
+            except Exception as e:
+                error_str = f"{str(e)}\n{w._render_script()}"
+                msg = f"Could not load ExampleSelectorWidget\n{error_str}"
+                self.fail(msg)
+
+            # Instantiate the widget
+            s = saved_widget()
+
+            # Make sure that the selected element was saved
+            self.assertEqual(s.all_values(), {"selector": "bar"})
+
+
+class ExampleSelectorWidget(wist.StreamlitWidget):
+
+    children = [
+        wist.StSelector(
+            options=[
+                wist.StResource(
+                    id='option_1',
+                    label="Option 1",
+                    value='foo'
+                ),
+                wist.StResource(
+                    id='option_2',
+                    label="Option 2",
+                    value='bar'
+                )
+            ]
+        )
+    ]
 
 
 if __name__ == '__main__':

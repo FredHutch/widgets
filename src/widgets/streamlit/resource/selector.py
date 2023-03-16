@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Union
 from widgets.streamlit.resource.base import StResource
 from widgets.streamlit.resource.value import StSelectString
 from widgets.base.exceptions import ResourceConfigurationException
@@ -14,7 +14,9 @@ class StSelector(StResource):
         self,
         id="selector",
         label="Select Resource",
-        options: List[StResource] = None
+        options: List[StResource] = None,
+        value: Union[str, None] = None,
+        **kwargs
     ):
 
         # The user must have provided a list of Resources to select from
@@ -40,12 +42,28 @@ class StSelector(StResource):
         # Attach the options
         self.options = options
 
-        # The value is the label of the first one
-        value = options[0].label
+        # If no value was provided
+        if value is None:
+
+            # The value is the label of the first one
+            value = options[0].label
+
+        # If a value was provided
+        else:
+
+            # Make a list of the labels for the options
+            option_labels = [o.label for o in options]
+
+            # Make sure that it is in the list of options
+            if value not in option_labels:
+                options_str = ", ".join(option_labels)
+                msg = f"value ({value}) not in options ({options_str})"
+                raise ResourceConfigurationException(msg)
 
         super().__init__(
             id=id,
             value=value,
+            label=label,
             children=[
                 StSelectString(
                     id='_selector_menu',
@@ -53,7 +71,8 @@ class StSelector(StResource):
                     options=label_list,
                     value=value
                 )
-            ] + options
+            ] + options,
+            **kwargs
         )
 
     def all_values(self, path=[], flatten=False, **kwargs) -> dict:
@@ -70,9 +89,19 @@ class StSelector(StResource):
                     **kwargs
                 )
 
+    def set_value(self, val, **kwargs) -> None:
+        """Set the value of the selector menu."""
+
+        self._get_child("_selector_menu").set_value(val, **kwargs)
+
+    def get_value(self, **kwargs) -> str:
+        """Get the value of the selector menu."""
+
+        return self._get_child("_selector_menu").get_value(**kwargs)
+
     def run_children(self, **kwargs) -> None:
         """Only run the selected child element."""
 
         for ix, r in enumerate(self.children):
-            if ix == 0 or r.label == self.get(['_selector_menu']):
+            if ix == 0 or r.label == self.get_value():
                 r.run(**kwargs)

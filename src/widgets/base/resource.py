@@ -254,7 +254,7 @@ class Resource:
         spacer = "".join([" " for _ in range(indent)])
 
         # Get the parameters used to initialize the object
-        params = self.source_init_params()
+        params = self.source_init_params(self.__class__)
 
         # Format the params as a string
         params_str = f',\n{spacer}{spacer}{spacer}'.join([
@@ -264,11 +264,11 @@ class Resource:
 
         return f"{self.__class__.__name__}(\n{spacer}{spacer}{spacer}{params_str}\n{spacer}{spacer})" # noqa
 
-    def source_init_params(self, skip=["self", "kwargs"]):
+    def source_init_params(self, cls, skip=["self", "kwargs"]):
         """Format the set of params used to initialize the object."""
 
         # Get the signature of the initialization function
-        sig = signature(self.__class__.__init__)
+        sig = signature(cls.__init__)
 
         # Build up the parameters to use to invoke the object
         params = {}
@@ -374,55 +374,60 @@ class Resource:
             if cls != self.__class__:
                 return cls
 
-    def _class_items(self, filter_functions=False):
-        """
-        Yield the items associated with the class of this widget.
-        If filter_functions is True, yield only functions, otherwise
-        do not yield any functions.
-        """
+    def _parent_class_chain(self):
+        """Yield all recursive parent classes which are Resource-based."""
 
-        # Iterate through attributes defined for this class
-        for kw in self.__class__.__dict__.keys():
+        c = self._parent_class()()
 
-            # If the attribute name is something like __dict__
-            if kw.startswith("__"):
-                # Skip it
-                continue
+        while hasattr(c, "_is_resource"):
+            yield c.__class__
 
-            # Get the value from the instance, falling back to the
-            # value from the class
-            val = self.__dict__.get(kw, self.__class__.__dict__[kw])
-
-            # If we pass the filter_functions test
-            if filter_functions == isfunction(val):
-
-                # Yield the kw/value
-                yield kw, val
+            c = c._parent_class()()
 
     def _source_attributes(self) -> str:
         """
-        Return a text block which captures the attributes of this class.
+        Return a text block which captures the attributes of this class which
+        are specified as keyword arguments in the __init__ methods of this
+        class or any of its parents.
         """
 
-        attributes = []
+        # Keep track of the attributes
+        attributes = dict()
 
-        # Iterate over the attributes of this class
-        for kw, attrib in self._class_items(filter_functions=False):
+        # Start with this class and add all of the
+        # attributes defined in the init
+        for kw, attrib in self.source_init_params(self.__class__).items():
+            attributes[kw] = attrib
 
-            # Add it to the list
-            attributes.append(f"    {kw} = {self._source_val(attrib)}")
+        # Now walk up the chain of parent classes
+        for cls in self._parent_class_chain():
 
-        return "\n\n".join(attributes)
+            # For each of the init methods on those classes
+            for kw, attrib in self.source_init_params(cls).items():
+
+                # If the kw has not yet been encountered
+                if kw not in attributes:
+
+                    # Add it
+                    attributes[kw] = attrib
+
+        return "\n\n".join([
+            f"    {kw} = {self._source_val(attrib)}"
+            for kw, attrib in attributes.items()
+        ])
 
     def _source_functions(self) -> str:
         """
-        Return a text block with source code for all functions of this widget
-        which do not match the parent class.
+        Return a text block with source code for all functions which
+        are defined by this class.
         """
 
+        # Iterate through functions defined for this class
+        # and join their source code
         return "\n\n".join([
-            getsource(func)
-            for _, func in self._class_items(filter_functions=True)
+            getsource(val)
+            for _, val in self.__class__.__dict__.items()
+            if isfunction(val)
         ])
 
     def _source_val(self, val, indent=4) -> Any:

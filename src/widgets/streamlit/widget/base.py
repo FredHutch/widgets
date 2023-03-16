@@ -86,7 +86,8 @@ class StreamlitWidget(StResource, Widget):
             self._render_html(title=self._name()),
             file_name=f"{self._name()}.html",
             mime="text/html",
-            help="Download this widget as a webpage (HTML)"
+            help="Download this widget as a webpage (HTML)",
+            use_container_width=True
         )
 
     def download_script_button(self, sidebar=True):
@@ -104,7 +105,8 @@ class StreamlitWidget(StResource, Widget):
             self._render_script(),
             file_name=f"{self._name()}.py",
             mime="text/x-python",
-            help="Download this widget as a script (Python)"
+            help="Download this widget as a script (Python)",
+            use_container_width=True
         )
 
     def _render_script(self, title="Widget") -> str:
