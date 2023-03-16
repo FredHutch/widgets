@@ -30,6 +30,28 @@ class StreamlitWidget(StResource, Widget):
     title = ""
     subtitle = ""
 
+    def __init__(
+        self,
+        requirements: Union[List[str], None] = None,
+        imports: Union[List[str], None] = None,
+        extra_imports: Union[List[str], None] = None,
+        initial_sidebar_state: Union[str, None] = None,
+        layout: Union[str, None] = None,
+        title: Union[str, None] = None,
+        subtitle: Union[str, None] = None,
+        **kwargs
+    ):
+        super().__init__(
+            requirements=self.__class__.requirements,
+            imports=self.__class__.imports,
+            extra_imports=self.__class__.extra_imports,
+            initial_sidebar_state=self.__class__.initial_sidebar_state,
+            layout=self.__class__.layout,
+            title=self.__class__.title,
+            subtitle=self.__class__.subtitle,
+            **kwargs
+        )
+
     def prep(self) -> None:
         """
         Set up a Streamlit-based widget
