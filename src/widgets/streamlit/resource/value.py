@@ -125,7 +125,7 @@ class StString(StValue):
 class StTextArea(StValue):
     """Text area resource used for Streamlit-based widgets."""
 
-    value: str = None
+    value: str = ""
     height: int = None
     max_chars: int = None
     placeholder = None
@@ -134,7 +134,7 @@ class StTextArea(StValue):
         self,
         id=None,
         label=None,
-        value=None,
+        value="",
         height=None,
         max_chars: int = None,
         help=None,

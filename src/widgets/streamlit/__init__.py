@@ -10,6 +10,7 @@ from widgets.streamlit.resource.value import StInteger # noqa
 from widgets.streamlit.resource.value import StSelectString # noqa
 from widgets.streamlit.resource.value import StMultiSelect # noqa
 from widgets.streamlit.resource.value import StString # noqa
+from widgets.streamlit.resource.value import StTextArea # noqa
 from widgets.streamlit.resource.value import StSlider # noqa
 from widgets.streamlit.resource.markdown import StMarkdown # noqa
 from widgets.streamlit.resource.duplicator import StDuplicator # noqa
