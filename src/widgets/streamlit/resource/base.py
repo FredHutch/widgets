@@ -49,12 +49,12 @@ class StResource(Resource):
         disable_sidebar=None,
         **kwargs
     ) -> None:
-        
+
         if disable_sidebar is not None:
             kwargs['disable_sidebar'] = disable_sidebar
         else:
             kwargs['disable_sidebar'] = self.__class__.disable_sidebar
-        
+
         super().__init__(
             id=id,
             value=value,

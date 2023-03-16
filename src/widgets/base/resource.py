@@ -394,7 +394,8 @@ class Resource:
         # Keep track of the attributes
         attributes = dict()
 
-        # Start with this class and add all of the attributes defined in the init
+        # Start with this class and add all of the
+        # attributes defined in the init
         for kw, attrib in self.source_init_params(self.__class__).items():
             attributes[kw] = attrib
 
