@@ -13,6 +13,13 @@ class TestModule(unittest.TestCase):
 
         self.assertIsInstance(widgets.__version__, str)
 
+    def test_imports(self):
+
+        try:
+            import widgets.streamlit # noqa
+        except ImportError as e:
+            self.fail(f"Could not import widgets.streamlit: {str(e)}")
+
 
 class TestResources(unittest.TestCase):
 

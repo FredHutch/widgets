@@ -1,6 +1,6 @@
 from typing import List, Union
 from widgets.streamlit.resource.base import StResource
-from widgets.streamlit.resource.value import StSelectString
+from widgets.streamlit.resource.values.selectstring import StSelectString
 from widgets.base.exceptions import ResourceConfigurationException
 
 

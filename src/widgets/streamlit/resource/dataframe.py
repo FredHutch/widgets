@@ -4,7 +4,7 @@ import pandas as pd
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.helpers import parse_dataframe_string
 from widgets.base.helpers import encode_dataframe_string
-from widgets.streamlit.resource.value import StValue
+from widgets.streamlit.resource.values.slider import StValue
 
 
 class StDataFrame(StValue):
