@@ -1,6 +1,6 @@
 from widgets.streamlit.resource.base import StResource # noqa
-from widgets.streamlit.resource.dataframe import StDataFrame # noqa
-from widgets.streamlit.resource.dataframe import StDownloadDataFrame # noqa
+from widgets.streamlit.resource.files.dataframe import StDataFrame # noqa
+from widgets.streamlit.resource.files.download_dataframe import StDownloadDataFrame # noqa
 from widgets.streamlit.resource.expander import StExpander # noqa
 from widgets.streamlit.resource.columns import StColumns # noqa
 from widgets.streamlit.resource.selector import StSelector # noqa
