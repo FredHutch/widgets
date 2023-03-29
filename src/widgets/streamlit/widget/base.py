@@ -1,6 +1,7 @@
 from importlib.metadata import PackageNotFoundError, version
 from tempfile import _TemporaryFileWrapper, NamedTemporaryFile
 from pathlib import Path
+import streamlit as st
 from typing import Any, Dict, List, Union
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.widget import Widget
@@ -92,6 +93,65 @@ class StreamlitWidget(StResource, Widget):
             # Launch the script with Streamlit
             from streamlit.web.cli import _main_run
             _main_run(script.name, args, flag_options=flag_options)
+
+    def clone_button(self, sidebar=True, as_html=True, as_script=True):
+        """
+        Render a button which gives the user the option to download a
+        cloned copy of this widget.
+        Importantly, the code is only generated once the button is
+        initially pressed, which should make it more performant than
+        download_html_button and download_script_buton, which have to
+        recompute the clone with every change to the object.
+        """
+
+        if sidebar:
+            button_container = self._get_ui_element(
+                sidebar=sidebar,
+                empty=False
+            )
+        else:
+            _, button_container, _ = self._get_ui_element(
+                sidebar=sidebar,
+                empty=False
+            ).columns(3)
+
+        if st.session_state.get("_ready_to_clone", False):
+
+            if as_html:
+                button_container.download_button(
+                    "Download HTML",
+                    self._render_html(title=self._name()),
+                    file_name=f"{self._name()}.html",
+                    mime="text/html",
+                    help="Download this widget as a webpage (HTML)",
+                    use_container_width=True,
+                    on_click=self._set_session_state,
+                    args=('_ready_to_clone', False)
+                )
+            if as_script:
+                button_container.download_button(
+                    "Download Script",
+                    self._render_script(),
+                    file_name=f"{self._name()}.py",
+                    mime="text/x-python",
+                    help="Download this widget as a script (Python)",
+                    use_container_width=True,
+                    on_click=self._set_session_state,
+                    args=('_ready_to_clone', False)
+                )
+
+        else:
+
+            button_container.button(
+                "Clone",
+                help="Save a copy with all changes frozen",
+                on_click=self._set_session_state,
+                args=('_ready_to_clone', True)
+            )
+
+    def _set_session_state(self, kw, val):
+        """Utility to set a value in the session state."""
+        st.session_state[kw] = val
 
     def download_html_button(self, sidebar=True):
         """
