@@ -98,4 +98,3 @@ class StMultiSelect(StValue):
             return compress_json(val)
         else:
             return super()._source_val(val, **kwargs)
-

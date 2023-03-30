@@ -66,4 +66,3 @@ class StCheckbox(StValue):
         )
 
         self.on_change()
-

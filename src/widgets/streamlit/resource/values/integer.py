@@ -94,4 +94,3 @@ class StInteger(StValue):
         )
 
         self.on_change()
-
