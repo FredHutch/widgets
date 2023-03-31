@@ -23,7 +23,13 @@ class StExpander(StResource):
         Set up the StExpander object
         """
 
-        # Set up the core attributes of the ResourceList
+        # If the sidebar flag is set to False
+        if not sidebar:
+
+            # Disable the sidebar for all child elements
+            kwargs["disable_sidebar"] = True
+
+        # Set up the core attributes of the StResource
         super().__init__(
             id=id,
             children=children,

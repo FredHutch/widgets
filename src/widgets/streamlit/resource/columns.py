@@ -20,7 +20,8 @@ class StColumns(StResource):
         children: List[Resource] = [],
         spec=None,
         sidebar=True,
-        gap="small"
+        gap="small",
+        **kwargs
     ) -> None:
         """
         Set up the StColumns object
@@ -55,7 +56,13 @@ class StColumns(StResource):
             msg = "StColumns: gap must be one of small, medium, large"
             raise ResourceConfigurationException(msg)
 
-        # Set up the core attributes of the ResourceList
+        # If the sidebar flag is set to False
+        if not sidebar:
+
+            # Disable the sidebar for all child elements
+            kwargs["disable_sidebar"] = True
+
+        # Set up the core attributes of the StResource
         super().__init__(
             id=id,
             children=children,
@@ -63,7 +70,8 @@ class StColumns(StResource):
             help="",
             spec=spec,
             gap=gap,
-            sidebar=sidebar
+            sidebar=sidebar,
+            **kwargs
         )
 
     def prep(self) -> None:
