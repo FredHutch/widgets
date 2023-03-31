@@ -11,7 +11,7 @@ class StFile(StValue):
 
     def __init__(
         self,
-        id=None,
+        id='file',
         value=None,
         label=None,
         help: Union[str, None] = None,
