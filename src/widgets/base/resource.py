@@ -377,7 +377,13 @@ class Resource:
     def _parent_class_chain(self):
         """Yield all recursive parent classes which are Resource-based."""
 
-        c = self._parent_class()()
+        try:
+            c = self._parent_class()()
+        except Exception as e:
+            msg = f"Exception while instantiating parent of '{self.id}'"
+            msg = msg + '\n\n' + f"Parent: {self._parent_name()}"
+            msg = msg + '\n\n' + str(e)
+            raise ResourceExecutionException(msg)
 
         while hasattr(c, "_is_resource"):
             yield c.__class__
