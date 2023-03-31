@@ -16,6 +16,7 @@ class StreamlitWidget(StResource, Widget):
     """
 
     requirements: List[str] = []
+    pyodide_requirements: List[str] = []
     imports: List[str] = [
         "import streamlit as st",
         "from widgets.streamlit import *"
@@ -34,6 +35,7 @@ class StreamlitWidget(StResource, Widget):
     def __init__(
         self,
         requirements: Union[List[str], None] = None,
+        pyodide_requirements: Union[List[str], None] = None,
         imports: Union[List[str], None] = None,
         extra_imports: Union[List[str], None] = None,
         initial_sidebar_state: Union[str, None] = None,
@@ -44,6 +46,7 @@ class StreamlitWidget(StResource, Widget):
     ):
         super().__init__(
             requirements=self.__class__.requirements,
+            pyodide_requirements=self.__class__.pyodide_requirements,
             imports=self.__class__.imports,
             extra_imports=self.__class__.extra_imports,
             initial_sidebar_state=self.__class__.initial_sidebar_state,
@@ -292,7 +295,14 @@ class StreamlitWidget(StResource, Widget):
         return html
 
     def _pin_module_version(self, module):
-        """Pin a module version, if possible."""
+        """
+        Pin a module version, if possible.
+        Do not pin a version for any packages which are
+        listed in self.pyodide_requirements.
+        """
+
+        if module in self.pyodide_requirements:
+            return module
 
         try:
             module_ver = version(module)
