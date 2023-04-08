@@ -97,7 +97,13 @@ class StreamlitWidget(StResource, Widget):
             from streamlit.web.cli import _main_run
             _main_run(script.name, args, flag_options=flag_options)
 
-    def clone_button(self, sidebar=True, as_html=True, as_script=True):
+    def clone_button(
+            self,
+            sidebar=True,
+            as_html=True,
+            as_script=True,
+            footer="Widget (github.com/FredHutch/widgets)"
+    ):
         """
         Render a button which gives the user the option to download a
         cloned copy of this widget.
@@ -123,7 +129,12 @@ class StreamlitWidget(StResource, Widget):
             if as_html:
                 button_container.download_button(
                     "Download HTML",
-                    self._render_html(title=self._name()),
+                    self._render_html(
+                        title=self._name(),
+                        layout=self.layout,
+                        initial_sidebar_state=self.initial_sidebar_state,
+                        footer=footer
+                    ),
                     file_name=f"{self._name()}.html",
                     mime="text/html",
                     help="Download this widget as a webpage (HTML)",
@@ -156,7 +167,11 @@ class StreamlitWidget(StResource, Widget):
         """Utility to set a value in the session state."""
         st.session_state[kw] = val
 
-    def download_html_button(self, sidebar=True):
+    def download_html_button(
+        self,
+        sidebar=True,
+        footer="Widget (github.com/FredHutch/widgets)"
+    ):
         """
         Render a button which allows the user to download the widget as HTML.
         """
@@ -168,7 +183,12 @@ class StreamlitWidget(StResource, Widget):
 
         col2.download_button(
             "Download HTML",
-            self._render_html(title=self._name()),
+            self._render_html(
+                title=self._name(),
+                layout=self.layout,
+                initial_sidebar_state=self.initial_sidebar_state,
+                footer=footer
+            ),
             file_name=f"{self._name()}.html",
             mime="text/html",
             help="Download this widget as a webpage (HTML)",
@@ -234,7 +254,11 @@ class StreamlitWidget(StResource, Widget):
         # Return the file object
         return fp
 
-    def to_html(self, fp: Union[Path, None] = None) -> Union[None, str]:
+    def to_html(
+        self,
+        fp: Union[Path, None] = None,
+        footer="Widget (github.com/FredHutch/widgets)"
+    ) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
         library, based on pyodide.
@@ -242,7 +266,12 @@ class StreamlitWidget(StResource, Widget):
         """
 
         # Create the HTML as a string
-        html = self._render_html(title=self._name())
+        html = self._render_html(
+            title=self._name(),
+            layout=self.layout,
+            initial_sidebar_state=self.initial_sidebar_state,
+            footer=footer
+        )
 
         # Write it out to a file (if provided), or return the string
         return self._to_file(html, fp)
@@ -267,8 +296,10 @@ class StreamlitWidget(StResource, Widget):
     def _render_html(
         self,
         title="Widget",
+        layout="centered",
+        initial_sidebar_state="auto",
         footer="Widget (github.com/FredHutch/widgets)",
-        stlite_ver="0.27.3",
+        stlite_ver="0.29.15",
     ):
         """Render the widget as HTML"""
 
@@ -284,6 +315,8 @@ class StreamlitWidget(StResource, Widget):
         html = render_template(
             "streamlit_single.html.j2",
             title=title,
+            layout=layout,
+            initial_sidebar_state=initial_sidebar_state,
             stlite_ver=stlite_ver,
             footer=footer,
             requirements=requirements,
