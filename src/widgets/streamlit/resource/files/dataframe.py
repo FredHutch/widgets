@@ -31,7 +31,7 @@ class StDataFrame(StFile):
             help (str):     (optional) Help text used for user input display
                             elements.
             value:          (optional) The starting Pandas DataFrame.
-            kwargs (dict):  Additional keyword arguments used as pd.read_csv(**kwargs).
+            kwargs (dict):  Additional keyword arguments passed to pd.read_csv.
             disabled (bool):  (optional) If True, the input element is
                             disabled (default: False)
             label_visibility: (optional) The visibility of the label.
