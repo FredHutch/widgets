@@ -9,7 +9,7 @@ class StDataFrame(StFile):
     """DataFrame resource used in a Streamlit-based widget."""
 
     value = pd.DataFrame()
-    sep = ","
+    kwargs = dict()
 
     def __init__(
         self,
@@ -19,10 +19,9 @@ class StDataFrame(StFile):
         help: Union[str, None] = None,
         disabled: bool = False,
         label_visibility: str = "visible",
-        sep=",",
+        kwargs={},
         sidebar=True,
-        show_uploader=True,
-        **kwargs
+        show_uploader=True
     ):
         """
         Args:
@@ -32,7 +31,7 @@ class StDataFrame(StFile):
             help (str):     (optional) Help text used for user input display
                             elements.
             value:          (optional) The starting Pandas DataFrame.
-            sep (str):      Separator value used when reading from a file
+            kwargs (dict):  Additional keyword arguments passed to pd.read_csv.
             disabled (bool):  (optional) If True, the input element is
                             disabled (default: False)
             label_visibility: (optional) The visibility of the label.
@@ -60,11 +59,10 @@ class StDataFrame(StFile):
             value=value,
             disabled=disabled,
             label_visibility=label_visibility,
-            sep=sep,
+            kwargs=kwargs,
             sidebar=sidebar,
             show_uploader=show_uploader,
-            accept_multiple_files=False,
-            **kwargs
+            accept_multiple_files=False
         )
 
     def parse_files(self, files):
@@ -73,7 +71,7 @@ class StDataFrame(StFile):
         # Read the file as a DataFrame
         self.value = pd.read_csv(
             files,
-            sep=self.sep
+            **self.kwargs
         )
 
     def _source_val(self, val, **kwargs):

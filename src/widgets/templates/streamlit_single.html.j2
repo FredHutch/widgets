@@ -38,6 +38,11 @@
                     "app.py": `
 {{ imports }}
 
+st.set_page_config(
+   page_title='{{ title }}',
+   layout='{{ layout }}',
+   initial_sidebar_state='{{ initial_sidebar_state }}'
+)
 
 {{ widget_source }}
 
