@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Union
 from widgets.streamlit.resource.base import StResource
 from widgets.streamlit.resource.values.selectstring import StSelectString
@@ -21,8 +22,11 @@ class StSelector(StResource):
 
         # The user must have provided a list of Resources to select from
         if options is None:
-            msg = f"Selector must have options provided ({id})"
-            raise ResourceConfigurationException(msg)
+            if self.__class__.options is None:
+                msg = f"Selector must have options provided ({id})"
+                raise ResourceConfigurationException(msg)
+            else:
+                options = deepcopy(self.__class__.options)
 
         if not isinstance(options, list):
             msg = f"Selector options must be a list ({id})"
