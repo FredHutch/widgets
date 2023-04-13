@@ -47,8 +47,8 @@ class Resource:
         """
 
         # The 'id' cannot be empty
-        if len(id) == 0:
-            msg = "Must provide id for Resource"
+        if id is None or len(id) == 0:
+            msg = f"Must provide id for Resource ({self.__class__.__name__})"
             raise ResourceConfigurationException(msg)
 
         # Save the id and starting value for this particular resource

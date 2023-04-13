@@ -1,3 +1,4 @@
+from copy import deepcopy
 from typing import List, Union
 from widgets.streamlit.resource.base import StResource
 from widgets.streamlit.resource.values.selectstring import StSelectString
@@ -10,6 +11,8 @@ class StSelector(StResource):
     element which they select (based on the label).
     """
 
+    options = []
+
     def __init__(
         self,
         id="selector",
@@ -21,8 +24,11 @@ class StSelector(StResource):
 
         # The user must have provided a list of Resources to select from
         if options is None:
-            msg = f"Selector must have options provided ({id})"
-            raise ResourceConfigurationException(msg)
+            if self.__class__.options is None:
+                msg = f"Selector must have options provided ({id})"
+                raise ResourceConfigurationException(msg)
+            else:
+                options = deepcopy(self.__class__.options)
 
         if not isinstance(options, list):
             msg = f"Selector options must be a list ({id})"
@@ -43,7 +49,7 @@ class StSelector(StResource):
         self.options = options
 
         # If no value was provided
-        if value is None:
+        if value is None and len(self.options) > 0:
 
             # The value is the label of the first one
             value = options[0].label

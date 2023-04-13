@@ -13,7 +13,7 @@ class StDataFrame(StFile):
 
     def __init__(
         self,
-        id=None,
+        id="dataframe",
         value=None,
         label=None,
         help: Union[str, None] = None,
