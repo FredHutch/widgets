@@ -11,6 +11,8 @@ class StSelector(StResource):
     element which they select (based on the label).
     """
 
+    options = []
+
     def __init__(
         self,
         id="selector",
@@ -47,7 +49,7 @@ class StSelector(StResource):
         self.options = options
 
         # If no value was provided
-        if value is None:
+        if value is None and len(self.options) > 0:
 
             # The value is the label of the first one
             value = options[0].label
