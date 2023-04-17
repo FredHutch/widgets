@@ -1,3 +1,4 @@
+from copy import deepcopy
 import unittest
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import WidgetFunctionException
@@ -83,27 +84,33 @@ class TestResources(unittest.TestCase):
             lambda: r._assert_isinstance(str, case=True)
         )
 
+    def setup_example_resource(self):
+
+        return deepcopy(
+            Resource(
+                id='top_list',
+                children=[
+                    Resource(id='first_resource', value='foo'),
+                    Resource(
+                        id='second_list',
+                        children=[
+                            Resource(id='second_resource', value='bar'),
+                            Resource(
+                                id='third_list',
+                                children=[
+                                    Resource(id='third_resource', value='howdy') # noqa
+                                ]
+                            )
+                        ]
+                    )
+                ]
+            )
+        )
+
     def test_child_value_assignment(self):
 
         # Define a Resource
-        r = Resource(
-            id='top_list',
-            children=[
-                Resource(id='first_resource', value='foo'),
-                Resource(
-                    id='second_list',
-                    children=[
-                        Resource(id='second_resource', value='bar'),
-                        Resource(
-                            id='third_list',
-                            children=[
-                                Resource(id='third_resource', value='howdy')
-                            ]
-                        )
-                    ]
-                )
-            ]
-        )
+        r = self.setup_example_resource()
 
         self.assertEqual(r.get(path=['first_resource']), 'foo')
         self.assertEqual(r.get(path=['second_list', 'second_resource']), 'bar')
@@ -136,6 +143,22 @@ class TestResources(unittest.TestCase):
             ResourceExecutionException,
             lambda: r.get(attr='missing_attribute')
         )
+
+    def test_find_child(self):
+        """Test the _find_child method."""
+
+        # Define a Resource
+        r = self.setup_example_resource()
+
+        for id, val in [
+            ('first_resource', 'foo'),
+            ('second_resource', 'bar'),
+            ('third_resource', 'howdy')
+        ]:
+            all_matching = list(r._find_child(id))
+
+            self.assertEqual(len(all_matching), 1, id)
+            self.assertEqual(all_matching[0].get_value(), val)
 
     def test_all_values(self):
 
