@@ -150,4 +150,4 @@ class StResource(Resource):
 
     def _find_child(self, id) -> Generator['StResource', None, None]:
         """Yield all nested child elements with the matching id."""
-        yield from super()._find_child(self)
+        yield from super()._find_child(id)
