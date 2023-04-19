@@ -101,8 +101,7 @@ class StreamlitWidget(StResource, Widget):
             self,
             sidebar=True,
             as_html=True,
-            as_script=True,
-            footer="Widget (github.com/FredHutch/widgets)"
+            as_script=True
     ):
         """
         Render a button which gives the user the option to download a
@@ -132,8 +131,7 @@ class StreamlitWidget(StResource, Widget):
                     self._render_html(
                         title=self._name(),
                         layout=self.layout,
-                        initial_sidebar_state=self.initial_sidebar_state,
-                        footer=footer
+                        initial_sidebar_state=self.initial_sidebar_state
                     ),
                     file_name=f"{self._name()}.html",
                     mime="text/html",
@@ -169,8 +167,7 @@ class StreamlitWidget(StResource, Widget):
 
     def download_html_button(
         self,
-        sidebar=True,
-        footer="Widget (github.com/FredHutch/widgets)"
+        sidebar=True
     ):
         """
         Render a button which allows the user to download the widget as HTML.
@@ -186,8 +183,7 @@ class StreamlitWidget(StResource, Widget):
             self._render_html(
                 title=self._name(),
                 layout=self.layout,
-                initial_sidebar_state=self.initial_sidebar_state,
-                footer=footer
+                initial_sidebar_state=self.initial_sidebar_state
             ),
             file_name=f"{self._name()}.html",
             mime="text/html",
@@ -256,8 +252,7 @@ class StreamlitWidget(StResource, Widget):
 
     def to_html(
         self,
-        fp: Union[Path, None] = None,
-        footer="Widget (github.com/FredHutch/widgets)"
+        fp: Union[Path, None] = None
     ) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
@@ -269,8 +264,7 @@ class StreamlitWidget(StResource, Widget):
         html = self._render_html(
             title=self._name(),
             layout=self.layout,
-            initial_sidebar_state=self.initial_sidebar_state,
-            footer=footer
+            initial_sidebar_state=self.initial_sidebar_state
         )
 
         # Write it out to a file (if provided), or return the string
@@ -298,8 +292,7 @@ class StreamlitWidget(StResource, Widget):
         title="Widget",
         layout="centered",
         initial_sidebar_state="auto",
-        footer="Widget (github.com/FredHutch/widgets)",
-        stlite_ver="0.29.15",
+        stlite_ver="0.31.0",
     ):
         """Render the widget as HTML"""
 
@@ -318,7 +311,6 @@ class StreamlitWidget(StResource, Widget):
             layout=layout,
             initial_sidebar_state=initial_sidebar_state,
             stlite_ver=stlite_ver,
-            footer=footer,
             requirements=requirements,
             imports=self._imports(),
             widget_source=self.source_all().replace("\\", "\\\\"),
