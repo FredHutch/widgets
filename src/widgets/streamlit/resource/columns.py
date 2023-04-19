@@ -94,6 +94,6 @@ class StColumns(StResource):
 
         # Set up the children within those containers
         for ix, child in enumerate(self.children):
-            child.main_empty = self.main_columns[ix]
+            child.main_empty = self.main_columns[ix].empty()
             if not self.disable_sidebar:
-                child.sidebar_empty = self.sidebar_columns[ix]
+                child.sidebar_empty = self.sidebar_columns[ix].empty()

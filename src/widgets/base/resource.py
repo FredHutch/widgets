@@ -1,6 +1,6 @@
 from copy import deepcopy
 from inspect import getmro, getsource, isfunction, signature
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Generator, List, Union
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.exceptions import CLIExecutionException
@@ -478,6 +478,15 @@ class Resource:
         else:
             # Return the element
             return r
+
+    def _find_child(self, id) -> Generator['Resource', None, None]:
+        """Yield all nested child elements with the matching id."""
+
+        if self.id == id:
+            yield self
+
+        for child in self.children:
+            yield from child._find_child(id)
 
     def get(
         self,

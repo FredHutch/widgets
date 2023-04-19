@@ -1,4 +1,4 @@
-from typing import Any, List, Union
+from typing import Any, Generator, List, Union
 import streamlit as st
 from streamlit.delta_generator import DeltaGenerator
 from widgets.base.exceptions import ResourceExecutionException
@@ -147,3 +147,7 @@ class StResource(Resource):
 
         # Set the value attribute on the resource
         self.value = st.session_state[self.key()]
+
+    def _find_child(self, id) -> Generator['StResource', None, None]:
+        """Yield all nested child elements with the matching id."""
+        yield from super()._find_child(id)
