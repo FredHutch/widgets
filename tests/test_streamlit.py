@@ -128,7 +128,11 @@ class ExampleStreamlitWidget(wist.StreamlitWidget):
         wist.StString(id="s", value="s", label="String"),
         wist.StInteger(id="i", value=0, label="Integer"),
         wist.StFloat(id="f", value=0.0, label="Float"),
-        wist.StMultiSelect(id='multi', value=['a'], options=['a', 'b', 'c'])
+        wist.StMultiSelect(
+            id='multi',
+            value=['a'],
+            options=pd.Series(['a', 'b', 'c']).values
+        )
     ]
 
 
