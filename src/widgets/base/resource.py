@@ -324,8 +324,17 @@ class Resource:
         # If this element was not defined in the widgets module
         if not self.__class__.__module__.startswith('widget'):
 
+            # If this element has already been added
+            if self._name() in gathered_source:
+
+                # Insert the source at the end of the dict
+                # so that it is bumped to the top of the source code
+                src = gathered_source[self._name()]
+                del gathered_source[self._name()]
+                gathered_source[self._name()] = src
+
             # If this element has not been added
-            if self._name() not in gathered_source:
+            else:
 
                 # Add it
                 gathered_source[self._name()] = self.source_self()
