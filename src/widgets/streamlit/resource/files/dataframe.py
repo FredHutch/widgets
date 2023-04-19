@@ -90,4 +90,4 @@ class StDataFrame(StFile):
             return encode_dataframe_string(val)
 
         else:
-            return val
+            return super()._source_val(val)
