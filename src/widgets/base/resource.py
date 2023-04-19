@@ -1,6 +1,7 @@
 from copy import deepcopy
 from inspect import getmro, getsource, isfunction, signature
 from typing import Any, Dict, Generator, List, Union
+import numpy as np
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.exceptions import ResourceExecutionException
 from widgets.base.exceptions import CLIExecutionException
@@ -446,7 +447,7 @@ class Resource:
             return f'"{val}"'
         if isinstance(val, int) or isinstance(val, float):
             return f'{val}'
-        elif isinstance(val, list):
+        elif isinstance(val, (list, np.ndarray)):
             return f"""[{', '.join([
                 self._source_val(i, indent=indent)
                 for i in val

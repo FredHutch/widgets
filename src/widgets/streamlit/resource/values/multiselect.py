@@ -1,4 +1,6 @@
 from typing import Any, List
+import numpy as np
+from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.helpers import compress_json, decompress_json
 from widgets.st_base.value import StValue
 
@@ -75,6 +77,11 @@ class StMultiSelect(StValue):
         # Increment the UI revision
         self.revision += 1
 
+        if not all([i in self.options for i in self.value]):
+            msg = f"Default value for {self.id} does not exist in options"
+            msg = f"{msg} ({self.value}, {self.options})"
+            raise WidgetFunctionException(msg)
+
         # Update the input element
         self.ui_container().multiselect(
             self.label,
@@ -94,6 +101,8 @@ class StMultiSelect(StValue):
         Use gzip encoding for any list elements
         """
 
+        if isinstance(val, np.ndarray):
+            val = list(val)
         if isinstance(val, list):
             return compress_json(val)
         else:
