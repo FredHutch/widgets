@@ -1,5 +1,5 @@
 from typing import Any
-from widgets.streamlit.resource.values.base import StValue
+from widgets.st_base.value import StValue
 
 
 class StTextArea(StValue):

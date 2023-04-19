@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Union
 from widgets.base.exceptions import WidgetFunctionException
 from widgets.base.widget import Widget
 from widgets.base.helpers import render_template
-from widgets.streamlit.resource.base import StResource
+from widgets.st_base.resource import StResource
 import widgets
 
 

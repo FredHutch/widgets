@@ -127,7 +127,12 @@ class ExampleStreamlitWidget(wist.StreamlitWidget):
     children = [
         wist.StString(id="s", value="s", label="String"),
         wist.StInteger(id="i", value=0, label="Integer"),
-        wist.StFloat(id="f", value=0.0, label="Float")
+        wist.StFloat(id="f", value=0.0, label="Float"),
+        wist.StMultiSelect(
+            id='multi',
+            value=['a'],
+            options=pd.Series(['a', 'b', 'c']).values
+        )
     ]
 
 
@@ -185,6 +190,13 @@ class TestStreamlitWidget(unittest.TestCase):
             self.assertEqual(s.get(path=["s"]), "t", w.to_script())
             self.assertEqual(s.get(path=["i"]), 1)
             self.assertEqual(s.get(path=["f"]), 1.0)
+
+            # Make sure that the StMultiSelect values were serialized correctly
+            self.assertEqual(s.get(path=["multi"]), ["a"])
+            self.assertEqual(
+                s.get(path=["multi"], attr="options"),
+                ["a", "b", "c"]
+            )
 
     def test_select_string(self):
 

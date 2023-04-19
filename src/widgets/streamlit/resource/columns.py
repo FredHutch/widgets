@@ -2,7 +2,7 @@ from streamlit.delta_generator import DeltaGenerator
 from typing import List, Union
 from widgets.base.exceptions import ResourceConfigurationException
 from widgets.base.resource import Resource
-from widgets.streamlit.resource.base import StResource
+from widgets.st_base.resource import StResource
 
 
 class StColumns(StResource):
