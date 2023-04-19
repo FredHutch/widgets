@@ -1,6 +1,6 @@
 from typing import Any, List
 from widgets.base.helpers import compress_json, decompress_json
-from widgets.streamlit.resource.values.base import StValue
+from widgets.st_base.value import StValue
 
 
 class StMultiSelect(StValue):

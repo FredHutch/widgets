@@ -1,5 +1,5 @@
 from widgets.base.exceptions import ResourceConfigurationException
-from widgets.streamlit.resource.values.base import StValue
+from widgets.st_base.value import StValue
 
 
 class StFloat(StValue):

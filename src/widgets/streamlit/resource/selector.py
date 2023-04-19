@@ -1,6 +1,6 @@
 from copy import deepcopy
 from typing import List, Union
-from widgets.streamlit.resource.base import StResource
+from widgets.st_base.resource import StResource
 from widgets.streamlit.resource.values.selectstring import StSelectString
 from widgets.base.exceptions import ResourceConfigurationException
 

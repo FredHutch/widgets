@@ -1,6 +1,6 @@
 from typing import List
 from widgets.base.resource import Resource
-from widgets.streamlit.resource.base import StResource
+from widgets.st_base.resource import StResource
 
 
 class StExpander(StResource):

@@ -1,4 +1,4 @@
-from widgets.streamlit.resource.base import StResource # noqa
+from widgets.st_base.resource import StResource # noqa
 from widgets.streamlit.resource.files.dataframe import StDataFrame # noqa
 from widgets.streamlit.resource.files.base import StFile # noqa
 from widgets.streamlit.resource.files.download_dataframe import StDownloadDataFrame # noqa
