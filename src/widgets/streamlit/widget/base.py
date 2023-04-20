@@ -29,6 +29,9 @@ class StreamlitWidget(StResource, Widget):
     # "centered" or "wide"
     layout = "centered"
 
+    # Optional GA tag
+    ga_tag = None
+
     title = ""
     subtitle = ""
 
@@ -40,6 +43,7 @@ class StreamlitWidget(StResource, Widget):
         extra_imports: Union[List[str], None] = None,
         initial_sidebar_state: Union[str, None] = None,
         layout: Union[str, None] = None,
+        ga_tag: Union[str, None] = None,
         title: Union[str, None] = None,
         subtitle: Union[str, None] = None,
         **kwargs
@@ -51,6 +55,7 @@ class StreamlitWidget(StResource, Widget):
             extra_imports=self.__class__.extra_imports,
             initial_sidebar_state=self.__class__.initial_sidebar_state,
             layout=self.__class__.layout,
+            ga_tag=self.__class__.ga_tag,
             title=self.__class__.title,
             subtitle=self.__class__.subtitle,
             **kwargs
@@ -101,8 +106,7 @@ class StreamlitWidget(StResource, Widget):
             self,
             sidebar=True,
             as_html=True,
-            as_script=True,
-            footer="Widget (github.com/FredHutch/widgets)"
+            as_script=True
     ):
         """
         Render a button which gives the user the option to download a
@@ -132,8 +136,7 @@ class StreamlitWidget(StResource, Widget):
                     self._render_html(
                         title=self._name(),
                         layout=self.layout,
-                        initial_sidebar_state=self.initial_sidebar_state,
-                        footer=footer
+                        initial_sidebar_state=self.initial_sidebar_state
                     ),
                     file_name=f"{self._name()}.html",
                     mime="text/html",
@@ -169,8 +172,7 @@ class StreamlitWidget(StResource, Widget):
 
     def download_html_button(
         self,
-        sidebar=True,
-        footer="Widget (github.com/FredHutch/widgets)"
+        sidebar=True
     ):
         """
         Render a button which allows the user to download the widget as HTML.
@@ -186,8 +188,7 @@ class StreamlitWidget(StResource, Widget):
             self._render_html(
                 title=self._name(),
                 layout=self.layout,
-                initial_sidebar_state=self.initial_sidebar_state,
-                footer=footer
+                initial_sidebar_state=self.initial_sidebar_state
             ),
             file_name=f"{self._name()}.html",
             mime="text/html",
@@ -256,8 +257,7 @@ class StreamlitWidget(StResource, Widget):
 
     def to_html(
         self,
-        fp: Union[Path, None] = None,
-        footer="Widget (github.com/FredHutch/widgets)"
+        fp: Union[Path, None] = None
     ) -> Union[None, str]:
         """
         Create an HTML file which will load this widget using the stlite
@@ -269,8 +269,7 @@ class StreamlitWidget(StResource, Widget):
         html = self._render_html(
             title=self._name(),
             layout=self.layout,
-            initial_sidebar_state=self.initial_sidebar_state,
-            footer=footer
+            initial_sidebar_state=self.initial_sidebar_state
         )
 
         # Write it out to a file (if provided), or return the string
@@ -298,8 +297,7 @@ class StreamlitWidget(StResource, Widget):
         title="Widget",
         layout="centered",
         initial_sidebar_state="auto",
-        footer="Widget (github.com/FredHutch/widgets)",
-        stlite_ver="0.29.15",
+        stlite_ver="0.31.0",
     ):
         """Render the widget as HTML"""
 
@@ -311,18 +309,29 @@ class StreamlitWidget(StResource, Widget):
             f"widgets-lib=={widgets.__version__}"
         ]
 
-        # Render the template for this HTML
-        html = render_template(
-            "streamlit_single.html.j2",
+        # Set up the contents of the HTML
+        kwargs = dict(
             title=title,
             layout=layout,
             initial_sidebar_state=initial_sidebar_state,
             stlite_ver=stlite_ver,
-            footer=footer,
             requirements=requirements,
             imports=self._imports(),
             widget_source=self.source_all().replace("\\", "\\\\"),
             widget_name=self._name()
+        )
+
+        # Select the template based on whether a ga_tag exists
+        if self.ga_tag is None:
+            template = "streamlit_single.html.j2"
+        else:
+            template = "streamlit_single_ga.html.j2"
+            kwargs['ga_tag'] = self.ga_tag
+
+        # Render the template for this HTML
+        html = render_template(
+            template,
+            **kwargs
         )
 
         return html
