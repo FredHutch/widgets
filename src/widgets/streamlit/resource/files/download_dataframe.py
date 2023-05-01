@@ -6,11 +6,14 @@ from widgets.streamlit.resource.values.slider import StValue
 class StDownloadDataFrame(StValue):
     """Download button for an StDataFrame."""
 
+    index = None
+
     def __init__(
         self,
         target: Union[str, None] = None,
         label="",
-        sidebar=True
+        sidebar=True,
+        index=None
     ):
         """
         Args:
@@ -37,7 +40,8 @@ class StDownloadDataFrame(StValue):
             id=id,
             label=label,
             help="",
-            value=None
+            value=None,
+            index=index
         )
 
         # Set up the specific attributes for this type of resource
@@ -51,7 +55,7 @@ class StDownloadDataFrame(StValue):
         target = self.parent._get_child(self.target)
 
         # Get the value of the table
-        csv = target.value.to_csv(index=None)
+        csv = target.value.to_csv(index=self.index)
 
         self.ui_container().download_button(
             self.label,
