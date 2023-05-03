@@ -64,7 +64,12 @@ def parse_dataframe_string(value) -> pd.DataFrame:
     if isinstance(value, dict):
 
         # If the dict appears to be a "split" DataFrame
-        if all([cname in value.keys() for cname in ['index', 'columns', 'data']]):
+        if all(
+            [
+                cname in value.keys()
+                for cname in ['index', 'columns', 'data']
+            ]
+        ):
             try:
                 value = pd.DataFrame(**value)
             except Exception as e:
