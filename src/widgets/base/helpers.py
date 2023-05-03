@@ -55,21 +55,35 @@ def parse_dataframe_string(value) -> pd.DataFrame:
     # If the value is a string, try to decompress it
     if isinstance(value, str):
         try:
-            value = pd.DataFrame(
-                json.loads(
-                    decompress_string(value)
-                )
-            )
+            value = json.loads(decompress_string(value))
         except Exception as e:
             msg = f"value could not be decompressed from string ({str(e)})"
             raise ResourceConfigurationException(msg)
+
     # If the value is a dict, convert it
-    elif isinstance(value, dict):
-        try:
-            value = pd.DataFrame(value)
-        except Exception as e:
-            msg = f"value could not be converted to DataFrame ({str(e)})"
-            raise ResourceConfigurationException(msg)
+    if isinstance(value, dict):
+
+        # If the dict appears to be a "split" DataFrame
+        if all(
+            [
+                cname in value.keys()
+                for cname in ['index', 'columns', 'data']
+            ]
+        ):
+            try:
+                value = pd.DataFrame(**value)
+            except Exception as e:
+                msg = f"value could not be converted to DataFrame ({str(e)})"
+                raise ResourceConfigurationException(msg)
+
+        # If not, just parse it as a normal DataFrame constructor
+        else:
+            try:
+                value = pd.DataFrame(value)
+            except Exception as e:
+                msg = f"value could not be converted to DataFrame ({str(e)})"
+                raise ResourceConfigurationException(msg)
+
     # If the value is a DataFrame, keep it
     elif isinstance(value, pd.DataFrame):
         pass
@@ -86,7 +100,7 @@ def parse_dataframe_string(value) -> pd.DataFrame:
 def encode_dataframe_string(val: pd.DataFrame) -> str:
 
     # Convert to dict
-    val_dict = val.to_dict(orient="list")
+    val_dict = val.to_dict(orient="split")
     # Convert to string
     val_str = json.dumps(val_dict)
     # Compress the string
