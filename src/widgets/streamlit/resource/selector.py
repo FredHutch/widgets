@@ -19,6 +19,7 @@ class StSelector(StResource):
         label="Select Resource",
         options: List[StResource] = None,
         value: Union[str, None] = None,
+        disable_sidebar=False,
         **kwargs
     ):
 
@@ -78,6 +79,7 @@ class StSelector(StResource):
                     value=value
                 )
             ] + options,
+            disable_sidebar=disable_sidebar,
             **kwargs
         )
 
