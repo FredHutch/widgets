@@ -46,6 +46,20 @@ class TestStreamlitResources(unittest.TestCase):
         # Make sure that the values are equal
         self.assertTrue(df.equals(res.value))
 
+    def test_dataframe_fromsplit(self):
+
+        df = pd.DataFrame(dict(a=[1, 2, 3], b=['a', 'b', 'c']))
+        split_dict = df.to_dict(orient='split')
+
+        # Make an StDataFrame based on the dict of that DataFrame
+        res = wist.StDataFrame(
+            id="test_dataframe",
+            value=split_dict
+        )
+
+        # Make sure that the values are equal
+        self.assertTrue(df.equals(res.value))
+
     def test_dataframe_exception(self):
 
         self.assertRaises(
