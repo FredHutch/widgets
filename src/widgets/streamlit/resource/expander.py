@@ -17,6 +17,7 @@ class StExpander(StResource):
         help=None,
         expanded=False,
         sidebar=True,
+        disable_sidebar=False,
         **kwargs
     ) -> None:
         """
@@ -37,6 +38,7 @@ class StExpander(StResource):
             help=help,
             expanded=expanded,
             sidebar=sidebar,
+            disable_sidebar=disable_sidebar,
             **kwargs
         )
 

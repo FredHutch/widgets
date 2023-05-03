@@ -11,7 +11,8 @@ class StMarkdown(StResource):
         self,
         id="markdown",
         value="",
-        sidebar=False
+        sidebar=False,
+        disable_sidebar=False,
     ) -> None:
         """
         Set up the attributes which are used by all Resource objects.
@@ -21,7 +22,8 @@ class StMarkdown(StResource):
             id=id,
             value=value,
             children=[],
-            sidebar=sidebar
+            sidebar=sidebar,
+            disable_sidebar=disable_sidebar
         )
 
     def run_self(self):
