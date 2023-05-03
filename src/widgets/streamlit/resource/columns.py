@@ -57,7 +57,8 @@ class StColumns(StResource):
             msg = "StColumns: gap must be one of small, medium, large"
             raise ResourceConfigurationException(msg)
 
-        # Disable the sidebar for all child elements IF the sidebar flag is set to False
+        # Disable the sidebar for all child elements
+        # IF the sidebar flag is set to False
         kwargs["disable_sidebar"] = not sidebar
 
         # Set up the core attributes of the StResource
