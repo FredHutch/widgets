@@ -21,7 +21,6 @@ class StColumns(StResource):
         spec=None,
         sidebar=True,
         gap="small",
-        disable_sidebar=False,
         **kwargs
     ) -> None:
         """

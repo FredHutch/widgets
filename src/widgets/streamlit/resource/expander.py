@@ -17,18 +17,15 @@ class StExpander(StResource):
         help=None,
         expanded=False,
         sidebar=True,
-        disable_sidebar=False,
         **kwargs
     ) -> None:
         """
         Set up the StExpander object
         """
 
-        # If the sidebar flag is set to False
-        if not sidebar:
-
-            # Disable the sidebar for all child elements
-            kwargs["disable_sidebar"] = True
+        # Disable the sidebar for all child elements
+        # IF the sidebar flag is set to False
+        kwargs["disable_sidebar"] = not sidebar
 
         # Set up the core attributes of the StResource
         super().__init__(
@@ -38,7 +35,6 @@ class StExpander(StResource):
             help=help,
             expanded=expanded,
             sidebar=sidebar,
-            disable_sidebar=disable_sidebar,
             **kwargs
         )
 
